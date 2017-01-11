@@ -20,6 +20,29 @@ public:
 
 		swerveLib = new swervelib(20, 20);
 
+		LFEnc = new Encoder(0, 1, false);
+		RFEnc = new Encoder(2, 3, false);
+		LBEnc = new Encoder(4, 5, false);
+		RBEnc = new Encoder(6, 7, false);
+
+		LFMotTurn = new VictorSP(0);
+		RFMotTurn = new VictorSP(1);
+		LBMotTurn = new VictorSP(2);
+		RBMotTurn = new VictorSP(3);
+
+		LFMotDrv = new VictorSP(4);
+		RFMotDrv = new VictorSP(5);
+		LBMotDrv = new VictorSP(6);
+		RBMotDrv = new VictorSP(7);
+
+		p = 0.1;
+		i = 0.1;
+		d = 0.1;
+		LFPID = new PIDController(p, i, d, LFEnc, LFMotTurn, period);
+		RFPID = new PIDController(p, i, d, RFEnc, RFMotTurn, period);
+		LBPID = new PIDController(p, i, d, LBEnc, LBMotTurn, period);
+		RBPID = new PIDController(p, i, d, RBEnc, RBMotTurn, period);
+
 	}
 
 	/*
@@ -55,6 +78,11 @@ public:
 
 	void TeleopInit() {
 
+		LFPID->Enable();
+		RFPID->Enable();
+		LBPID->Enable();
+		RBPID->Enable();
+
 	}
 
 	void TeleopPeriodic() {
@@ -63,6 +91,18 @@ public:
 
 		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX);
 
+		RFPID->SetSetpoint(swerveLib->whl->angle1);
+		LFPID->SetSetpoint(swerveLib->whl->angle2);
+		RBPID->SetSetpoint(swerveLib->whl->angle4);
+		LBPID->SetSetpoint(swerveLib->whl->angle3);
+
+		LFMotDrv->Set(swerveLib->whl->speed2);
+		RFMotDrv->Set(swerveLib->whl->speed1);
+		RBMotDrv->Set(swerveLib->whl->speed4);
+		LBMotDrv->Set(swerveLib->whl->speed3);
+
+		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
+		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
 
 	}
 

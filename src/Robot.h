@@ -15,5 +15,25 @@
 
 	swervelib *swerveLib;
 
+	PIDController *LFPID;
+	PIDController *LBPID;
+	PIDController *RFPID;
+	PIDController *RBPID;
+	float p, i, d;
+	const float period = 0.05;
+
+	VictorSP *LFMotDrv;
+	VictorSP *LBMotDrv;
+	VictorSP *RFMotDrv;
+	VictorSP *RBMotDrv;
+	VictorSP *LFMotTurn;
+	VictorSP *LBMotTurn;
+	VictorSP *RFMotTurn;
+	VictorSP *RBMotTurn;
+
+	Encoder *LFEnc;
+	Encoder *LBEnc;
+	Encoder *RFEnc;
+	Encoder *RBEnc;
 
 #endif /* SRC_ROBOT_H_ */

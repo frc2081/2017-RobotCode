@@ -60,8 +60,8 @@ cntl::cntl(int port) {
 void cntl::UpdateCntl() {
 	this->LX = this->stick->GetY();
 	this->LY = this->stick->GetX();
-	this->RX = this->stick->GetRawAxis(5);
-	this->RY = this->stick->GetRawAxis(4);
+	this->RX = this->stick->GetRawAxis(4);
+	this->RY = this->stick->GetRawAxis(5);
 	this->RTrig = this->stick->GetRawAxis(3);
 	this->LTrig = this->stick->GetRawAxis(2);
 	this->RY *= -1;
