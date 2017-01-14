@@ -8,6 +8,33 @@
 #include <SmartDashboard/SmartDashboard.h>
 #include "Robot.h"
 
+Talon *LFMotDrv;
+Talon *LBMotDrv;
+Talon *RFMotDrv;
+Talon *RBMotDrv;
+Talon *LFMotTurn;
+Talon *LBMotTurn;
+Talon *RFMotTurn;
+Talon *RBMotTurn;
+
+AnalogPotentiometer *LFEnc;
+AnalogPotentiometer *LBEnc;
+AnalogPotentiometer *RFEnc;
+AnalogPotentiometer *RBEnc;
+
+cntl *stick1;
+cntl *stick2;
+
+swervelib *swerveLib;
+
+ADXRS450_Gyro *gyroCompass;
+
+PIDController *LFPID;
+PIDController *LBPID;
+PIDController *RFPID;
+PIDController *RBPID;
+
+float p, i, d;
 class Robot: public frc::IterativeRobot {
 public:
 
@@ -33,15 +60,15 @@ public:
 		stick2 = new cntl(1);
 
 		//Instanciate the swerve calculations library
-		swerveLib = new swervelib(20, 20);
+		swerveLib = new swervelib(27, 23.5);
 
 		gyroCompass = new ADXRS450_Gyro();
 
 		//Instanciate the encoders
-		LFEnc = new AnalogPotentiometer(1, false, 0);
-		RFEnc = new AnalogPotentiometer(0, false, 0);
-		LBEnc = new AnalogPotentiometer(3, false, 0);
-		RBEnc = new AnalogPotentiometer(2, false, 0);
+		LFEnc = new AnalogPotentiometer(1, 360, 0);
+		RFEnc = new AnalogPotentiometer(0, 360, 0);
+		LBEnc = new AnalogPotentiometer(3, 360, 0);
+		RBEnc = new AnalogPotentiometer(2, 360, 0);
 
 		//Instanciate the motors based on where they are plugged in
 		LFMotTurn = new Talon(8);
@@ -49,14 +76,14 @@ public:
 		LBMotTurn = new Talon(2);
 		RBMotTurn = new Talon(1);
 
-		LFMotDrv = new Talon(4);
+		LFMotDrv = new Talon(6);
 		RFMotDrv = new Talon(5);
-		LBMotDrv = new Talon(6);
+		LBMotDrv = new Talon(4);
 		RBMotDrv = new Talon(3);
 
 
 		//Instanciate the PID controllers to their proper values
-		p = 0;
+		p = .025;
 		i = 0;
 		d = 0;
 		LFPID = new PIDController(p, i, d, LFEnc, LFMotTurn, period);
@@ -83,6 +110,8 @@ public:
 		RBPID->SetOutputRange(-1,1);
 		RBPID->SetContinuous();
 		RBPID->Enable();
+
+		gyroCompass->Calibrate();
 	}
 
 	void AutonomousInit() override {
@@ -106,13 +135,6 @@ public:
 	}
 
 	void TeleopInit() {
-		gyroCompass->Calibrate();
-
-		//Get the numbers from the smartdashboard for live PID tuning
-		SmartDashboard::GetNumber("P: ", 0);
-		SmartDashboard::GetNumber("I: ", 0);
-		SmartDashboard::GetNumber("D: ", 0);
-
 	}
 
 	void TeleopPeriodic() {
@@ -124,18 +146,20 @@ public:
 		stick1->LY = this->deadband(stick1->LY);
 		stick1->RX = this->deadband(stick1->RX);
 		stick1->RY = this->deadband(stick1->RY);
-		facing = gyroCompass->GetAngle();
 
 		//Get the numbers from the smartdashboard for live PID tuning
-		p = SmartDashboard::GetNumber("P: ", 0);
-		i = SmartDashboard::GetNumber("I: ", 0);
-		d = SmartDashboard::GetNumber("D: ", 0);
+
 
 		//Set the PID values for live tuning
 		RFPID->SetPID(p, i, d);
 		LFPID->SetPID(p, i, d);
 		RBPID->SetPID(p, i, d);
 		LBPID->SetPID(p, i, d);
+
+		SmartDashboard::PutNumber("LFEnc: ", LFEnc->Get());
+		SmartDashboard::PutNumber("RFEnc: ", RFEnc->Get());
+		SmartDashboard::PutNumber("LBEnc: ", LBEnc->Get());
+		SmartDashboard::PutNumber("RBEnc: ", RBEnc->Get());
 
 		//Calculate the proper values for the swerve drive motion
 		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX);
@@ -147,10 +171,10 @@ public:
 		LBPID->SetSetpoint(swerveLib->whl->angle3);
 
 		//Set the wheel speed based on what the calculations from the swervelib
-		LFMotDrv->Set(swerveLib->whl->speed2);
-		RFMotDrv->Set(swerveLib->whl->speed1);
-		RBMotDrv->Set(swerveLib->whl->speed4);
-		LBMotDrv->Set(swerveLib->whl->speed3);
+		LFMotDrv->Set(swerveLib->whl->speed2 * -1);
+		RFMotDrv->Set(swerveLib->whl->speed1 * -1);
+		RBMotDrv->Set(swerveLib->whl->speed4 * -1);
+		LBMotDrv->Set(swerveLib->whl->speed3 * -1);
 
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);

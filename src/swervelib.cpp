@@ -48,10 +48,10 @@ void swervelib::calcWheelVect(double x,
 	target_WS4 = sqrt(pow(A, 2) + pow(C, 2));
 	MAX_WS = std::max({target_WS1, target_WS2, target_WS3, target_WS4});
 
-	target_WA1 = atan2(B, C) * 180/PI;
-	target_WA2 = atan2(B, D) * 180/PI;
-	target_WA3 = atan2(A, D) * 180/PI;
-	target_WA4 = atan2(A, C) * 180/PI;
+	target_WA1 = atan2(B, C) * 180./PI;
+	target_WA2 = atan2(B, D) * 180./PI;
+	target_WA3 = atan2(A, D) * 180./PI;
+	target_WA4 = atan2(A, C) * 180./PI;
 	if (MAX_WS > 1) {
 		target_WS1 /= MAX_WS;
 		target_WS2 /= MAX_WS;
@@ -64,8 +64,8 @@ void swervelib::calcWheelVect(double x,
 	this->whl->speed3 = target_WS3;
 	this->whl->speed4 = target_WS4;
 
-	this->whl->angle1 = target_WA1;
-	this->whl->angle2 = target_WA2;
-	this->whl->angle3 = target_WA3;
-	this->whl->angle4 = target_WA4;
+	this->whl->angle1 = 360 - (target_WA1 + 180);
+	this->whl->angle2 = 360 - (target_WA2 + 180);
+	this->whl->angle3 = 360 - (target_WA3 + 180);
+	this->whl->angle4 = 360 - (target_WA4 + 180);
 }

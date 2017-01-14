@@ -63,6 +63,7 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.1457345068" name="calcSwerve.h" rcbsApplicability="disable" resourcePath="src/calcSwerve.h" toolsToInvoke=""/>
 					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.820075552" name="swervelib.h" rcbsApplicability="disable" resourcePath="src/swervelib.h" toolsToInvoke="">
 						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.43338647" name="Resource Custom Build Step">
 							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2031543069" name="Resource Custom Build Step Input Type">
@@ -72,7 +73,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/calcSwerve.h|src/calcSwerve.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

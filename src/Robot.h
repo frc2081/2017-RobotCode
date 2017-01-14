@@ -10,33 +10,34 @@
 #include "cntl.h"
 #include "swervelib.h"
 
-cntl *stick1;
-cntl *stick2;
+extern Talon *LFMotDrv;
+extern Talon *LBMotDrv;
+extern Talon *RFMotDrv;
+extern Talon *RBMotDrv;
+extern Talon *LFMotTurn;
+extern Talon *LBMotTurn;
+extern Talon *RFMotTurn;
+extern Talon *RBMotTurn;
 
-swervelib *swerveLib;
+extern AnalogPotentiometer *LFEnc;
+extern AnalogPotentiometer *LBEnc;
+extern AnalogPotentiometer *RFEnc;
+extern AnalogPotentiometer *RBEnc;
 
-ADXRS450_Gyro *gyroCompass;
-double facing;
+extern cntl *stick1;
+extern cntl *stick2;
 
-PIDController *LFPID;
-PIDController *LBPID;
-PIDController *RFPID;
-PIDController *RBPID;
-float p, i, d;
+extern swervelib *swerveLib;
+
+extern ADXRS450_Gyro *gyroCompass;
+
+extern PIDController *LFPID;
+extern PIDController *LBPID;
+extern PIDController *RFPID;
+extern PIDController *RBPID;
+
+extern float p, i, d;
 const float period = 0.05;
 
-Talon *LFMotDrv;
-Talon *LBMotDrv;
-Talon *RFMotDrv;
-Talon *RBMotDrv;
-Talon *LFMotTurn;
-Talon *LBMotTurn;
-Talon *RFMotTurn;
-Talon *RBMotTurn;
-
-AnalogPotentiometer *LFEnc;
-AnalogPotentiometer *LBEnc;
-AnalogPotentiometer *RFEnc;
-AnalogPotentiometer *RBEnc;
 
 #endif /* SRC_ROBOT_H_ */
