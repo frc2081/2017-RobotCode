@@ -1,4 +1,4 @@
-/* Copyright 2016 Charles Young */
+/* Copyright 2016 Charles Young
 
 #include <algorithm>
 #include "swervelib.h"
@@ -26,7 +26,7 @@ swervelib::swervelib(double wheelbase, double trackwidth) {
 	B = 0;
 	C = 0;
 	D = 0;
-	R = sqrt(pow(wheelbase, 2) + pow(trackwidth, 2));
+	R = sqrt(pow(wheelbase/2, 2) + pow(trackwidth/2, 2))/12;
 	_wheelbase = wheelbase;
 
 	whl = new wheel();
@@ -72,7 +72,7 @@ void swervelib::calcWheelVect(double x,
 	/*
 	* Gives the angle in radians between the positive X axis and the point given
 	* by the coordinates.  The result is then converted to degrees.
-	*/
+
 	if (x > 0 && y > 0 && rudder > 0) {
 		this->whl->angle1 = radians_to_degrees(atan2(B, C));
 		this->whl->angle2 = radians_to_degrees(atan2(B, D));
@@ -85,3 +85,4 @@ void swervelib::calcWheelVect(double x,
 		this->whl->angle4 = 0;
 	}
 }
+*/

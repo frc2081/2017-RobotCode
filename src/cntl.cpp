@@ -58,13 +58,14 @@ cntl::cntl(int port) {
 }
 
 void cntl::UpdateCntl() {
-	this->LX = this->stick->GetY();
-	this->LY = this->stick->GetX();
+	this->LX = this->stick->GetX();
+	this->LY = this->stick->GetY();
 	this->RX = this->stick->GetRawAxis(4);
 	this->RY = this->stick->GetRawAxis(5);
 	this->RTrig = this->stick->GetRawAxis(3);
 	this->LTrig = this->stick->GetRawAxis(2);
 	this->RY *= -1;
+	this->LY *= -1;
 	this->bA->Update();
 	this->bB->Update();
 	this->bX->Update();

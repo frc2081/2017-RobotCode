@@ -8,32 +8,35 @@
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 #include "cntl.h"
-#include "swervelib.h"
+#include "swervelibFixed.h"
 
-	cntl *stick1;
-	cntl *stick2;
+cntl *stick1;
+cntl *stick2;
 
-	swervelib *swerveLib;
+swervelib *swerveLib;
 
-	PIDController *LFPID;
-	PIDController *LBPID;
-	PIDController *RFPID;
-	PIDController *RBPID;
-	float p, i, d;
-	const float period = 0.05;
+ADXRS450_Gyro *gyroCompass;
+double facing;
 
-	VictorSP *LFMotDrv;
-	VictorSP *LBMotDrv;
-	VictorSP *RFMotDrv;
-	VictorSP *RBMotDrv;
-	VictorSP *LFMotTurn;
-	VictorSP *LBMotTurn;
-	VictorSP *RFMotTurn;
-	VictorSP *RBMotTurn;
+PIDController *LFPID;
+PIDController *LBPID;
+PIDController *RFPID;
+PIDController *RBPID;
+float p, i, d;
+const float period = 0.05;
 
-	Encoder *LFEnc;
-	Encoder *LBEnc;
-	Encoder *RFEnc;
-	Encoder *RBEnc;
+Talon *LFMotDrv;
+Talon *LBMotDrv;
+Talon *RFMotDrv;
+Talon *RBMotDrv;
+Talon *LFMotTurn;
+Talon *LBMotTurn;
+Talon *RFMotTurn;
+Talon *RBMotTurn;
+
+AnalogPotentiometer *LFEnc;
+AnalogPotentiometer *LBEnc;
+AnalogPotentiometer *RFEnc;
+AnalogPotentiometer *RBEnc;
 
 #endif /* SRC_ROBOT_H_ */

@@ -11,55 +11,71 @@
 class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
-		chooser.AddDefault(autoNameDefault, autoNameDefault);
-		chooser.AddObject(autoNameCustom, autoNameCustom);
-		frc::SmartDashboard::PutData("Auto Modes", &chooser);
+		//chooser.AddDefault(autoNameDefault, autoNameDefault);
+		//chooser.AddObject(autoNameCustom, autoNameCustom);
+		//frc::SmartDashboard::PutData("Auto Modes", &chooser);
 
+		//Instanciate the joysticks according to the controller class
 		stick1 = new cntl(0);
 		stick2 = new cntl(1);
 
+		//Instanciate the swerve calculations library
 		swerveLib = new swervelib(20, 20);
 
-		LFEnc = new Encoder(0, 1, false);
-		RFEnc = new Encoder(2, 3, false);
-		LBEnc = new Encoder(4, 5, false);
-		RBEnc = new Encoder(6, 7, false);
+		gyroCompass = new ADXRS450_Gyro();
 
-		LFMotTurn = new VictorSP(0);
-		RFMotTurn = new VictorSP(1);
-		LBMotTurn = new VictorSP(2);
-		RBMotTurn = new VictorSP(3);
+		//Instanciate the encoders
+		LFEnc = new AnalogPotentiometer(1, false, 0);
+		RFEnc = new AnalogPotentiometer(0, false, 0);
+		LBEnc = new AnalogPotentiometer(3, false, 0);
+		RBEnc = new AnalogPotentiometer(2, false, 0);
 
-		LFMotDrv = new VictorSP(4);
-		RFMotDrv = new VictorSP(5);
-		LBMotDrv = new VictorSP(6);
-		RBMotDrv = new VictorSP(7);
+		//Instanciate the motors based on where they are plugged in
+		LFMotTurn = new Talon(8);
+		RFMotTurn = new Talon(7);
+		LBMotTurn = new Talon(2);
+		RBMotTurn = new Talon(1);
 
-		p = 0.1;
-		i = 0.1;
-		d = 0.1;
+		LFMotDrv = new Talon(4);
+		RFMotDrv = new Talon(5);
+		LBMotDrv = new Talon(6);
+		RBMotDrv = new Talon(3);
+
+
+		//Instanciate the PID controllers to their proper values
+		p = 0;
+		i = 0;
+		d = 0;
 		LFPID = new PIDController(p, i, d, LFEnc, LFMotTurn, period);
 		RFPID = new PIDController(p, i, d, RFEnc, RFMotTurn, period);
 		LBPID = new PIDController(p, i, d, LBEnc, LBMotTurn, period);
 		RBPID = new PIDController(p, i, d, RBEnc, RBMotTurn, period);
 
+		LFPID->SetInputRange(0,360);
+		LFPID->SetOutputRange(-1,1);
+		LFPID->SetContinuous();
+		LFPID->Enable();
+
+		RFPID->SetInputRange(0,360);
+		RFPID->SetOutputRange(-1,1);
+		RFPID->SetContinuous();
+		RFPID->Enable();
+
+		LBPID->SetInputRange(0,360);
+		LBPID->SetOutputRange(-1,1);
+		LBPID->SetContinuous();
+		LBPID->Enable();
+
+		RBPID->SetInputRange(0,360);
+		RBPID->SetOutputRange(-1,1);
+		RBPID->SetContinuous();
+		RBPID->Enable();
 	}
 
-	/*
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * GetString line to get the auto name from the text box below the Gyro.
-	 *
-	 * You can add additional auto modes by adding additional comparisons to the
-	 * if-else structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
 	void AutonomousInit() override {
-		autoSelected = chooser.GetSelected();
+		//autoSelected = chooser.GetSelected();
 		// std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
-		std::cout << "Auto selected: " << autoSelected << std::endl;
+		//std::cout << "Auto selected: " << autoSelected << std::endl;
 
 		if (autoSelected == autoNameCustom) {
 			// Custom Auto goes here
@@ -77,32 +93,58 @@ public:
 	}
 
 	void TeleopInit() {
+		gyroCompass->Calibrate();
 
-		LFPID->Enable();
-		RFPID->Enable();
-		LBPID->Enable();
-		RBPID->Enable();
+		//Get the numbers from the smartdashboard for live PID tuning
+		SmartDashboard::GetNumber("P: ", 0);
+		SmartDashboard::GetNumber("I: ", 0);
+		SmartDashboard::GetNumber("D: ", 0);
 
 	}
 
 	void TeleopPeriodic() {
+		//Update the joystick values
 		stick1->UpdateCntl();
 		stick2->UpdateCntl();
 
-		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX);
+		facing = gyroCompass->GetAngle();
 
-		RFPID->SetSetpoint(swerveLib->whl->angle1);
-		LFPID->SetSetpoint(swerveLib->whl->angle2);
-		RBPID->SetSetpoint(swerveLib->whl->angle4);
-		LBPID->SetSetpoint(swerveLib->whl->angle3);
+		//Get the numbers from the smartdashboard for live PID tuning
+		p = SmartDashboard::GetNumber("P: ", 0);
+		i = SmartDashboard::GetNumber("I: ", 0);
+		d = SmartDashboard::GetNumber("D: ", 0);
 
-		LFMotDrv->Set(swerveLib->whl->speed2);
-		RFMotDrv->Set(swerveLib->whl->speed1);
-		RBMotDrv->Set(swerveLib->whl->speed4);
-		LBMotDrv->Set(swerveLib->whl->speed3);
+		//Set the PID values for live tuning
+		RFPID->SetPID(p, i, d);
+		LFPID->SetPID(p, i, d);
+		RBPID->SetPID(p, i, d);
+		LBPID->SetPID(p, i, d);
+
+		//Calculate the proper values for the swerve drive motion
+		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX, facing);
+
+		//Set the PID controllers to angle the wheels properly
+		//RFPID->SetSetpoint(swerveLib->whl->angle1/72);
+		//LFPID->SetSetpoint(swerveLib->whl->angle2/72);
+		//RBPID->SetSetpoint(swerveLib->whl->angle4/72);
+		//LBPID->SetSetpoint(swerveLib->whl->angle3/72);
+
+		LFMotTurn->Set(swerveLib->whl->angle2/360);
+		RFMotTurn->Set(swerveLib->whl->angle1/360);
+		LBMotTurn->Set(swerveLib->whl->angle3/360);
+		RBMotTurn->Set(swerveLib->whl->angle4/360);
+
+
+		//Set the wheel speed based on what the calculations from the swervelib
+		LFMotDrv->Set(swerveLib->whl->speed2/11.5);
+		RFMotDrv->Set(swerveLib->whl->speed1/11.5);
+		RBMotDrv->Set(swerveLib->whl->speed4/11.5);
+		LBMotDrv->Set(swerveLib->whl->speed3/11.5);
 
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
+		printf("%.2f, %.2f, %.2f\n\n", stick1->LX, stick1->LY, stick1->RX);
+
 
 	}
 
