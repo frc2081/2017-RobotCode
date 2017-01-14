@@ -18,7 +18,8 @@ public:
 class swervelib {
 private:
 	double target_WS1, target_WS2, target_WS3, target_WS4, MAX_WS;
-	double A, B, C, D, R, _wheelbase;
+	double target_WA1, target_WA2, target_WA3, target_WA4;
+	double A, B, C, D, R, _width, _length;
 
 public:
     swervelib(double wheelbase, double trackwidth);

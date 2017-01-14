@@ -72,7 +72,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="src/swervelib.cpp|src/swervelib.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -251,6 +251,7 @@
 		<configuration configurationName="Simulate">
 			<resource resourceType="PROJECT" workspacePath="/GearsBotCPP"/>
 		</configuration>
+		<configuration configurationName="linux_simulate"/>
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/GearsBotCPP"/>
 		</configuration>

@@ -8,7 +8,7 @@
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 #include "cntl.h"
-#include "swervelibFixed.h"
+#include "swervelib.h"
 
 cntl *stick1;
 cntl *stick2;

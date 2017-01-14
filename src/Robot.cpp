@@ -10,6 +10,19 @@
 
 class Robot: public frc::IterativeRobot {
 public:
+
+	double deadband(double input) {
+		double output;
+		output = fabs(input)-.2;
+		output /= .8;
+		if (output < 0) {
+			output = 0;
+		}
+		if (input < 0) {
+			output *= -1;
+		}
+		return output;
+	}
 	void RobotInit() {
 		//chooser.AddDefault(autoNameDefault, autoNameDefault);
 		//chooser.AddObject(autoNameCustom, autoNameCustom);
@@ -107,6 +120,10 @@ public:
 		stick1->UpdateCntl();
 		stick2->UpdateCntl();
 
+		stick1->LX = this->deadband(stick1->LX);
+		stick1->LY = this->deadband(stick1->LY);
+		stick1->RX = this->deadband(stick1->RX);
+		stick1->RY = this->deadband(stick1->RY);
 		facing = gyroCompass->GetAngle();
 
 		//Get the numbers from the smartdashboard for live PID tuning
@@ -121,25 +138,19 @@ public:
 		LBPID->SetPID(p, i, d);
 
 		//Calculate the proper values for the swerve drive motion
-		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX, facing);
+		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX);
 
 		//Set the PID controllers to angle the wheels properly
-		//RFPID->SetSetpoint(swerveLib->whl->angle1/72);
-		//LFPID->SetSetpoint(swerveLib->whl->angle2/72);
-		//RBPID->SetSetpoint(swerveLib->whl->angle4/72);
-		//LBPID->SetSetpoint(swerveLib->whl->angle3/72);
-
-		LFMotTurn->Set(swerveLib->whl->angle2/360);
-		RFMotTurn->Set(swerveLib->whl->angle1/360);
-		LBMotTurn->Set(swerveLib->whl->angle3/360);
-		RBMotTurn->Set(swerveLib->whl->angle4/360);
-
+		RFPID->SetSetpoint(swerveLib->whl->angle1);
+		LFPID->SetSetpoint(swerveLib->whl->angle2);
+		RBPID->SetSetpoint(swerveLib->whl->angle4);
+		LBPID->SetSetpoint(swerveLib->whl->angle3);
 
 		//Set the wheel speed based on what the calculations from the swervelib
-		LFMotDrv->Set(swerveLib->whl->speed2/11.5);
-		RFMotDrv->Set(swerveLib->whl->speed1/11.5);
-		RBMotDrv->Set(swerveLib->whl->speed4/11.5);
-		LBMotDrv->Set(swerveLib->whl->speed3/11.5);
+		LFMotDrv->Set(swerveLib->whl->speed2);
+		RFMotDrv->Set(swerveLib->whl->speed1);
+		RBMotDrv->Set(swerveLib->whl->speed4);
+		LBMotDrv->Set(swerveLib->whl->speed3);
 
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
