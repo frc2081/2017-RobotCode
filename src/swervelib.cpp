@@ -1,4 +1,4 @@
-/* Copyright 2016 Charles Young
+/* Copyright 2016 Charles Young */
 
 #include <algorithm>
 #include "swervelib.h"
@@ -15,74 +15,56 @@ double radians_to_degrees(double radians) {
 	return degrees;
 }
 
-swervelib::swervelib(double wheelbase, double trackwidth) {
-	target_WS1 = 0;
-	target_WS2 = 0;
-	target_WS3 = 0;
-	target_WS4 = 0;
+enum wheelArray {
+	a,
+	s
+};
+
+swervelib::swervelib(double _length, double _width) {
+	W1[a] = 0;
+	W2[a] = 0;
+	W3[a] = 0;
+	W4[a] = 0;
+	W1[s] = 0;
+	W2[s] = 0;
+	W3[s] = 0;
+	W4[s] = 0;
 	MAX_WS = 0;
 
 	A = 0;
 	B = 0;
 	C = 0;
 	D = 0;
-	R = sqrt(pow(wheelbase/2, 2) + pow(trackwidth/2, 2))/12;
-	_wheelbase = wheelbase;
-
-	whl = new wheel();
+	R = sqrt(pow(width, 2) + pow(length, 2));
+	width = _width;
+	length = _length;
 }
 
 void swervelib::calcWheelVect(double x,
-						 double y,
-						 double rudder) {
+						 	  double y,
+							  double rudder) {
 
-	A = x - rudder * (_wheelbase/R);
-	B = x + rudder * (_wheelbase/R);
-	C = y - rudder * (_wheelbase/R);
-	D = y + rudder * (_wheelbase/R);
+	A = x - rudder * (length/2);
+	B = x + rudder * (length/2);
+	C = y - rudder * (width/2);
+	D = y + rudder * (width/2);
 
-	target_WS1 = sqrt(pow(B, 2) + pow(C, 2));
-	target_WS2 = sqrt(pow(B, 2) + pow(D, 2));
-	target_WS3 = sqrt(pow(A, 2) + pow(D, 2));
-	target_WS4 = sqrt(pow(A, 2) + pow(C, 2));
-	MAX_WS = std::max({target_WS1, target_WS2, target_WS3, target_WS4});
+	W1[s] = sqrt(pow(B, 2) + pow(C, 2));
+	W2[s] = sqrt(pow(B, 2) + pow(D, 2));
+	W3[s] = sqrt(pow(A, 2) + pow(D, 2));
+	W4[s] = sqrt(pow(A, 2) + pow(C, 2));
+	MAX_WS = std::max({W1[s], W2[s], W3[s], W4[s]});
 
-	// This is a mess
-	if (target_WS1 > 1) {
-		this->whl->speed1 = target_WS1/MAX_WS;
-	} else {
-		this->whl->speed1 = target_WS1;
-	}
-	if (target_WS2 > 1) {
-		this->whl->speed2 = target_WS2/MAX_WS;
-	} else {
-		this->whl->speed2 = target_WS2;
-	}
-	if (target_WS3 > 1) {
-		this->whl->speed3 = target_WS3/MAX_WS;
-	} else {
-		this->whl->speed3 = target_WS3;
-	}
-	if (target_WS4 > 1) {
-		this->whl->speed4 = target_WS4/MAX_WS;
-	} else {
-		this->whl->speed4 = target_WS4;
+	if(MAX_WS > 1) {
+		W1[s] /= MAX_WS;
+		W2[s] /= MAX_WS;
+		W3[s] /= MAX_WS;
+		W4[s] /= MAX_WS;
 	}
 
-	/*
-	* Gives the angle in radians between the positive X axis and the point given
-	* by the coordinates.  The result is then converted to degrees.
+	W1[a] = (atan2(B, C) * 180 ) / PI;
+	W2[a] = (atan2(B, D) * 180 ) / PI;
+	W3[a] = (atan2(A, D) * 180 ) / PI;
+	W4[a] = (atan2(A, C) * 180 ) / PI;
 
-	if (x > 0 && y > 0 && rudder > 0) {
-		this->whl->angle1 = radians_to_degrees(atan2(B, C));
-		this->whl->angle2 = radians_to_degrees(atan2(B, D));
-		this->whl->angle3 = radians_to_degrees(atan2(A, D));
-		this->whl->angle4 = radians_to_degrees(atan2(A, C));
-	} else {
-		this->whl->angle1 = 0;
-		this->whl->angle2 = 0;
-		this->whl->angle3 = 0;
-		this->whl->angle4 = 0;
-	}
 }
-*/

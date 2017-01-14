@@ -18,7 +18,7 @@ class btn
 {
 	private:
 		//JoystickButton object
-		Btn_t *raw;
+		Btn_t *M_raw;
 
 	public:
 		//The current state of the given button
@@ -40,18 +40,20 @@ class cntl
 {
 	private:
 		//Joystick object
-		Joystick *stick;
+		Joystick *M_stick;
+
+		double M_deadzone;
 
 	public:
-		//Returns controller object, takes controller number as argument
-		cntl(int);
+		//Returns controller object, takes controller number and deadzone(0.01 to 1) as argument
+		cntl(int, double);
 
-		float LX;
-		float LY;
-		float RX;
-		float RY;
-		float RTrig;
-		float LTrig;
+		double LX;
+		double LY;
+		double RX;
+		double RY;
+		double RTrig;
+		double LTrig;
 
 		//Should be called for each controller at the beginning of each teleop loop
 		void UpdateCntl();

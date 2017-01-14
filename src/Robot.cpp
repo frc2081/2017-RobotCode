@@ -11,26 +11,22 @@
 class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
-		//chooser.AddDefault(autoNameDefault, autoNameDefault);
-		//chooser.AddObject(autoNameCustom, autoNameCustom);
-		//frc::SmartDashboard::PutData("Auto Modes", &chooser);
+		//Instantiate the joysticks according to the controller class
+		stick1 = new cntl(0, 0.2);
+		//stick2 = new cntl(1, 0.2);
 
-		//Instanciate the joysticks according to the controller class
-		stick1 = new cntl(0);
-		stick2 = new cntl(1);
-
-		//Instanciate the swerve calculations library
+		//Instantiate the swerve calculations library
 		swerveLib = new swervelib(20, 20);
 
 		gyroCompass = new ADXRS450_Gyro();
 
-		//Instanciate the encoders
+		//Instantiate the encoders
 		LFEnc = new AnalogPotentiometer(1, false, 0);
 		RFEnc = new AnalogPotentiometer(0, false, 0);
 		LBEnc = new AnalogPotentiometer(3, false, 0);
 		RBEnc = new AnalogPotentiometer(2, false, 0);
 
-		//Instanciate the motors based on where they are plugged in
+		//Instantiate the motors based on where they are plugged in
 		LFMotTurn = new Talon(8);
 		RFMotTurn = new Talon(7);
 		LBMotTurn = new Talon(2);
@@ -42,7 +38,7 @@ public:
 		RBMotDrv = new Talon(3);
 
 
-		//Instanciate the PID controllers to their proper values
+		//Instantiate the PID controllers to their proper values
 		p = 0;
 		i = 0;
 		d = 0;
@@ -70,35 +66,23 @@ public:
 		RBPID->SetOutputRange(-1,1);
 		RBPID->SetContinuous();
 		RBPID->Enable();
+
+		SmartDashboard::init();
 	}
 
 	void AutonomousInit() override {
-		//autoSelected = chooser.GetSelected();
-		// std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
-		//std::cout << "Auto selected: " << autoSelected << std::endl;
-
-		if (autoSelected == autoNameCustom) {
-			// Custom Auto goes here
-		} else {
-			// Default Auto goes here
-		}
 	}
 
 	void AutonomousPeriodic() {
-		if (autoSelected == autoNameCustom) {
-			// Custom Auto goes here
-		} else {
-			// Default Auto goes here
-		}
 	}
 
 	void TeleopInit() {
 		gyroCompass->Calibrate();
 
 		//Get the numbers from the smartdashboard for live PID tuning
-		SmartDashboard::GetNumber("P: ", 0);
+		/*SmartDashboard::GetNumber("P: ", 0);
 		SmartDashboard::GetNumber("I: ", 0);
-		SmartDashboard::GetNumber("D: ", 0);
+		SmartDashboard::GetNumber("D: ", 0);*/
 
 	}
 
@@ -107,21 +91,8 @@ public:
 		stick1->UpdateCntl();
 		stick2->UpdateCntl();
 
-		facing = gyroCompass->GetAngle();
-
-		//Get the numbers from the smartdashboard for live PID tuning
-		p = SmartDashboard::GetNumber("P: ", 0);
-		i = SmartDashboard::GetNumber("I: ", 0);
-		d = SmartDashboard::GetNumber("D: ", 0);
-
-		//Set the PID values for live tuning
-		RFPID->SetPID(p, i, d);
-		LFPID->SetPID(p, i, d);
-		RBPID->SetPID(p, i, d);
-		LBPID->SetPID(p, i, d);
-
 		//Calculate the proper values for the swerve drive motion
-		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX, facing);
+		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX);
 
 		//Set the PID controllers to angle the wheels properly
 		//RFPID->SetSetpoint(swerveLib->whl->angle1/72);
@@ -129,23 +100,32 @@ public:
 		//RBPID->SetSetpoint(swerveLib->whl->angle4/72);
 		//LBPID->SetSetpoint(swerveLib->whl->angle3/72);
 
-		LFMotTurn->Set(swerveLib->whl->angle2/360);
-		RFMotTurn->Set(swerveLib->whl->angle1/360);
-		LBMotTurn->Set(swerveLib->whl->angle3/360);
-		RBMotTurn->Set(swerveLib->whl->angle4/360);
+		LFMotTurn->Set(swerveLib->W2[a]/360);
+		RFMotTurn->Set(swerveLib->W1[a]/360);
+		LBMotTurn->Set(swerveLib->W3[a]/360);
+		RBMotTurn->Set(swerveLib->W4[a]/360);
 
 
 		//Set the wheel speed based on what the calculations from the swervelib
-		LFMotDrv->Set(swerveLib->whl->speed2/11.5);
-		RFMotDrv->Set(swerveLib->whl->speed1/11.5);
-		RBMotDrv->Set(swerveLib->whl->speed4/11.5);
-		LBMotDrv->Set(swerveLib->whl->speed3/11.5);
+		LFMotDrv->Set(swerveLib->W2[s]/11.5);
+		RFMotDrv->Set(swerveLib->W1[s]/11.5);
+		LBMotDrv->Set(swerveLib->W3[s]/11.5);
+		RBMotDrv->Set(swerveLib->W4[s]/11.5);
 
-		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
-		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
-		printf("%.2f, %.2f, %.2f\n\n", stick1->LX, stick1->LY, stick1->RX);
+		SmartDashboard::PutNumber("RX", stick1->RX);
+		SmartDashboard::PutNumber("RY", stick1->RY);
+		SmartDashboard::PutNumber("LX", stick1->LX);
+		SmartDashboard::PutNumber("LY", stick1->LY);
 
+		SmartDashboard::PutNumber("Wheel 1 speed", swerveLib->W1[s]);
+		SmartDashboard::PutNumber("Wheel 2 speed", swerveLib->W2[s]);
+		SmartDashboard::PutNumber("Wheel 3 speed", swerveLib->W3[s]);
+		SmartDashboard::PutNumber("Wheel 4 speed", swerveLib->W4[s]);
 
+		SmartDashboard::PutNumber("Wheel 1 angle", swerveLib->W1[a]);
+		SmartDashboard::PutNumber("Wheel 2 angle", swerveLib->W2[a]);
+		SmartDashboard::PutNumber("Wheel 3 angle", swerveLib->W3[a]);
+		SmartDashboard::PutNumber("Wheel 4 angle", swerveLib->W4[a]);
 	}
 
 	void TestPeriodic() {

@@ -8,7 +8,7 @@
 #ifndef SRC_ROBOT_H_
 #define SRC_ROBOT_H_
 #include "cntl.h"
-#include "swervelibFixed.h"
+#include "swervelib.h"
 
 cntl *stick1;
 cntl *stick2;
@@ -16,7 +16,6 @@ cntl *stick2;
 swervelib *swerveLib;
 
 ADXRS450_Gyro *gyroCompass;
-double facing;
 
 PIDController *LFPID;
 PIDController *LBPID;
@@ -39,4 +38,8 @@ AnalogPotentiometer *LBEnc;
 AnalogPotentiometer *RFEnc;
 AnalogPotentiometer *RBEnc;
 
+enum wheelArray {
+	a,
+	s
+};
 #endif /* SRC_ROBOT_H_ */
