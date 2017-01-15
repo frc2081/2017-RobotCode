@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="2017-RobotCode"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/charles/git/2017-RobotCode/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/charles/git/2017-RobotCode/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/charles/git/2017-RobotCode/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="deploy">
+				<Option working_dir="/home/charles/git/2017-RobotCode/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 deploy"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="2017-RobotCode">
+				<Option output="/home/charles/git/2017-RobotCode/cmake-build-debug/2017-RobotCode" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/charles/git/2017-RobotCode/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/charles/wpilib/cpp/current/include"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/include"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/include-fixed"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include"/>
+					<Add directory="/usr/arm-frc-linux-gnueabi/usr/include"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include/c++/4.9.3"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include/c++/4.9.3/arm-frc-linux-gnueabi"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include/c++/4.9.3/backward"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 2017-RobotCode"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="2017-RobotCode/fast">
+				<Option output="/home/charles/git/2017-RobotCode/cmake-build-debug/2017-RobotCode" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/charles/git/2017-RobotCode/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/charles/wpilib/cpp/current/include"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/include"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/include-fixed"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include"/>
+					<Add directory="/usr/arm-frc-linux-gnueabi/usr/include"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include/c++/4.9.3"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include/c++/4.9.3/arm-frc-linux-gnueabi"/>
+					<Add directory="/usr/lib/x86_64-linux-gnu/gcc/arm-frc-linux-gnueabi/4.9.3/../../../../../arm-frc-linux-gnueabi/include/c++/4.9.3/backward"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 2017-RobotCode/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/charles/git/2017-RobotCode/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/charles/git/2017-RobotCode/src/Robot.cpp">
+			<Option target="2017-RobotCode"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/src/Robot.h">
+			<Option target="2017-RobotCode"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/src/cntl.cpp">
+			<Option target="2017-RobotCode"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/src/cntl.h">
+			<Option target="2017-RobotCode"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/src/swervelib.cpp">
+			<Option target="2017-RobotCode"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/src/swervelib.h">
+			<Option target="2017-RobotCode"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/frc.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/arm-toolchain.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/arm-toolchain.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/charles/git/2017-RobotCode/arm-toolchain.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
