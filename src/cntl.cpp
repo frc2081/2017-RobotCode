@@ -20,61 +20,79 @@ enum btnNums {
 	_bRS
 };
 
-btn::btn(int button, Joystick **s) {
-	raw = new JoystickButton(*s, button);
+btn::btn(int button, frc::Joystick **s) {
+	M_raw = new Btn_t(*s, button);
 	Hld = false;
 	State = false;
 	RE = false;
 }
 
 void btn::Update() {
-	this->Hld = this->State;
-	this->State = this->raw->Grab();
-	this->RE = false;
-	if(this->Hld != this->State && !this->Hld) {
-		this->RE = true;
+	Hld = State;
+	State = M_raw->Grab();
+	RE = false;
+	if(Hld != State && !Hld) {
+		RE = true;
 	}
 }
 
-cntl::cntl(int port) {
-	stick = new Joystick(port);
-	this->RX = 0.0;
-	this->RY = 0.0;
-	this->LX = 0.0;
-	this->LY = 0.0;
-	this->RTrig = 0.0;
-	this->LTrig = 0.0;
+cntl::cntl(int port, double deadzone) {
+	M_stick = new frc::Joystick(port);
+	RX = 0.0;
+	RY = 0.0;
+	LX = 0.0;
+	LY = 0.0;
+	RTrig = 0.0;
+	LTrig = 0.0;
 
-	this->bA = new btn(1, &stick);
-	this->bB = new btn(2, &stick);
-	this->bX = new btn(3, &stick);
-	this->bY = new btn(4, &stick);
-	this->bLB = new btn(5, &stick);
-	this->bRB = new btn(6, &stick);
-	this->bBack = new btn(7, &stick);
-	this->bStart = new btn(8, &stick);
-	this->bLS = new btn(9, &stick);
-	this->bRS = new btn(10, &stick);
+	M_deadzone = deadzone;
+
+	bA = new btn(1, &M_stick);
+	bB = new btn(2, &M_stick);
+	bX = new btn(3, &M_stick);
+	bY = new btn(4, &M_stick);
+	bLB = new btn(5, &M_stick);
+	bRB = new btn(6, &M_stick);
+	bBack = new btn(7, &M_stick);
+	bStart = new btn(8, &M_stick);
+	bLS = new btn(9, &M_stick);
+	bRS = new btn(10, &M_stick);
+}
+
+void applyDeadzone(double *var, double input, double zone) {
+	double output = fabs(input) - zone;
+	output /= (1 - zone);
+	if(output < 0) {
+		output = 0;
+	}
+	if(input < 0) {
+		output *= -1;
+	}
+	if((output + 0.0) == 0.0) {
+		output = 0.0;
+	}
+	*var = output;
 }
 
 void cntl::UpdateCntl() {
-	this->LX = this->stick->GetX();
-	this->LY = this->stick->GetY();
-	this->RX = this->stick->GetRawAxis(4);
-	this->RY = this->stick->GetRawAxis(5);
-	this->RTrig = this->stick->GetRawAxis(3);
-	this->LTrig = this->stick->GetRawAxis(2);
-	this->RY *= -1;
-	this->LY *= -1;
-	this->bA->Update();
-	this->bB->Update();
-	this->bX->Update();
-	this->bY->Update();
-	this->bLB->Update();
-	this->bRB->Update();
-	this->bBack->Update();
-	this->bStart->Update();
-	this->bLS->Update();
-	this->bRS->Update();
+	applyDeadzone(&this->LX, M_stick->GetX(), M_deadzone);
+	applyDeadzone(&this->LY, M_stick->GetY(), M_deadzone);
+	applyDeadzone(&this->RX, M_stick->GetRawAxis(4), M_deadzone);
+	applyDeadzone(&this->RY, M_stick->GetRawAxis(5), M_deadzone);
+	applyDeadzone(&this->RTrig, M_stick->GetRawAxis(3), M_deadzone);
+	applyDeadzone(&this->LTrig, M_stick->GetRawAxis(2), M_deadzone);
+	RY *= -1;
+	LY *= -1;
+
+	bA->Update();
+	bB->Update();
+	bX->Update();
+	bY->Update();
+	bLB->Update();
+	bRB->Update();
+	bBack->Update();
+	bStart->Update();
+	bLS->Update();
+	bRS->Update();
 }
 

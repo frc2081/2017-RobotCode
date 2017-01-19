@@ -22,6 +22,11 @@ AnalogPotentiometer *LBEnc;
 AnalogPotentiometer *RFEnc;
 AnalogPotentiometer *RBEnc;
 
+Encoder *LFEncDrv;
+Encoder *RFEncDrv;
+Encoder *LBEncDrv;
+Encoder *RBEncDrv;
+
 cntl *stick1;
 cntl *stick2;
 
@@ -35,29 +40,17 @@ PIDController *RFPID;
 PIDController *RBPID;
 
 float p, i, d;
+bool charlesMode = false;
 class Robot: public frc::IterativeRobot {
 public:
-
-	double deadband(double input) {
-		double output;
-		output = fabs(input)-.2;
-		output /= .8;
-		if (output < 0) {
-			output = 0;
-		}
-		if (input < 0) {
-			output *= -1;
-		}
-		return output;
-	}
 	void RobotInit() {
 		//chooser.AddDefault(autoNameDefault, autoNameDefault);
 		//chooser.AddObject(autoNameCustom, autoNameCustom);
 		//frc::SmartDashboard::PutData("Auto Modes", &chooser);
 
 		//Instanciate the joysticks according to the controller class
-		stick1 = new cntl(0);
-		stick2 = new cntl(1);
+		stick1 = new cntl(0, .2);
+		stick2 = new cntl(1, .2);
 
 		//Instanciate the swerve calculations library
 		swerveLib = new swervelib(27, 23.5);
@@ -69,6 +62,11 @@ public:
 		RFEnc = new AnalogPotentiometer(0, 360, 0);
 		LBEnc = new AnalogPotentiometer(3, 360, 0);
 		RBEnc = new AnalogPotentiometer(2, 360, 0);
+
+		LFEncDrv = new Encoder(6, 7, false);
+		RFEncDrv = new Encoder(4, 5, false);
+		LBEncDrv = new Encoder (0, 1, false);
+		RBEncDrv = new Encoder (2, 3, false);
 
 		//Instanciate the motors based on where they are plugged in
 		LFMotTurn = new Talon(8);
@@ -112,6 +110,11 @@ public:
 		RBPID->Enable();
 
 		gyroCompass->Calibrate();
+
+		LFEncDrv->Reset();
+		RFEncDrv->Reset();
+		LBEncDrv->Reset();
+		RBEncDrv->Reset();
 	}
 
 	void AutonomousInit() override {
@@ -138,16 +141,12 @@ public:
 	}
 
 	void TeleopPeriodic() {
+
+		bStartHld = stick1->bStart;
 		//Update the joystick values
 		stick1->UpdateCntl();
 		stick2->UpdateCntl();
-
-		stick1->LX = this->deadband(stick1->LX);
-		stick1->LY = this->deadband(stick1->LY);
-		stick1->RX = this->deadband(stick1->RX);
-		stick1->RY = this->deadband(stick1->RY);
-
-		//Get the numbers from the smartdashboard for live PID tuning
+		bStart = stick1->bStart;
 
 
 		//Set the PID values for live tuning
@@ -164,11 +163,24 @@ public:
 		//Calculate the proper values for the swerve drive motion
 		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX);
 
+		if (charlesMode == true) {
+			swerveLib->calcWheelVect(stick1->RX, stick1->RY, stick1->LX);
+		}
+
+
+
 		//Set the PID controllers to angle the wheels properly
 		RFPID->SetSetpoint(swerveLib->whl->angle1);
 		LFPID->SetSetpoint(swerveLib->whl->angle2);
 		RBPID->SetSetpoint(swerveLib->whl->angle4);
 		LBPID->SetSetpoint(swerveLib->whl->angle3);
+
+			if (fabs(swerveLib->whl->speed1) == 0 && fabs(swerveLib->whl->speed2) == 0 && fabs(swerveLib->whl->speed3) == 0 && fabs(swerveLib->whl->speed4) == 0) {
+				RFPID->SetSetpoint(225);
+				LFPID->SetSetpoint(135);
+				RBPID->SetSetpoint(315);
+				LBPID->SetSetpoint(45);
+			}
 
 		//Set the wheel speed based on what the calculations from the swervelib
 		LFMotDrv->Set(swerveLib->whl->speed2 * -1);
@@ -176,6 +188,10 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speed4 * -1);
 		LBMotDrv->Set(swerveLib->whl->speed3 * -1);
 
+		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
+		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
+		SmartDashboard::PutNumber("LB: ", LBEncDrv->Get());
+		SmartDashboard::PutNumber("RB: ", RBEncDrv->Get());
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
 		printf("%.2f, %.2f, %.2f\n\n", stick1->LX, stick1->LY, stick1->RX);

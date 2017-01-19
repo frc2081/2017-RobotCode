@@ -36,7 +36,15 @@ extern PIDController *LBPID;
 extern PIDController *RFPID;
 extern PIDController *RBPID;
 
+extern Encoder *LFEncDrv;
+extern Encoder *RFEncDrv;
+extern Encoder *LBEncDrv;
+extern Encoder *RBEncDrv;
+
 extern float p, i, d;
+extern bool charlesMode;
+bool bStartHld;
+bool bStart;
 const float period = 0.05;
 
 
