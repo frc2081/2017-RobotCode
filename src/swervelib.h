@@ -21,8 +21,8 @@ private:
 	double target_WA1, target_WA2, target_WA3, target_WA4;
 	double A, B, C, D, R, _width, _length;
 	double currAng1, currAng2, currAng3, currAng4;
+	double centerVecX, centerVecY;
 
-	int wheelStableize1, wheelStableize2, wheelStableize3, wheelStableize4;
 	int a [11] = { 0, 0, 45, 90, 135, 180, 225, 280, 325, 360, 360 };
 public:
     swervelib(double wheelbase, double trackwidth);
@@ -31,6 +31,6 @@ public:
 
     wheel *whl;
 
-    void calcWheelVect(double x, double y, double rudder);
+    void calcWheelVect(double mag, double ang, double rotation);
 };
 #endif //SWERVELIB_H_
