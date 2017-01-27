@@ -9,6 +9,7 @@
 #define SRC_ROBOT_H_
 #include "cntl.h"
 #include "swervelib.h"
+#include "gyroManager.h"
 
 extern Talon *LFMotDrv;
 extern Talon *LBMotDrv;
@@ -29,7 +30,7 @@ extern cntl *cntl2;
 
 extern swervelib *swerveLib;
 
-//extern ADXRS450_Gyro *gyroCompass;
+extern gyroManager *gyroManagerRun;
 
 extern PIDController *LFPID;
 extern PIDController *LBPID;
@@ -45,7 +46,6 @@ extern float p, i, d;
 extern float comAng, comMag;
 extern float currentFacing;
 extern double currAng1, currAng2, currAng3, currAng4;
-extern double preAng1, preAng2, preAng3, preAng4;
 const float period = 0.05;
 
 

@@ -38,13 +38,12 @@ PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
 PIDController *RBPID;
-
 float p, i, d;
 float currentAngle;
 float currentFacing;
 float comAng, comMag;
 double currAng1, currAng2, currAng3, currAng4;
-double preAng1, preAng2, preAng3, preAng4;
+
 class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
@@ -59,7 +58,9 @@ public:
 		//Instantiate the swerve calculations library
 		swerveLib = new swervelib(27, 23.5);
 
-		//gyroCompass = new ADXRS450_Gyro();
+		gyroManagerRun = gyroManager::Get();
+
+		gyroManagerRun->start();
 
 		//Instantiate the encoders
 		LFEnc = new AnalogPotentiometer(1, 360, 0);
@@ -113,8 +114,6 @@ public:
 		RBPID->SetContinuous();
 		RBPID->Enable();
 
-		//gyroCompass->Calibrate();
-
 		LFEncDrv->Reset();
 		RFEncDrv->Reset();
 		LBEncDrv->Reset();
@@ -162,13 +161,13 @@ public:
 		SmartDashboard::PutNumber("LBEnc: ", LBEnc->Get());
 		SmartDashboard::PutNumber("RBEnc: ", RBEnc->Get());
 
-		//Get current gyro heading
-		/*currentFacing = fabs(gyroCompass->GetAngle());
+
+		currentFacing = fabs(gyroManagerRun->getLastValue());
 
 		if (currentFacing > 360) {
 			currentFacing = (int)currentFacing % 360;
 		}
-*/
+
 
 		currAng1 = swerveLib->whl->angle1;
 		currAng2 = swerveLib->whl->angle2;
@@ -238,7 +237,7 @@ public:
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
 		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
-		//printf("%.5f, %.5f\n\n", gyroCompass->GetAngle(), currentFacing);
+		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
 
 	}
 
