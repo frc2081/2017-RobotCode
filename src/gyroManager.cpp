@@ -6,7 +6,8 @@
  */
 
 #include "gyroManager.h"
-gyroManager *gyroManager::manager = 0;
+gyroManager* gyroManager::_manager = 0;
+
 gyroManager::gyroManager() {
 	// TODO Auto-generated constructor stub
 
@@ -16,17 +17,18 @@ gyroManager::gyroManager() {
 
 	lastValue = 0;
 
-	//gyroCompass = new ADXRS450_Gyro();
+	gyroCompass = new ADXRS450_Gyro();
 
-	//gyroCompass->Calibrate();
+	gyroCompass->Calibrate();
 
 }
 
 gyroManager *gyroManager::Get() {
-	if (manager == 0) {
-		manager = new gyroManager();
+	if (_manager == 0) {
+		_manager = new gyroManager();
 	}
-	return manager;
+
+	return _manager;
 }
 
 void gyroManager::start() {
@@ -40,8 +42,11 @@ void gyroManager::start() {
 void gyroManager::gyroPoll() {
 	isRunning = true;
 	while (keepRunning) {
+		double readValue;
+		readValue = gyroCompass->GetAngle();
+
 		lockGyroThread.lock();
-		//lastValue = gyroCompass->GetAngle();
+		lastValue = readValue;
 		lockGyroThread.unlock();
 	}
 	isRunning = false;
@@ -50,7 +55,6 @@ void gyroManager::gyroPoll() {
 void gyroManager::stop() {
 
 	keepRunning = false;
-
 }
 
 double gyroManager::getLastValue() {
@@ -64,10 +68,7 @@ double gyroManager::getLastValue() {
 }
 
 gyroManager::~gyroManager() {
-	// TODO Auto-generated destructor stub
-
-	//delete gyroCompass;
-
+	delete gyroCompass;
 	stop();
 }
 

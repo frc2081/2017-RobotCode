@@ -251,6 +251,7 @@ private:
 	const std::string autoNameDefault = "Default";
 	const std::string autoNameCustom = "My Auto";
 	std::string autoSelected;
+	gyroManager *gyroManagerRun;
 };
 
 START_ROBOT_CLASS(Robot)
