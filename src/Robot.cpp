@@ -32,8 +32,6 @@ cntl *cntl2;
 
 swervelib *swerveLib;
 
-ADXRS450_Gyro *gyroCompass;
-
 PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
@@ -43,6 +41,7 @@ float currentAngle;
 float currentFacing;
 float comAng, comMag;
 double currAng1, currAng2, currAng3, currAng4;
+double gyroZero, gyroZeroOffset;
 
 class Robot: public frc::IterativeRobot {
 public:
@@ -149,24 +148,16 @@ public:
 		cntl1->UpdateCntl();
 		cntl2->UpdateCntl();
 
+		cntl1->RX *= .9;
 
-		//Set the PID values for live tuning
-		RFPID->SetPID(p, i, d);
-		LFPID->SetPID(p, i, d);
-		RBPID->SetPID(p, i, d);
-		LBPID->SetPID(p, i, d);
-
-		SmartDashboard::PutNumber("LFEnc: ", LFEnc->Get());
-		SmartDashboard::PutNumber("RFEnc: ", RFEnc->Get());
-		SmartDashboard::PutNumber("LBEnc: ", LBEnc->Get());
-		SmartDashboard::PutNumber("RBEnc: ", RBEnc->Get());
-
+		//Gyro needs to be mounted in center of robot otherwise it will not work properly
 		currentFacing = fabs(gyroManagerRun->getLastValue());
 
-		if (currentFacing > 360) {
-			currentFacing = (int)currentFacing % 360;
+		if (currentFacing >= 300) {
+			currentFacing = ((int)currentFacing % 300);
 		}
 
+		currentFacing *= 1.2;
 
 		currAng1 = swerveLib->whl->angleRF;
 		currAng2 = swerveLib->whl->angleLF;
@@ -176,7 +167,7 @@ public:
 		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI) + currentFacing;
 		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
 
-		//Calculate the proper values for the swerve drive motion
+		//Calculate the proper values for the swerve drive motion. If there are no inputs, keep the wheels in their previous position
 		if (cntl1->LX != 0 || cntl1->LY != 0 || cntl1->RX != 0) {
 			swerveLib->calcWheelVect(comMag, comAng, cntl1->RX);
 		} else {
