@@ -9,7 +9,6 @@
 gyroManager* gyroManager::_manager = 0;
 
 gyroManager::gyroManager() {
-	// TODO Auto-generated constructor stub
 
 	keepRunning = false;
 
@@ -32,22 +31,33 @@ gyroManager *gyroManager::Get() {
 }
 
 void gyroManager::start() {
-	if (keepRunning && isRunning) {
+	if (gyroManager::isRunningCheck()) {
 		return;
 	}
-
+	keepRunning = true;
+	try {
 	gyro_thread = thread(&gyroManager::gyroPoll, this);
+	} catch (...) {
+		keepRunning = false;
+		isRunning = false;
+	}
 }
 
 void gyroManager::gyroPoll() {
 	isRunning = true;
+	try {
 	while (keepRunning) {
 		double readValue;
+		//Can operate at + or - 300 degrees per second max
 		readValue = gyroCompass->GetAngle();
 
 		lockGyroThread.lock();
 		lastValue = readValue;
 		lockGyroThread.unlock();
+	}
+
+	} catch (...) {
+		keepRunning = false;
 	}
 	isRunning = false;
 }
@@ -55,6 +65,11 @@ void gyroManager::gyroPoll() {
 void gyroManager::stop() {
 
 	keepRunning = false;
+	gyro_thread.join();
+}
+
+bool gyroManager::isRunningCheck() {
+	return isRunning && keepRunning;
 }
 
 double gyroManager::getLastValue() {

@@ -18,18 +18,18 @@ double radians_to_degrees(double radians) {
 
 //width and length are between the wheels, not the robot's dimensions
 swervelib::swervelib(double width, double length) {
-	target_WS1 = 0;
-	target_WS2 = 0;
-	target_WS3 = 0;
-	target_WS4 = 0;
-	target_WA1 = 0;
-	target_WA2 = 0;
-	target_WA3 = 0;
-	target_WA4 = 0;
-	currAng1 = 0;
-	currAng2 = 0;
-	currAng3 = 0;
-	currAng4 = 0;
+	target_WSRF = 0;
+	target_WSLF = 0;
+	target_WSLB = 0;
+	target_WSRB = 0;
+	target_WARF = 0;
+	target_WALF = 0;
+	target_WALB = 0;
+	target_WARB = 0;
+	currAngRF = 0;
+	currAngLF = 0;
+	currAngLB = 0;
+	currAngRB = 0;
 	MAX_WS = 0;
 
 	A = 0;
@@ -37,7 +37,7 @@ swervelib::swervelib(double width, double length) {
 	C = 0;
 	D = 0;
 	//Radius of robot - corner to center
-	R = sqrt(pow(width, 2) + pow(length, 2));
+	radius = sqrt(pow(width, 2) + pow(length, 2));
 	_width = width;
 	_length = length;
 
@@ -72,39 +72,39 @@ void swervelib::calcWheelVect(double mag,
 	 * 	X - A
 	 * 	Y - C
 */
-	A = centerVecX - rotation * (_length/R);
-	B = centerVecX + rotation * (_length/R);
-	C = centerVecY - rotation * (_width/R);
-	D = centerVecY + rotation * (_width/R);
+	A = centerVecX - rotation * (_length/radius);
+	B = centerVecX + rotation * (_length/radius);
+	C = centerVecY - rotation * (_width/radius);
+	D = centerVecY + rotation * (_width/radius);
 
 	//Calculating the wheel speeds
-	target_WS1 = sqrt(pow(B, 2) + pow(C, 2));
-	target_WS2 = sqrt(pow(B, 2) + pow(D, 2));
-	target_WS3 = sqrt(pow(A, 2) + pow(D, 2));
-	target_WS4 = sqrt(pow(A, 2) + pow(C, 2));
-	MAX_WS = std::max({target_WS1, target_WS2, target_WS3, target_WS4});
+	target_WSRF = sqrt(pow(B, 2) + pow(C, 2));
+	target_WSLF = sqrt(pow(B, 2) + pow(D, 2));
+	target_WSLB = sqrt(pow(A, 2) + pow(D, 2));
+	target_WSRB = sqrt(pow(A, 2) + pow(C, 2));
+	MAX_WS = std::max({target_WSRF, target_WSLF, target_WSLB, target_WSRB});
 
 	//Calculating wanted angle of each wheel
-	target_WA1 = radians_to_degrees(atan2(B, C));
-	target_WA2 = radians_to_degrees(atan2(B, D));
-	target_WA3 = radians_to_degrees(atan2(A, D));
-	target_WA4 = radians_to_degrees(atan2(A, C));
+	target_WARF = radians_to_degrees(atan2(B, C));
+	target_WALF = radians_to_degrees(atan2(B, D));
+	target_WALB = radians_to_degrees(atan2(A, D));
+	target_WARB = radians_to_degrees(atan2(A, C));
 	if (MAX_WS > 1) {
-		target_WS1 /= MAX_WS;
-		target_WS2 /= MAX_WS;
-		target_WS3 /= MAX_WS;
-		target_WS4 /= MAX_WS;
+		target_WSRF /= MAX_WS;
+		target_WSLF /= MAX_WS;
+		target_WSLB /= MAX_WS;
+		target_WSRB /= MAX_WS;
 	}
 
 
 	//Set the wheel speeds and angles to be accessed outside of the class
-	this->whl->speed1 = target_WS1;
-	this->whl->speed2 = target_WS2;
-	this->whl->speed3 = target_WS3;
-	this->whl->speed4 = target_WS4;
+	this->whl->speed1 = target_WSRF;
+	this->whl->speed2 = target_WSLF;
+	this->whl->speed3 = target_WSLB;
+	this->whl->speed4 = target_WSRB;
 
-	this->whl->angle1 = 360 - (target_WA1 + 180);
-	this->whl->angle2 = 360 - (target_WA2 + 180);
-	this->whl->angle3 = 360 - (target_WA3 + 180);
-	this->whl->angle4 = 360 - (target_WA4 + 180);
+	this->whl->angle1 = 360 - (target_WARF + 180);
+	this->whl->angle2 = 360 - (target_WALF + 180);
+	this->whl->angle3 = 360 - (target_WALB + 180);
+	this->whl->angle4 = 360 - (target_WARB + 180);
 }

@@ -24,6 +24,8 @@ public:
 
 	double getLastValue();
 
+	bool isRunningCheck();
+
 	//Infinite ducks
 
 

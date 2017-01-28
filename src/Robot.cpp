@@ -161,7 +161,6 @@ public:
 		SmartDashboard::PutNumber("LBEnc: ", LBEnc->Get());
 		SmartDashboard::PutNumber("RBEnc: ", RBEnc->Get());
 
-
 		currentFacing = fabs(gyroManagerRun->getLastValue());
 
 		if (currentFacing > 360) {
@@ -174,7 +173,7 @@ public:
 		currAng3 = swerveLib->whl->angle3;
 		currAng4 = swerveLib->whl->angle4;
 
-		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI);// + currentFacing;
+		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI) + currentFacing;
 		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
 
 		//Calculate the proper values for the swerve drive motion
