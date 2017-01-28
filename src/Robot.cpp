@@ -168,10 +168,10 @@ public:
 		}
 
 
-		currAng1 = swerveLib->whl->angle1;
-		currAng2 = swerveLib->whl->angle2;
-		currAng3 = swerveLib->whl->angle3;
-		currAng4 = swerveLib->whl->angle4;
+		currAng1 = swerveLib->whl->angleRF;
+		currAng2 = swerveLib->whl->angleLF;
+		currAng3 = swerveLib->whl->angleLB;
+		currAng4 = swerveLib->whl->angleRB;
 
 		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI) + currentFacing;
 		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
@@ -180,37 +180,37 @@ public:
 		if (cntl1->LX != 0 || cntl1->LY != 0 || cntl1->RX != 0) {
 			swerveLib->calcWheelVect(comMag, comAng, cntl1->RX);
 		} else {
-			swerveLib->whl->speed1 = 0;
-			swerveLib->whl->speed2 = 0;
-			swerveLib->whl->speed3 = 0;
-			swerveLib->whl->speed4 = 0;
+			swerveLib->whl->speedRF = 0;
+			swerveLib->whl->speedLF = 0;
+			swerveLib->whl->speedLB = 0;
+			swerveLib->whl->speedRB = 0;
 		}
 
-		if (fabs(swerveLib->whl->angle1 - currAng1) > 90 && fabs(swerveLib->whl->angle1 - currAng1) < 270) {
-			swerveLib->whl->angle1 = ((int)swerveLib->whl->angle1 + 180) % 360;
-			swerveLib->whl->speed1 *= -1;
+		if (fabs(swerveLib->whl->angleRF - currAng1) > 90 && fabs(swerveLib->whl->angleRF - currAng1) < 270) {
+			swerveLib->whl->angleRF = ((int)swerveLib->whl->angleRF + 180) % 360;
+			swerveLib->whl->speedRF *= -1;
 		}
 
-		if (fabs(swerveLib->whl->angle2 - currAng2) > 90 && fabs(swerveLib->whl->angle2 - currAng2) < 270) {
-			swerveLib->whl->angle2 = ((int)swerveLib->whl->angle2 + 180) % 360;
-			swerveLib->whl->speed2 *= -1;
+		if (fabs(swerveLib->whl->angleLF - currAng2) > 90 && fabs(swerveLib->whl->angleLF - currAng2) < 270) {
+			swerveLib->whl->angleLF = ((int)swerveLib->whl->angleLF + 180) % 360;
+			swerveLib->whl->speedLF *= -1;
 		}
 
-		if (fabs(swerveLib->whl->angle3 - currAng3) > 90 && fabs(swerveLib->whl->angle3 - currAng3) < 270) {
-			swerveLib->whl->angle3 = ((int)swerveLib->whl->angle3 + 180) % 360;
-			swerveLib->whl->speed3 *= -1;
+		if (fabs(swerveLib->whl->angleLB - currAng3) > 90 && fabs(swerveLib->whl->angleLB - currAng3) < 270) {
+			swerveLib->whl->angleLB = ((int)swerveLib->whl->angleLB + 180) % 360;
+			swerveLib->whl->speedLB *= -1;
 		}
 
-		if (fabs(swerveLib->whl->angle4 - currAng4) > 90 && fabs(swerveLib->whl->angle4 - currAng4) < 270) {
-			swerveLib->whl->angle4 = ((int)swerveLib->whl->angle4 + 180) % 360;
-			swerveLib->whl->speed4 *= -1;
+		if (fabs(swerveLib->whl->angleRB - currAng4) > 90 && fabs(swerveLib->whl->angleRB - currAng4) < 270) {
+			swerveLib->whl->angleRB = ((int)swerveLib->whl->angleRB + 180) % 360;
+			swerveLib->whl->speedRB *= -1;
 		}
 
 		//Set the PID controllers to angle the wheels properly
-		RFPID->SetSetpoint(swerveLib->whl->angle1);
-		LFPID->SetSetpoint(swerveLib->whl->angle2);
-		RBPID->SetSetpoint(swerveLib->whl->angle4);
-		LBPID->SetSetpoint(swerveLib->whl->angle3);
+		RFPID->SetSetpoint(swerveLib->whl->angleRF);
+		LFPID->SetSetpoint(swerveLib->whl->angleLF);
+		RBPID->SetSetpoint(swerveLib->whl->angleRB);
+		LBPID->SetSetpoint(swerveLib->whl->angleLB);
 
 		//If the commanded speeds are 0, keep the wheels in the position they were in  before
 		/*
@@ -223,18 +223,18 @@ public:
 		*/
 
 		//Set the wheel speed based on what the calculations from the swervelib
-		LFMotDrv->Set(swerveLib->whl->speed2 * -1);
-		RFMotDrv->Set(swerveLib->whl->speed1 * -1);
-		RBMotDrv->Set(swerveLib->whl->speed4 * -1);
-		LBMotDrv->Set(swerveLib->whl->speed3 * -1);
+		LFMotDrv->Set(swerveLib->whl->speedLF * -1);
+		RFMotDrv->Set(swerveLib->whl->speedRF * -1);
+		RBMotDrv->Set(swerveLib->whl->speedRB * -1);
+		LBMotDrv->Set(swerveLib->whl->speedLB * -1);
 
 		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
 		SmartDashboard::PutNumber("LB: ", LBEncDrv->Get());
 		SmartDashboard::PutNumber("RB: ", RBEncDrv->Get());
-		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
-		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
+		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
+		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
 		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
 		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
 

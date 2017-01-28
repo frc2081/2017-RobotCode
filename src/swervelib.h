@@ -10,20 +10,37 @@ const double PI = 3.14159265;
 class wheel {
 public:
 	// front right, front left, rear left, rear right
-	double speed1, speed2, speed3, speed4;
+	double speedRF, speedLF, speedLB, speedRB;
 	// front right, front left, rear left, rear right
-	double angle1, angle2, angle3, angle4;
+	double angleRF, angleLF, angleLB, angleRB;
 };
 
 class swervelib {
 private:
-	double target_WSRF, target_WSLF, target_WSLB, target_WSRB, MAX_WS;
-	double target_WARF, target_WALF, target_WALB, target_WARB;
-	double A, B, C, D, radius, _width, _length;
-	double currAngRF, currAngLF, currAngLB, currAngRB;
-	double centerVecX, centerVecY;
-
-	int a [11] = { 0, 0, 45, 90, 135, 180, 225, 280, 325, 360, 360 };
+	//Wanted speeds for the wheels
+	double _targetWhlSpeed_RF, _targetWhlSpeed_LF, _targetWhlSpeed_LB, _targetWhlSpeed_RB, _MaxWhlSpeed;
+	//Wanted angles for the wheels
+	double _targetWhlAng_RF, _targetWhlAng_LF, _targetWhlAng_LB, _targetWhlAng_RB;
+	//Vectors for the wheels' motion, and dimensions of robot. Width is wheelbase, length is trachwidth, radius is one corrner to center
+	double _A, _B, _C, _D, _radius, _width, _length;
+	//Last commanded angle for wheels
+	double _currAngRF, _currAngLF, _currAngLB, _currAngRB;
+	//Motion the center of the robot wants to take
+	double _centerVecX, _centerVecY;
+	/*
+	 * Wheel 1
+	 * 	X = B
+	 * 	Y = C
+	 * Wheel 2
+	 *	X = B
+	 *	Y = D
+	 * Wheel 3
+	 * 	X = A
+	 * 	Y = D
+	 * Wheel 4
+	 * 	X = A
+	 * 	Y = C
+*/
 public:
     swervelib(double wheelbase, double trackwidth);
 
