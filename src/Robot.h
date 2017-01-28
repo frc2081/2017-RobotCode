@@ -30,8 +30,6 @@ extern cntl *cntl2;
 
 extern swervelib *swerveLib;
 
-extern gyroManager *gyroManagerRun;
-
 extern PIDController *LFPID;
 extern PIDController *LBPID;
 extern PIDController *RFPID;

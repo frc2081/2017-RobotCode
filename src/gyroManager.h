@@ -36,21 +36,21 @@ private:
 	//Destructor
 	virtual ~gyroManager();
 
-	static thread gyro_thread;
+	thread gyro_thread;
 
-	static bool keepRunning;
+	bool keepRunning;
 
-	static bool isRunning;
+	bool isRunning;
 
-	static double lastValue;
+	double lastValue;
 
-	static mutex lockGyroThread;
+	mutex lockGyroThread;
 
-	static ADXRS450_Gyro *gyroCompass;
+	ADXRS450_Gyro *gyroCompass;
 
-	static void gyroPoll();
+	void gyroPoll();
 
-	static gyroManager *manager;
+	static gyroManager *_manager;
 };
 
 #endif /* SRC_GYROMANAGER_H_ */
