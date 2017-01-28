@@ -27,8 +27,8 @@ Encoder *RFEncDrv;
 Encoder *LBEncDrv;
 Encoder *RBEncDrv;
 
-cntl *stick1;
-cntl *stick2;
+cntl *cntl1;
+cntl *cntl2;
 
 swervelib *swerveLib;
 
@@ -38,9 +38,12 @@ PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
 PIDController *RBPID;
-
 float p, i, d;
-bool charlesMode = false;
+float currentAngle;
+float currentFacing;
+float comAng, comMag;
+double currAng1, currAng2, currAng3, currAng4;
+
 class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
@@ -48,16 +51,18 @@ public:
 		//chooser.AddObject(autoNameCustom, autoNameCustom);
 		//frc::SmartDashboard::PutData("Auto Modes", &chooser);
 
-		//Instanciate the joysticks according to the controller class
-		stick1 = new cntl(0, .2);
-		stick2 = new cntl(1, .2);
+		//Instantiate the joysticks according to the controller class
+		cntl1 = new cntl(0, .2);
+		cntl2 = new cntl(1, .2);
 
-		//Instanciate the swerve calculations library
+		//Instantiate the swerve calculations library
 		swerveLib = new swervelib(27, 23.5);
 
-		gyroCompass = new ADXRS450_Gyro();
+		gyroManagerRun = gyroManager::Get();
 
-		//Instanciate the encoders
+		gyroManagerRun->start();
+
+		//Instantiate the encoders
 		LFEnc = new AnalogPotentiometer(1, 360, 0);
 		RFEnc = new AnalogPotentiometer(0, 360, 0);
 		LBEnc = new AnalogPotentiometer(3, 360, 0);
@@ -68,7 +73,7 @@ public:
 		LBEncDrv = new Encoder (0, 1, false);
 		RBEncDrv = new Encoder (2, 3, false);
 
-		//Instanciate the motors based on where they are plugged in
+		//Instantiate the motors based on where they are plugged in
 		LFMotTurn = new Talon(8);
 		RFMotTurn = new Talon(7);
 		LBMotTurn = new Talon(2);
@@ -80,7 +85,7 @@ public:
 		RBMotDrv = new Talon(3);
 
 
-		//Instanciate the PID controllers to their proper values
+		//Instantiate the PID controllers to their proper values
 		p = .025;
 		i = 0;
 		d = 0;
@@ -108,8 +113,6 @@ public:
 		RBPID->SetOutputRange(-1,1);
 		RBPID->SetContinuous();
 		RBPID->Enable();
-
-		gyroCompass->Calibrate();
 
 		LFEncDrv->Reset();
 		RFEncDrv->Reset();
@@ -142,11 +145,9 @@ public:
 
 	void TeleopPeriodic() {
 
-		bStartHld = stick1->bStart;
 		//Update the joystick values
-		stick1->UpdateCntl();
-		stick2->UpdateCntl();
-		bStart = stick1->bStart;
+		cntl1->UpdateCntl();
+		cntl2->UpdateCntl();
 
 
 		//Set the PID values for live tuning
@@ -160,14 +161,50 @@ public:
 		SmartDashboard::PutNumber("LBEnc: ", LBEnc->Get());
 		SmartDashboard::PutNumber("RBEnc: ", RBEnc->Get());
 
-		//Calculate the proper values for the swerve drive motion
-		swerveLib->calcWheelVect(stick1->LX, stick1->LY, stick1->RX);
+		currentFacing = fabs(gyroManagerRun->getLastValue());
 
-		if (charlesMode == true) {
-			swerveLib->calcWheelVect(stick1->RX, stick1->RY, stick1->LX);
+		if (currentFacing > 360) {
+			currentFacing = (int)currentFacing % 360;
 		}
 
 
+		currAng1 = swerveLib->whl->angle1;
+		currAng2 = swerveLib->whl->angle2;
+		currAng3 = swerveLib->whl->angle3;
+		currAng4 = swerveLib->whl->angle4;
+
+		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI) + currentFacing;
+		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
+
+		//Calculate the proper values for the swerve drive motion
+		if (cntl1->LX != 0 || cntl1->LY != 0 || cntl1->RX != 0) {
+			swerveLib->calcWheelVect(comMag, comAng, cntl1->RX);
+		} else {
+			swerveLib->whl->speed1 = 0;
+			swerveLib->whl->speed2 = 0;
+			swerveLib->whl->speed3 = 0;
+			swerveLib->whl->speed4 = 0;
+		}
+
+		if (fabs(swerveLib->whl->angle1 - currAng1) > 90 && fabs(swerveLib->whl->angle1 - currAng1) < 270) {
+			swerveLib->whl->angle1 = ((int)swerveLib->whl->angle1 + 180) % 360;
+			swerveLib->whl->speed1 *= -1;
+		}
+
+		if (fabs(swerveLib->whl->angle2 - currAng2) > 90 && fabs(swerveLib->whl->angle2 - currAng2) < 270) {
+			swerveLib->whl->angle2 = ((int)swerveLib->whl->angle2 + 180) % 360;
+			swerveLib->whl->speed2 *= -1;
+		}
+
+		if (fabs(swerveLib->whl->angle3 - currAng3) > 90 && fabs(swerveLib->whl->angle3 - currAng3) < 270) {
+			swerveLib->whl->angle3 = ((int)swerveLib->whl->angle3 + 180) % 360;
+			swerveLib->whl->speed3 *= -1;
+		}
+
+		if (fabs(swerveLib->whl->angle4 - currAng4) > 90 && fabs(swerveLib->whl->angle4 - currAng4) < 270) {
+			swerveLib->whl->angle4 = ((int)swerveLib->whl->angle4 + 180) % 360;
+			swerveLib->whl->speed4 *= -1;
+		}
 
 		//Set the PID controllers to angle the wheels properly
 		RFPID->SetSetpoint(swerveLib->whl->angle1);
@@ -175,12 +212,15 @@ public:
 		RBPID->SetSetpoint(swerveLib->whl->angle4);
 		LBPID->SetSetpoint(swerveLib->whl->angle3);
 
-			if (fabs(swerveLib->whl->speed1) == 0 && fabs(swerveLib->whl->speed2) == 0 && fabs(swerveLib->whl->speed3) == 0 && fabs(swerveLib->whl->speed4) == 0) {
-				RFPID->SetSetpoint(225);
-				LFPID->SetSetpoint(135);
-				RBPID->SetSetpoint(315);
-				LBPID->SetSetpoint(45);
-			}
+		//If the commanded speeds are 0, keep the wheels in the position they were in  before
+		/*
+		if (fabs(cntl1->LX) == 0 && fabs(cntl1->LY) == 0 && fabs(cntl1->RX) == 0) {
+			RFPID->SetSetpoint(preAng1);
+			LFPID->SetSetpoint(preAng2);
+			RBPID->SetSetpoint(preAng4);
+			LBPID->SetSetpoint(preAng3);
+		}
+		*/
 
 		//Set the wheel speed based on what the calculations from the swervelib
 		LFMotDrv->Set(swerveLib->whl->speed2 * -1);
@@ -188,14 +228,15 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speed4 * -1);
 		LBMotDrv->Set(swerveLib->whl->speed3 * -1);
 
+		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
 		SmartDashboard::PutNumber("LB: ", LBEncDrv->Get());
 		SmartDashboard::PutNumber("RB: ", RBEncDrv->Get());
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angle1, swerveLib->whl->angle2, swerveLib->whl->angle3, swerveLib->whl->angle4);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speed1, swerveLib->whl->speed2, swerveLib->whl->speed3, swerveLib->whl->speed4);
-		printf("%.2f, %.2f, %.2f\n\n", stick1->LX, stick1->LY, stick1->RX);
-
+		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
+		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
 
 	}
 
@@ -209,6 +250,7 @@ private:
 	const std::string autoNameDefault = "Default";
 	const std::string autoNameCustom = "My Auto";
 	std::string autoSelected;
+	gyroManager *gyroManagerRun;
 };
 
 START_ROBOT_CLASS(Robot)
