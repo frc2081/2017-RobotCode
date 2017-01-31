@@ -16,6 +16,8 @@ Talon *LFMotTurn;
 Talon *LBMotTurn;
 Talon *RFMotTurn;
 Talon *RBMotTurn;
+VictorSP*ClimbMotDrv;
+VictorSP * ballLoad;
 
 AnalogPotentiometer *LFEnc;
 AnalogPotentiometer *LBEnc;
@@ -83,6 +85,8 @@ public:
 		LBMotDrv = new Talon(4);
 		RBMotDrv = new Talon(3);
 
+		ClimbMotDrv = new VictorSP(9);
+		ballLoad = new VictorSP(10);
 
 		//Instantiate the PID controllers to their proper values
 		p = .025;
@@ -218,7 +222,14 @@ public:
 		RFMotDrv->Set(swerveLib->whl->speedRF * -1);
 		RBMotDrv->Set(swerveLib->whl->speedRB * -1);
 		LBMotDrv->Set(swerveLib->whl->speedLB * -1);
+		//Motor for Climbing
+		if(cntl1->bA->State==true){
+		ClimbMotDrv->Set(.5);
+		} else {
+			ClimbMotDrv->Set(0);
+		}
 
+		ballLoad->Set(.5);
 		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
@@ -228,7 +239,7 @@ public:
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
 		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
 		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
-
+		std::cout << cntl1->bA->RE << ClimbMotDrv->Get() << "\n\n";
 	}
 
 	void TestPeriodic() {
