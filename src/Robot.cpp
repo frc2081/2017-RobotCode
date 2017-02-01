@@ -152,16 +152,16 @@ public:
 		cntl1->UpdateCntl();
 		cntl2->UpdateCntl();
 
+		//Soft limit the rotational speed so the gyro is not overloaded
 		cntl1->RX *= .9;
 
 		//Gyro needs to be mounted in center of robot otherwise it will not work properly
 		currentFacing = fabs(gyroManagerRun->getLastValue());
 
-		if (currentFacing >= 300) {
-			currentFacing = ((int)currentFacing % 300);
+		if (currentFacing >= 360) {
+			currentFacing = ((int)currentFacing % 360);
 		}
 
-		currentFacing *= 1.2;
 
 		currAng1 = swerveLib->whl->angleRF;
 		currAng2 = swerveLib->whl->angleLF;

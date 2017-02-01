@@ -10,6 +10,7 @@
 #include "cntl.h"
 #include "swervelib.h"
 #include "gyroManager.h"
+#include "autoCommands/CommandManager.h"
 
 extern Talon *LFMotDrv;
 extern Talon *LBMotDrv;
