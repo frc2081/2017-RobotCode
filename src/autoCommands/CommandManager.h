@@ -10,14 +10,34 @@
 
 #include "..\swervelib.h"
 #include "CommandIO.h"
+#include "CommandBase.h"
+#include <vector>
+
+using namespace std;
+
+enum robotTeam {
+	BLUE,
+	RED
+};
+
+enum robotStation {
+	ONE,
+	TWO,
+	THREE
+};
 class CommandManager {
 public:
-	CommandManager(swervelib *swerveLib);
+	CommandManager(swervelib *swerveLib, robotTeam, robotStation);
 	virtual ~CommandManager();
 	commandOutput tick(commandInput input);
 
+
 private:
-	swervelib *swerveLib;
+	swervelib *_swerveLib;
+
+	vector<CommandBase> commands;
+
+	vector<CommandBase> buildCommands(robotTeam, robotStation);
 };
 
 #endif /* SRC_AUTOCOMMANDS_COMMANDMANAGER_H_ */
