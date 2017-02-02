@@ -10,7 +10,8 @@
 #include "cntl.h"
 #include "swervelib.h"
 #include "gyroManager.h"
-#include "autoCommands/CommandManager.h"
+#include "autoCommands\CommandManager.h"
+#include "autoCommands\CommandIO.h"
 
 extern Talon *LFMotDrv;
 extern Talon *LBMotDrv;
@@ -21,9 +22,9 @@ extern Talon *LBMotTurn;
 extern Talon *RFMotTurn;
 extern Talon *RBMotTurn;
 
-extern AnalogPotentiometer *LFEnc;
-extern AnalogPotentiometer *LBEnc;
-extern AnalogPotentiometer *RFEnc;
+extern AnalogPotentiometer *LFEncTurn;
+extern AnalogPotentiometer *LBEncTurn;
+extern AnalogPotentiometer *RFEncTurn;
 extern AnalogPotentiometer *RBEnc;
 
 extern cntl *cntl1;
@@ -47,7 +48,10 @@ extern float currentFacing;
 extern double currAng1, currAng2, currAng3, currAng4;
 const float period = 0.05;
 
-extern VictorSP*ClimbMotDrv;
+extern VictorSP *ClimbMotDrv;
 extern VictorSP *ballLoad;
+
+extern commandInput autoInput;
+extern commandOutput autoOutput;
 
 #endif /* SRC_ROBOT_H_ */

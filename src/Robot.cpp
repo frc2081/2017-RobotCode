@@ -19,10 +19,10 @@ Talon *RBMotTurn;
 VictorSP*ClimbMotDrv;
 VictorSP * ballLoad;
 
-AnalogPotentiometer *LFEnc;
-AnalogPotentiometer *LBEnc;
-AnalogPotentiometer *RFEnc;
-AnalogPotentiometer *RBEnc;
+AnalogPotentiometer *LFEncTurn;
+AnalogPotentiometer *LBEncTurn;
+AnalogPotentiometer *RFEncTurn;
+AnalogPotentiometer *RBEncTurn;
 
 Encoder *LFEncDrv;
 Encoder *RFEncDrv;
@@ -45,6 +45,9 @@ float comAng, comMag;
 double currAng1, currAng2, currAng3, currAng4;
 double gyroZero, gyroZeroOffset;
 
+commandInput autoInput;
+commandOutput autoOutput;
+
 class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
@@ -64,10 +67,10 @@ public:
 		gyroManagerRun->start();
 
 		//Instantiate the encoders
-		LFEnc = new AnalogPotentiometer(1, 360, 0);
-		RFEnc = new AnalogPotentiometer(0, 360, 0);
-		LBEnc = new AnalogPotentiometer(3, 360, 0);
-		RBEnc = new AnalogPotentiometer(2, 360, 0);
+		LFEncTurn = new AnalogPotentiometer(1, 360, 0);
+		RFEncTurn = new AnalogPotentiometer(0, 360, 0);
+		LBEncTurn = new AnalogPotentiometer(3, 360, 0);
+		RBEncTurn = new AnalogPotentiometer(2, 360, 0);
 
 		LFEncDrv = new Encoder(6, 7, false);
 		RFEncDrv = new Encoder(4, 5, false);
@@ -92,10 +95,10 @@ public:
 		p = .025;
 		i = 0;
 		d = 0;
-		LFPID = new PIDController(p, i, d, LFEnc, LFMotTurn, period);
-		RFPID = new PIDController(p, i, d, RFEnc, RFMotTurn, period);
-		LBPID = new PIDController(p, i, d, LBEnc, LBMotTurn, period);
-		RBPID = new PIDController(p, i, d, RBEnc, RBMotTurn, period);
+		LFPID = new PIDController(p, i, d, LFEncTurn, LFMotTurn, period);
+		RFPID = new PIDController(p, i, d, RFEncTurn, RFMotTurn, period);
+		LBPID = new PIDController(p, i, d, LBEncTurn, LBMotTurn, period);
+		RBPID = new PIDController(p, i, d, RBEncTurn, RBMotTurn, period);
 
 		LFPID->SetInputRange(0,360);
 		LFPID->SetOutputRange(-1,1);
@@ -128,19 +131,42 @@ public:
 		// std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
 		//std::cout << "Auto selected: " << autoSelected << std::endl;
 
-		if (autoSelected == autoNameCustom) {
-			// Custom Auto goes here
-		} else {
-			// Default Auto goes here
-		}
+		autoCom = new CommandManager(swerveLib, RED, ONE);
+
 	}
 
 	void AutonomousPeriodic() {
-		if (autoSelected == autoNameCustom) {
-			// Custom Auto goes here
-		} else {
-			// Default Auto goes here
-		}
+
+		autoInput.LFWhlDrvEnc = LFEncDrv->Get();
+		autoInput.RFWhlDrvEnc = RFEncDrv->Get();
+		autoInput.LBWhlDrvEnc = LBEncDrv->Get();
+		autoInput.RBWhlDrvEnc = RBEncDrv->Get();
+
+		autoInput.LFWhlTurnEnc = LFEncTurn->Get();
+		autoInput.RFWhlTurnEnc = RFEncTurn->Get();
+		autoInput.LBWhlTurnEnc = LBEncTurn->Get();
+		autoInput.RBWhlTurnEnc = RBEncTurn->Get();
+
+		autoInput.currentGyroReading = gyroManagerRun->getLastValue();
+
+		autoOutput = autoCom->tick(autoInput);
+
+		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
+
+		LFPID->SetSetpoint(swerveLib->whl->angleLF);
+		RFPID->SetSetpoint(swerveLib->whl->angleRF);
+		LBPID->SetSetpoint(swerveLib->whl->angleLB);
+		RBPID->SetSetpoint(swerveLib->whl->angleRB);
+
+		LFMotDrv->Set(swerveLib->whl->speedLF);
+		RFMotDrv->Set(swerveLib->whl->speedRF);
+		LBMotDrv->Set(swerveLib->whl->speedLB);
+		RBMotDrv->Set(swerveLib->whl->speedRB);
+
+		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
+		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
+		printf("%.2f, %.2f, %.2f\n\n", autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
+
 	}
 
 	void TeleopInit() {
@@ -253,6 +279,7 @@ private:
 	const std::string autoNameCustom = "My Auto";
 	std::string autoSelected;
 	gyroManager *gyroManagerRun;
+	CommandManager *autoCom;
 };
 
 START_ROBOT_CLASS(Robot)

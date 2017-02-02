@@ -16,7 +16,7 @@ void init() {
 
 }
 
-commandOutput tick(commandInput input) {
+commandOutput CommandVision::tick(commandInput input) {
 
 }
 

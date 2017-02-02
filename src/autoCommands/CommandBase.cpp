@@ -5,7 +5,7 @@
  *      Author: FIRSTUser
  */
 
-#include <autoCommands/CommandBase.h>
+#include "CommandBase.h"
 
 
 CommandBase::CommandBase() {
@@ -19,6 +19,10 @@ void CommandBase::setComplete() {
 
 commandOutput CommandBase::doNothing() {
 	return commandOutput();
+}
+
+bool CommandBase::isDone() {
+	return commandComplete;
 }
 CommandBase::~CommandBase() {
 	// TODO Auto-generated destructor stub

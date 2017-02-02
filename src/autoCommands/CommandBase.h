@@ -8,7 +8,6 @@
 #ifndef SRC_AUTOCOMMANDS_COMMANDBASE_H_
 #define SRC_AUTOCOMMANDS_COMMANDBASE_H_
 #include "CommandInterface.h"
-
 #include "..\swervelib.h"
 #include "CommandIO.h"
 class CommandBase : public CommandInterface {

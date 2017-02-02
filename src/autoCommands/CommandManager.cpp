@@ -16,17 +16,33 @@ CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStatio
 	commands = buildCommands(team, station);
 
 	_swerveLib = swerveLib;
+
+	currCommand = NULL;
+
+	currCommand = getNextCommand();
 }
 
 
-commandOutput tick(commandInput input) {
+commandOutput CommandManager::tick(commandInput input) {
 
+	if (currCommand->isDone()) currCommand = getNextCommand();
+
+	return currCommand->tick(input);
 }
 
-vector<CommandBase> CommandManager::buildCommands(robotTeam team, robotStation station) {
-	vector<CommandBase> toExecute = vector<CommandBase>();
-	toExecute.push_back(CommandDrive(_swerveLib, 2));
-	toExecute.push_back(CommandPause(-1));
+CommandBase *CommandManager::getNextCommand() {
+	CommandBase *commandPop =  commands.front();
+	commands.pop();
+
+	if (currCommand != NULL) delete currCommand;
+
+	return commandPop;
+}
+
+queue<CommandBase*> CommandManager::buildCommands(robotTeam team, robotStation station) {
+	queue<CommandBase*> toExecute = queue<CommandBase*>();
+	toExecute.push(new CommandDrive(_swerveLib, 2));
+	toExecute.push(new CommandPause(-1));
 	return toExecute;
 }
 CommandManager::~CommandManager() {

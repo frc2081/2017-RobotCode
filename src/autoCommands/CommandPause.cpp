@@ -28,7 +28,7 @@ commandOutput CommandPause::tick(commandInput input) {
 	return doNothing();
 }
 
-void init(commandInput input) {
+void CommandPause::init(commandInput input) {
 
 }
 

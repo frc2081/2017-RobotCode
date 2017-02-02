@@ -11,7 +11,7 @@
 #include "..\swervelib.h"
 #include "CommandIO.h"
 #include "CommandBase.h"
-#include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -31,13 +31,16 @@ public:
 	virtual ~CommandManager();
 	commandOutput tick(commandInput input);
 
-
+protected:
+	CommandBase *getNextCommand();
 private:
 	swervelib *_swerveLib;
 
-	vector<CommandBase> commands;
+	queue<CommandBase*> commands;
 
-	vector<CommandBase> buildCommands(robotTeam, robotStation);
+	queue<CommandBase*> buildCommands(robotTeam, robotStation);
+
+	CommandBase *currCommand;
 };
 
 #endif /* SRC_AUTOCOMMANDS_COMMANDMANAGER_H_ */
