@@ -26,6 +26,8 @@ public:
 
 	bool isRunningCheck();
 
+	void resetGyro();
+
 	//Infinite ducks
 
 

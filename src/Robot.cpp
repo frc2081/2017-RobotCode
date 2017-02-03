@@ -100,6 +100,8 @@ public:
 		LBPID = new PIDController(p, i, d, LBEncTurn, LBMotTurn, period);
 		RBPID = new PIDController(p, i, d, RBEncTurn, RBMotTurn, period);
 
+		LFEncDrv->SetDistancePerPulse(12);
+
 		LFPID->SetInputRange(0,360);
 		LFPID->SetOutputRange(-1,1);
 		LFPID->SetContinuous();
@@ -124,23 +126,24 @@ public:
 		RFEncDrv->Reset();
 		LBEncDrv->Reset();
 		RBEncDrv->Reset();
+
+
 	}
 
 	void AutonomousInit() override {
 		//autoSelected = chooser.GetSelected();
 		// std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
 		//std::cout << "Auto selected: " << autoSelected << std::endl;
-
 		autoCom = new CommandManager(swerveLib, RED, ONE);
-
+		gyroManagerRun->resetGyro();
 	}
 
 	void AutonomousPeriodic() {
 
-		autoInput.LFWhlDrvEnc = LFEncDrv->Get();
-		autoInput.RFWhlDrvEnc = RFEncDrv->Get();
-		autoInput.LBWhlDrvEnc = LBEncDrv->Get();
-		autoInput.RBWhlDrvEnc = RBEncDrv->Get();
+		autoInput.LFWhlDrvEnc = LFEncDrv->GetDistance();
+		autoInput.RFWhlDrvEnc = RFEncDrv->GetDistance();
+		autoInput.LBWhlDrvEnc = LBEncDrv->GetDistance();
+		autoInput.RBWhlDrvEnc = RBEncDrv->GetDistance();
 
 		autoInput.LFWhlTurnEnc = LFEncTurn->Get();
 		autoInput.RFWhlTurnEnc = RFEncTurn->Get();
@@ -158,10 +161,10 @@ public:
 		LBPID->SetSetpoint(swerveLib->whl->angleLB);
 		RBPID->SetSetpoint(swerveLib->whl->angleRB);
 
-		LFMotDrv->Set(swerveLib->whl->speedLF);
-		RFMotDrv->Set(swerveLib->whl->speedRF);
-		LBMotDrv->Set(swerveLib->whl->speedLB);
-		RBMotDrv->Set(swerveLib->whl->speedRB);
+		LFMotDrv->Set(-swerveLib->whl->speedLF);
+		RFMotDrv->Set(-swerveLib->whl->speedRF);
+		LBMotDrv->Set(-swerveLib->whl->speedLB);
+		RBMotDrv->Set(-swerveLib->whl->speedRB);
 
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);

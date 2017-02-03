@@ -6,6 +6,7 @@
  */
 
 #include <autoCommands/CommandDrive.h>
+#include <stdio.h>
 
 CommandDrive::CommandDrive(swervelib *swerveLib, double toTravel) {
 	// TODO Auto-generated constructor stub
@@ -16,7 +17,7 @@ CommandDrive::CommandDrive(swervelib *swerveLib, double toTravel) {
 commandOutput CommandDrive::tick(commandInput input) {
 
 	if (checkDistance(input) >= _toTravel) {
-		isDone();
+		setComplete();
 		return doNothing();
 	}
 
@@ -38,6 +39,7 @@ void CommandDrive::init(commandInput input) {
 	LBWhlTurnEncInit = input.LBWhlTurnEnc;
 	RBWhlTurnEncInit = input.RBWhlTurnEnc;
 
+	printf("DRIVE INIT\n");
 }
 
 double CommandDrive::checkDistance(commandInput input) {

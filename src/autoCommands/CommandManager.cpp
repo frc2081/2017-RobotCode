@@ -9,23 +9,28 @@
 #include "CommandDrive.h"
 #include "CommandPause.h"
 #include "CommandTurn.h"
+#include <stdio.h>
 
 CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStation station) {
 	// TODO Auto-generated constructor stub
 
-	commands = buildCommands(team, station);
+	commands = queue<CommandBase*>();
+	buildCommands(&commands, team, station);
 
 	_swerveLib = swerveLib;
 
 	currCommand = NULL;
 
-	currCommand = getNextCommand();
 }
 
 
 commandOutput CommandManager::tick(commandInput input) {
 
-	if (currCommand->isDone()) currCommand = getNextCommand();
+
+	if (currCommand == NULL || currCommand->isDone()) {
+		currCommand = getNextCommand();
+		currCommand->init(input);
+	}
 
 	return currCommand->tick(input);
 }
@@ -36,14 +41,13 @@ CommandBase *CommandManager::getNextCommand() {
 
 	if (currCommand != NULL) delete currCommand;
 
+	printf("COMMAND GOTTEN\n");
 	return commandPop;
 }
 
-queue<CommandBase*> CommandManager::buildCommands(robotTeam team, robotStation station) {
-	queue<CommandBase*> toExecute = queue<CommandBase*>();
-	toExecute.push(new CommandDrive(_swerveLib, 2));
-	toExecute.push(new CommandPause(-1));
-	return toExecute;
+void CommandManager::buildCommands(queue<CommandBase*> *queue, robotTeam team, robotStation station) {
+	queue->push(new CommandDrive(_swerveLib, 200));
+	queue->push(new CommandPause(-1));
 }
 CommandManager::~CommandManager() {
 	// TODO Auto-generated destructor stub

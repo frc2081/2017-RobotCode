@@ -38,7 +38,7 @@ private:
 
 	queue<CommandBase*> commands;
 
-	queue<CommandBase*> buildCommands(robotTeam, robotStation);
+	void buildCommands(queue<CommandBase*> *queue,robotTeam, robotStation);
 
 	CommandBase *currCommand;
 };

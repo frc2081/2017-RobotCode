@@ -6,6 +6,7 @@
  */
 
 #include <autoCommands/CommandPause.h>
+#include <stdio.h>
 
 CommandPause::CommandPause(double toWaitSec) {
 	// TODO Auto-generated constructor stub
@@ -23,13 +24,13 @@ commandOutput CommandPause::tick(commandInput input) {
 
 
 	if (_toWaitSec >= 0 && elapsed >= _toWaitSec)
-		isDone();
+		setComplete();
+
 
 	return doNothing();
 }
 
 void CommandPause::init(commandInput input) {
-
 }
 
 CommandPause::~CommandPause() {
