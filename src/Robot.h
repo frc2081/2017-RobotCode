@@ -13,14 +13,20 @@
 #include "autoCommands\CommandManager.h"
 #include "autoCommands\CommandIO.h"
 
-extern Talon *LFMotDrv;
-extern Talon *LBMotDrv;
-extern Talon *RFMotDrv;
-extern Talon *RBMotDrv;
-extern Talon *LFMotTurn;
-extern Talon *LBMotTurn;
-extern Talon *RFMotTurn;
-extern Talon *RBMotTurn;
+extern VictorSP *LFMotDrv;
+extern VictorSP *LBMotDrv;
+extern VictorSP *RFMotDrv;
+extern VictorSP *RBMotDrv;
+extern VictorSP *LFMotTurn;
+extern VictorSP *LBMotTurn;
+extern VictorSP *RFMotTurn;
+extern VictorSP *RBMotTurn;
+extern VictorSP *ballFeederMot;
+extern VictorSP *ClimbMotDrv;
+extern VictorSP *ballLoad;
+extern VictorSP *ballShooterMot;
+
+extern Servo *shooterAimServo;
 
 extern AnalogPotentiometer *LFEncTurn;
 extern AnalogPotentiometer *LBEncTurn;
@@ -46,10 +52,10 @@ extern float p, i, d;
 extern float comAng, comMag;
 extern float currentFacing;
 extern double currAng1, currAng2, currAng3, currAng4;
+extern double feederSpeed;
+extern bool runShooter;
+extern double shooterAimLocation;
 const float period = 0.05;
-
-extern VictorSP *ClimbMotDrv;
-extern VictorSP *ballLoad;
 
 extern commandInput autoInput;
 extern commandOutput autoOutput;

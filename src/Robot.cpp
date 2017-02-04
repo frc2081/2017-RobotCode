@@ -8,16 +8,20 @@
 #include <SmartDashboard/SmartDashboard.h>
 #include "Robot.h"
 
-Talon *LFMotDrv;
-Talon *LBMotDrv;
-Talon *RFMotDrv;
-Talon *RBMotDrv;
-Talon *LFMotTurn;
-Talon *LBMotTurn;
-Talon *RFMotTurn;
-Talon *RBMotTurn;
-VictorSP*ClimbMotDrv;
-VictorSP * ballLoad;
+VictorSP *LFMotDrv;
+VictorSP *LBMotDrv;
+VictorSP *RFMotDrv;
+VictorSP *RBMotDrv;
+VictorSP *LFMotTurn;
+VictorSP *LBMotTurn;
+VictorSP *RFMotTurn;
+VictorSP *RBMotTurn;
+VictorSP *ClimbMotDrv;
+VictorSP *ballLoad;
+VictorSP *ballFeederMot;
+VictorSP *ballShooterMot;
+
+Servo *shooterAimServo;
 
 AnalogPotentiometer *LFEncTurn;
 AnalogPotentiometer *LBEncTurn;
@@ -43,7 +47,9 @@ float currentAngle;
 float currentFacing;
 float comAng, comMag;
 double currAng1, currAng2, currAng3, currAng4;
-double gyroZero, gyroZeroOffset;
+double feederSpeed;
+double shooterAimLocation;
+bool runShooter;
 
 commandInput autoInput;
 commandOutput autoOutput;
@@ -78,18 +84,24 @@ public:
 		RBEncDrv = new Encoder (2, 3, false);
 
 		//Instantiate the motors based on where they are plugged in
-		LFMotTurn = new Talon(8);
-		RFMotTurn = new Talon(7);
-		LBMotTurn = new Talon(2);
-		RBMotTurn = new Talon(1);
+		LFMotTurn = new VictorSP(8);
+		RFMotTurn = new VictorSP(7);
+		LBMotTurn = new VictorSP(2);
+		RBMotTurn = new VictorSP(1);
 
-		LFMotDrv = new Talon(6);
-		RFMotDrv = new Talon(5);
-		LBMotDrv = new Talon(4);
-		RBMotDrv = new Talon(3);
+		LFMotDrv = new VictorSP(6);
+		RFMotDrv = new VictorSP(5);
+		LBMotDrv = new VictorSP(4);
+		RBMotDrv = new VictorSP(3);
+		ClimbMotDrv = new VictorSP(13);
 
-		ClimbMotDrv = new VictorSP(9);
+		//Located on the MXP expansion board
 		ballLoad = new VictorSP(10);
+		ballFeederMot = new VictorSP(11);
+		ballShooterMot = new VictorSP(12);
+		shooterAimServo = new Servo(9);
+
+		runShooter = false;
 
 		//Instantiate the PID controllers to their proper values
 		p = .025;
@@ -164,8 +176,6 @@ public:
 		LBPID->SetSetpoint(swerveLib->whl->angleLB);
 		RBPID->SetSetpoint(swerveLib->whl->angleRB);
 
-		printf("%.2f\n", LBPID->GetSetpoint());
-		printf("%.2f\n", LBEncTurn->Get());
 		LFMotDrv->Set(swerveLib->whl->speedLF);
 		RFMotDrv->Set(swerveLib->whl->speedRF);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
@@ -257,14 +267,42 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speedRB * -1);
 		LBMotDrv->Set(swerveLib->whl->speedLB * -1);
 		//Motor for Climbing
-		if(cntl1->bA->State==true){
+		if(cntl1->bY->State==true){
 		ClimbMotDrv->Set(.5);
 		} else {
 			ClimbMotDrv->Set(0);
 		}
 
-		ballLoad->Set(.5);
+		//Set the ball load speeds. Speed values can be changed to whatever is needed
+		if (cntl1->bLB->State == true) ballLoad->Set(-.5);
+		else if (cntl1->bRB->State == true) ballLoad->Set(.5);
+		else ballLoad->Set(0);
+
+		//Get the trigger values on the second controller. The left one is negative because it runs the feeder in reverse
+		feederSpeed = cntl1->RTrig - cntl1->LTrig;
+		//Set the ball feeder to the desired speed
+		ballFeederMot->Set(feederSpeed);
+
+		//Toggle the shooter with the start button
+		if (cntl1->bStart->RE == true) {
+			runShooter = !runShooter;
+		}
+
+		if (runShooter == true) ballShooterMot->Set(1);
+		else ballShooterMot->Set(0);
+
+
+
+		//Aim the shooter up and down depending on how long the buttons are held down
+		if (cntl1->bA->State == true) shooterAimLocation += 0.01;
+		if (cntl1->bB->State == true) shooterAimLocation -= 0.01;
+		if (shooterAimLocation > 1) shooterAimLocation = 1;
+		if (shooterAimLocation < 0) shooterAimLocation = 0;
+
+		shooterAimServo->Set(shooterAimLocation);
+
 		//Debug print statements
+		/*
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
 		SmartDashboard::PutNumber("LB: ", LBEncDrv->Get());
@@ -273,7 +311,12 @@ public:
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
 		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
 		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
+		*/
 		std::cout << cntl1->bA->RE << ClimbMotDrv->Get() << "\n\n";
+		printf("%.2f, %.2f\n", feederSpeed, ballFeederMot->Get());
+		printf("%d, %.2f\n", runShooter, ballShooterMot->Get());
+		printf("%.2f\n", ballLoad->Get());
+		printf("%.2f\n\n", ClimbMotDrv->Get());
 	}
 
 	void TestPeriodic() {
