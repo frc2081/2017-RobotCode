@@ -275,24 +275,24 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speedRB * -1);
 		LBMotDrv->Set(swerveLib->whl->speedLB * -1);
 		//Motor for Climbing
-		if(cntl1->bY->State==true){
+		if(cntl2->bY->State==true){
 		ClimbMotDrv->Set(.5);
 		} else {
 			ClimbMotDrv->Set(0);
 		}
 
 		//Set the ball load speeds. Speed values can be changed to whatever is needed
-		if (cntl1->bLB->State == true) ballLoad->Set(-.5);
-		else if (cntl1->bRB->State == true) ballLoad->Set(.5);
+		if (cntl2->bLB->State == true) ballLoad->Set(-.5);
+		else if (cntl2->bRB->State == true) ballLoad->Set(.5);
 		else ballLoad->Set(0);
 
 		//Get the trigger values on the second controller. The left one is negative because it runs the feeder in reverse
-		feederSpeed = cntl1->RTrig - cntl1->LTrig;
+		feederSpeed = cntl2->RTrig - cntl2->LTrig;
 		//Set the ball feeder to the desired speed
 		ballFeederMot->Set(feederSpeed);
 
 		//Toggle the shooter with the start button
-		if (cntl1->bStart->RE == true) {
+		if (cntl2->bStart->RE == true) {
 			runShooter = !runShooter;
 		}
 
@@ -302,8 +302,8 @@ public:
 
 
 		//Aim the shooter up and down depending on how long the buttons are held down
-		if (cntl1->bA->State == true) shooterAimLocation += 0.01;
-		if (cntl1->bB->State == true) shooterAimLocation -= 0.01;
+		if (cntl2->bA->State == true) shooterAimLocation += 0.01;
+		if (cntl2->bB->State == true) shooterAimLocation -= 0.01;
 		if (shooterAimLocation > 1) shooterAimLocation = 1;
 		if (shooterAimLocation < 0) shooterAimLocation = 0;
 
