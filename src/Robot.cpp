@@ -100,7 +100,10 @@ public:
 		LBPID = new PIDController(p, i, d, LBEncTurn, LBMotTurn, period);
 		RBPID = new PIDController(p, i, d, RBEncTurn, RBMotTurn, period);
 
-		LFEncDrv->SetDistancePerPulse(12);
+		LFEncDrv->SetDistancePerPulse(.1904545454545);
+		RFEncDrv->SetDistancePerPulse(.1904545454545);
+		LBEncDrv->SetDistancePerPulse(.1904545454545);
+		RBEncDrv->SetDistancePerPulse(.1904545454545);
 
 		LFPID->SetInputRange(0,360);
 		LFPID->SetOutputRange(-1,1);
@@ -135,15 +138,14 @@ public:
 		// std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
 		//std::cout << "Auto selected: " << autoSelected << std::endl;
 		autoCom = new CommandManager(swerveLib, RED, ONE);
-		gyroManagerRun->resetGyro();
 	}
 
 	void AutonomousPeriodic() {
 
-		autoInput.LFWhlDrvEnc = LFEncDrv->GetDistance();
-		autoInput.RFWhlDrvEnc = RFEncDrv->GetDistance();
-		autoInput.LBWhlDrvEnc = LBEncDrv->GetDistance();
-		autoInput.RBWhlDrvEnc = RBEncDrv->GetDistance();
+		autoInput.LFWhlDrvEnc = LFEncDrv->Get();
+		autoInput.RFWhlDrvEnc = RFEncDrv->Get();
+		autoInput.LBWhlDrvEnc = LBEncDrv->Get();
+		autoInput.RBWhlDrvEnc = RBEncDrv->Get();
 
 		autoInput.LFWhlTurnEnc = LFEncTurn->Get();
 		autoInput.RFWhlTurnEnc = RFEncTurn->Get();
@@ -152,6 +154,7 @@ public:
 
 		autoInput.currentGyroReading = gyroManagerRun->getLastValue();
 
+		printf("%.2f\n", autoInput.LBWhlDrvEnc);
 		autoOutput = autoCom->tick(autoInput);
 
 		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
@@ -161,10 +164,12 @@ public:
 		LBPID->SetSetpoint(swerveLib->whl->angleLB);
 		RBPID->SetSetpoint(swerveLib->whl->angleRB);
 
-		LFMotDrv->Set(-swerveLib->whl->speedLF);
-		RFMotDrv->Set(-swerveLib->whl->speedRF);
-		LBMotDrv->Set(-swerveLib->whl->speedLB);
-		RBMotDrv->Set(-swerveLib->whl->speedRB);
+		printf("%.2f\n", LBPID->GetSetpoint());
+		printf("%.2f\n", LBEncTurn->Get());
+		LFMotDrv->Set(swerveLib->whl->speedLF);
+		RFMotDrv->Set(swerveLib->whl->speedRF);
+		LBMotDrv->Set(swerveLib->whl->speedLB);
+		RBMotDrv->Set(swerveLib->whl->speedRB);
 
 		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
@@ -273,6 +278,13 @@ public:
 
 	void TestPeriodic() {
 		lw->Run();
+	}
+
+	void DisabledPeriodic() {
+		/*printf("%.2f\n", LFEncTurn->Get());
+		printf("%.2f\n", RFEncTurn->Get());
+		printf("%.2f\n", LBEncTurn->Get());
+		printf("%.2f\n\n", RBEncTurn->Get());*/
 	}
 
 private:
