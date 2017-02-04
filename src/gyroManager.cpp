@@ -30,6 +30,10 @@ gyroManager *gyroManager::Get() {
 	return _manager;
 }
 
+void gyroManager::resetGyro() {
+	gyroCompass->Reset();
+}
+
 void gyroManager::start() {
 	if (gyroManager::isRunningCheck()) {
 		return;
