@@ -51,6 +51,7 @@ double feederSpeed;
 double shooterAimLocation;
 bool runShooter;
 
+CAMERAFEEDS *cameras;
 commandInput autoInput;
 commandOutput autoOutput;
 
@@ -93,15 +94,19 @@ public:
 		RFMotDrv = new VictorSP(5);
 		LBMotDrv = new VictorSP(4);
 		RBMotDrv = new VictorSP(3);
-		ClimbMotDrv = new VictorSP(13);
+		ClimbMotDrv = new VictorSP(9);
 
 		//Located on the MXP expansion board
 		ballLoad = new VictorSP(10);
 		ballFeederMot = new VictorSP(11);
 		ballShooterMot = new VictorSP(12);
-		shooterAimServo = new Servo(9);
+		shooterAimServo = new Servo(13);
 
+		//If true, the shooter will run. If false, it will not
 		runShooter = false;
+
+		cameras = new CAMERAFEEDS(stick);
+		cameras->init();
 
 		//Instantiate the PID controllers to their proper values
 		p = .025;
@@ -302,7 +307,6 @@ public:
 		shooterAimServo->Set(shooterAimLocation);
 
 		//Debug print statements
-		/*
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
 		SmartDashboard::PutNumber("LB: ", LBEncDrv->Get());
@@ -311,7 +315,6 @@ public:
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
 		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
 		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
-		*/
 		std::cout << cntl1->bA->RE << ClimbMotDrv->Get() << "\n\n";
 		printf("%.2f, %.2f\n", feederSpeed, ballFeederMot->Get());
 		printf("%d, %.2f\n", runShooter, ballShooterMot->Get());
