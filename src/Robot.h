@@ -46,5 +46,7 @@ extern float currentFacing;
 extern double currAng1, currAng2, currAng3, currAng4;
 const float period = 0.05;
 
+extern VictorSP*ClimbMotDrv;
+extern VictorSP *ballLoad;
 
 #endif /* SRC_ROBOT_H_ */
