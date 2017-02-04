@@ -51,7 +51,9 @@ double feederSpeed;
 double shooterAimLocation;
 bool runShooter;
 
-CAMERAFEEDS *cameras;
+//CAMERAFEEDS *cameras;
+//CameraServer *autoAlignCamera;
+
 commandInput autoInput;
 commandOutput autoOutput;
 
@@ -94,19 +96,20 @@ public:
 		RFMotDrv = new VictorSP(5);
 		LBMotDrv = new VictorSP(4);
 		RBMotDrv = new VictorSP(3);
-		ClimbMotDrv = new VictorSP(9);
+		ClimbMotDrv = new VictorSP(13);
 
 		//Located on the MXP expansion board
 		ballLoad = new VictorSP(10);
 		ballFeederMot = new VictorSP(11);
 		ballShooterMot = new VictorSP(12);
-		shooterAimServo = new Servo(13);
+		shooterAimServo = new Servo(9);
 
+		CameraServer::GetInstance()->StartAutomaticCapture();
 		//If true, the shooter will run. If false, it will not
 		runShooter = false;
 
-		cameras = new CAMERAFEEDS(stick);
-		cameras->init();
+		//cameras = new CAMERAFEEDS(stick);
+		//cameras->init();
 
 		//Instantiate the PID controllers to their proper values
 		p = .025;
@@ -217,7 +220,7 @@ public:
 		currAng3 = swerveLib->whl->angleLB;
 		currAng4 = swerveLib->whl->angleRB;
 
-		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI) + currentFacing;
+		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI);// + currentFacing;
 		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
 
 		//Calculate the proper values for the swerve drive motion. If there are no inputs, keep the wheels in their previous position
@@ -319,7 +322,7 @@ public:
 		printf("%.2f, %.2f\n", feederSpeed, ballFeederMot->Get());
 		printf("%d, %.2f\n", runShooter, ballShooterMot->Get());
 		printf("%.2f\n", ballLoad->Get());
-		printf("%.2f\n\n", ClimbMotDrv->Get());
+		printf("%.2f\n", ClimbMotDrv->Get());
 	}
 
 	void TestPeriodic() {

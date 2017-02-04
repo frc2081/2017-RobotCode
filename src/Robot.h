@@ -57,7 +57,8 @@ extern bool runShooter;
 extern double shooterAimLocation;
 const float period = 0.05;
 
-extern CAMERAFEEDS *cameras;
+//extern CAMERAFEEDS *cameras;
+
 extern commandInput autoInput;
 extern commandOutput autoOutput;
 
