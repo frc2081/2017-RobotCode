@@ -38,6 +38,8 @@ cntl *cntl2;
 
 swervelib *swerveLib;
 
+CameraServer *alignCam;
+
 PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
@@ -52,9 +54,6 @@ double shooterAimLocation;
 bool runShooter;
 double liftCenterDistance;
 autoGearStates autoGearStateMachine;
-
-//CAMERAFEEDS *cameras;
-//CameraServer *autoAlignCamera;
 
 commandInput autoInput;
 commandOutput autoOutput;
@@ -72,6 +71,8 @@ public:
 
 		//Instantiate the swerve calculations library
 		swerveLib = new swervelib(27, 23.5);
+
+		//alignCam->StartAutomaticCapture();
 
 		gyroManagerRun = gyroManager::Get();
 
@@ -203,6 +204,9 @@ public:
 	}
 
 	void TeleopPeriodic() {
+
+		CameraServer::GetInstance()->GetVideo();
+		CameraServer::GetInstance()->PutVideo("cam0", 1280, 800);
 
 		//Update the joystick values
 		cntl1->UpdateCntl();

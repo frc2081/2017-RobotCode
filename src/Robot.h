@@ -38,6 +38,8 @@ extern cntl *cntl2;
 
 extern swervelib *swerveLib;
 
+extern CameraServer *alignCam;
+
 extern PIDController *LFPID;
 extern PIDController *LBPID;
 extern PIDController *RFPID;
