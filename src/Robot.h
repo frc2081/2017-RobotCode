@@ -57,6 +57,23 @@ extern bool runShooter;
 extern double shooterAimLocation;
 const float period = 0.05;
 
+extern double liftCenterDistance;
+enum autoGearStates {
+	//Driver has not yet engaged the autolock
+	DO_NOTHING,
+	//Make sure the target is in the camera's field of vision
+	TARGET_AQUIRED,
+	//Make the robot square against the desired target
+	TURN_TO_SQUARE,
+	//Line the robot up to drive straight into the spring
+	HORIZONTAL_LINEUP,
+	//Drive to the proper distance to unload the spring
+	DRIVE_TO_SPRING,
+	//Wait a few seconds, then let normal drive controls work again
+	DONE
+};
+extern autoGearStates autoGearStateMachine;
+
 //extern CAMERAFEEDS *cameras;
 
 extern commandInput autoInput;
