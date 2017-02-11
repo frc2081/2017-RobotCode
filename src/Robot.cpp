@@ -16,7 +16,9 @@ VictorSP *LFMotTurn;
 VictorSP *LBMotTurn;
 VictorSP *RFMotTurn;
 VictorSP *RBMotTurn;
-VictorSP *ClimbMotDrv;
+VictorSP *ClimbMotDrv1;
+VictorSP *ClimbMotDrv2;
+VictorSP *ClimbMotDrv3;
 VictorSP *ballLoad;
 VictorSP *ballFeederMot;
 VictorSP *ballShooterMot;
@@ -32,6 +34,7 @@ Encoder *LFEncDrv;
 Encoder *RFEncDrv;
 Encoder *LBEncDrv;
 Encoder *RBEncDrv;
+Encoder *shooterEnc;
 
 cntl *cntl1;
 cntl *cntl2;
@@ -54,6 +57,8 @@ double shooterAimLocation;
 bool runShooter;
 double liftCenterDistance;
 autoGearStates autoGearStateMachine;
+
+double x;
 
 commandInput autoInput;
 commandOutput autoOutput;
@@ -81,33 +86,37 @@ public:
 		autoGearStateMachine = DO_NOTHING;
 
 		//Instantiate the encoders
-		LFEncTurn = new AnalogPotentiometer(1, 360, 0);
-		RFEncTurn = new AnalogPotentiometer(0, 360, 0);
-		LBEncTurn = new AnalogPotentiometer(3, 360, 0);
-		RBEncTurn = new AnalogPotentiometer(2, 360, 0);
+		LFEncTurn = new AnalogPotentiometer(0, 360, 0);
+		RFEncTurn = new AnalogPotentiometer(2, 360, 0);
+		LBEncTurn = new AnalogPotentiometer(1, 360, 0);
+		RBEncTurn = new AnalogPotentiometer(3, 360, 0);
 
-		LFEncDrv = new Encoder(6, 7, false);
-		RFEncDrv = new Encoder(4, 5, false);
-		LBEncDrv = new Encoder (0, 1, false);
-		RBEncDrv = new Encoder (2, 3, false);
+		LFEncDrv = new Encoder(4, 5, false);
+		RFEncDrv = new Encoder(2, 3, false);
+		LBEncDrv = new Encoder (6, 7, false);
+		RBEncDrv = new Encoder (8, 9, false);
+		shooterEnc = new Encoder(0, 1, false);
 
 		//Instantiate the motors based on where they are plugged in
 		LFMotTurn = new VictorSP(8);
-		RFMotTurn = new VictorSP(7);
-		LBMotTurn = new VictorSP(2);
-		RBMotTurn = new VictorSP(1);
+		RFMotTurn = new VictorSP(12);
+		LBMotTurn = new VictorSP(3);
+		RBMotTurn = new VictorSP(6);
 
-		LFMotDrv = new VictorSP(6);
-		RFMotDrv = new VictorSP(5);
+		LFMotDrv = new VictorSP(9);
+		RFMotDrv = new VictorSP(13);
 		LBMotDrv = new VictorSP(4);
-		RBMotDrv = new VictorSP(3);
-		ClimbMotDrv = new VictorSP(13);
+		RBMotDrv = new VictorSP(7);
+
+		ClimbMotDrv1 = new VictorSP(0);
+		ClimbMotDrv2 = new VictorSP(1);
+		ClimbMotDrv3 = new VictorSP(2);
 
 		//Located on the MXP expansion board
 		ballLoad = new VictorSP(10);
 		ballFeederMot = new VictorSP(11);
-		ballShooterMot = new VictorSP(12);
-		shooterAimServo = new Servo(9);
+		ballShooterMot = new VictorSP(5);
+		shooterAimServo = new Servo(14);
 
 		CameraServer::GetInstance()->StartAutomaticCapture();
 		//If true, the shooter will run. If false, it will not
@@ -156,6 +165,9 @@ public:
 		RBEncDrv->Reset();
 
 
+		//Distance in pixels between center of robot and camera
+		x = 10;
+
 	}
 
 	void AutonomousInit() override {
@@ -201,6 +213,7 @@ public:
 	}
 
 	void TeleopInit() {
+
 	}
 
 	void TeleopPeriodic() {
@@ -278,16 +291,24 @@ public:
 		*/
 
 		//Set the wheel speed based on what the calculations from the swervelib
-		LFMotDrv->Set(swerveLib->whl->speedLF * -1);
-		RFMotDrv->Set(swerveLib->whl->speedRF * -1);
-		RBMotDrv->Set(swerveLib->whl->speedRB * -1);
-		LBMotDrv->Set(swerveLib->whl->speedLB * -1);
+		LFMotDrv->Set(swerveLib->whl->speedLF);
+		RFMotDrv->Set(swerveLib->whl->speedRF);
+		RBMotDrv->Set(swerveLib->whl->speedRB);
+		LBMotDrv->Set(swerveLib->whl->speedLB);
 
+
+		printf("bA RE: ,%d\n", cntl1->bA->RE);
+		if (cntl1->bA->RE == true){
+			autoGearStateMachine = TARGET_AQUIRED;
+		}
 
 		switch (autoGearStateMachine) {
 		case DO_NOTHING:
 			//wait for the autolock button to be pressed
+			x = 0;
 			if (cntl1->bA->RE == true) {
+				x = 0;
+				printf("STARTING!!!\n");
 				liftCenterDistance = /*wherever the distance between the centers of the tape pieces are*/0;
 				if (liftCenterDistance/*vision system sees a "lift"*/ != 0) {
 					autoGearStateMachine = TARGET_AQUIRED;
@@ -295,22 +316,25 @@ public:
 			}
 			break;
 		case TARGET_AQUIRED:
+			printf("STARTING!!!!!\n");
 			//Get the current distance between the lifts
 			liftCenterDistance = /*wherever the distance between the centers of the tape pieces are*/0;
 			autoGearStateMachine = TURN_TO_SQUARE;
+			if (cntl1->bA->State == true) autoGearStateMachine = DO_NOTHING;
 			break;
 		case HORIZONTAL_LINEUP:
 			//Line up horizontally to the lift. Previous angle stays the same
 			liftCenterDistance = /*wherever the distance between the centers of the tape pieces are*/0;
-			if (0/*angle from center of picture horizontally to spring*/ > 0) {
+			if (x/*angle from center of picture horizontally to spring*/ > 5) {
 				swerveLib->calcWheelVect(0, 0.5, 0);
-			} else if (0/*angle from center of picture horizontally to spring*/ < 0) {
+			} else if (x/*angle from center of picture horizontally to spring*/ < 5) {
 				swerveLib->calcWheelVect(0, -0.5, 0);
 			}
 
 			if (0/*angle from center of picture to spring*/ == 0) {
 				autoGearStateMachine = TURN_TO_SQUARE;
 			}
+			if (cntl1->bA->State == true) autoGearStateMachine = DO_NOTHING;
 			break;
 		case TURN_TO_SQUARE:
 			//Turn to be square against the lift that is being targeted
@@ -323,34 +347,39 @@ public:
 			if (0/*distance in pixels from center of picture horizontally to spring*/ == 0) {
 				autoGearStateMachine = DRIVE_TO_SPRING;
 			}
+			if (cntl1->bA->State == true) autoGearStateMachine = DO_NOTHING;
 			break;
 		case DRIVE_TO_SPRING:
 			//Drive forward to the point where the pilot can take the gear
-			liftCenterDistance = /*wherever the distance between the centers of the tape pieces are*/0;
-			if (0/*distance in pixels from center of picture horizontally to spring*/ != 0) autoGearStateMachine = HORIZONTAL_LINEUP;
-			if (liftCenterDistance < 100) { //value here is subject to change with the robot
+			liftCenterDistance += /*wherever the distance between the centers of the tape pieces are*/0;
+			if (x/*distance in pixels from center of picture horizontally to spring*/ != 0) autoGearStateMachine = HORIZONTAL_LINEUP;
+			if (liftCenterDistance < 10) { //value here is subject to change with the robot
 				swerveLib->calcWheelVect(0.5, 0, 0);
-			} else if (liftCenterDistance == 100) autoGearStateMachine = DONE;;
+			} else if (liftCenterDistance == 10) autoGearStateMachine = DONE;
+			if (cntl1->bA->State == true) autoGearStateMachine = DO_NOTHING;
 			break;
 		case DONE:
 			//Keep the robot still for a bit so the pilot can safely take the gear out
 			autoGearStateMachine = DO_NOTHING;
 			break;
 		}
+
+		x += 1;
 		//Motor for Climbing
-		if(cntl2->bY->State==true){
-		ClimbMotDrv->Set(.5);
-		} else {
-			ClimbMotDrv->Set(0);
-		}
+		double climbSpeed;
+		climbSpeed = cntl1->RTrig;
+		ClimbMotDrv1->Set(-climbSpeed);
+		ClimbMotDrv2->Set(-climbSpeed);
+		ClimbMotDrv3->Set(-climbSpeed);
 
 		//Set the ball load speeds. Speed values can be changed to whatever is needed
-		if (cntl2->bLB->State == true) ballLoad->Set(-.5);
-		else if (cntl2->bRB->State == true) ballLoad->Set(.5);
+		if (cntl2->bLB->State == true) ballLoad->Set(-1);
+		else if (cntl2->bRB->State == true) ballLoad->Set(1);
 		else ballLoad->Set(0);
 
 		//Get the trigger values on the second controller. The left one is negative because it runs the feeder in reverse
-		feederSpeed = cntl1->RTrig - cntl1->LTrig;
+		feederSpeed = cntl2->RTrig - cntl2->LTrig;
+
 		//Set the ball feeder to the desired speed
 		ballFeederMot->Set(feederSpeed);
 
@@ -377,16 +406,17 @@ public:
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
 		SmartDashboard::PutNumber("LB: ", LBEncDrv->Get());
 		SmartDashboard::PutNumber("RB: ", RBEncDrv->Get());
-		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
-		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
+		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF,
+				swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
+		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF,
+				swerveLib->whl->speedLB, swerveLib->whl->speedRB);
 		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
 		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
-		std::cout << cntl1->bA->RE << ClimbMotDrv->Get() << "\n\n";
+		std::cout << cntl1->bA->RE << ClimbMotDrv1->Get() << "\n\n";
 		printf("%.2f, %.2f\n", feederSpeed, ballFeederMot->Get());
 		printf("%d, %.2f\n", runShooter, ballShooterMot->Get());
 		printf("%.2f\n", ballLoad->Get());
-		printf("%.2f\n", ClimbMotDrv->Get());
-		printf("%.2f\n\n", LFEncTurn->Get());
+		printf("%.2i\n\n", shooterEnc->Get());
 	}
 
 	void TestPeriodic() {
@@ -394,10 +424,12 @@ public:
 	}
 
 	void DisabledPeriodic() {
-		/*printf("%.2f\n", LFEncTurn->Get());
-		printf("%.2f\n", RFEncTurn->Get());
-		printf("%.2f\n", LBEncTurn->Get());
-		printf("%.2f\n\n", RBEncTurn->Get());*/
+		printf("Shooter Encoder: %.2i\n", shooterEnc->Get());
+		printf("LFEnc Turn: %.2f\n", LFEncTurn->Get());
+		printf("RFEnc Turn: %.2f\n", RFEncTurn->Get());
+		printf("LBEnc Turn: %.2f\n", LBEncTurn->Get());
+		printf("RBEnc Turn: %.2f\n", RBEncTurn->Get());
+		printf("Gyro: %.5f\n\n", gyroManagerRun->getLastValue());
 	}
 
 private:

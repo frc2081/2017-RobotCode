@@ -22,7 +22,9 @@ extern VictorSP *LBMotTurn;
 extern VictorSP *RFMotTurn;
 extern VictorSP *RBMotTurn;
 extern VictorSP *ballFeederMot;
-extern VictorSP *ClimbMotDrv;
+extern VictorSP *ClimbMotDrv1;
+extern VictorSP *ClimbMotDrv2;
+extern VictorSP *ClimbMotDrv3;
 extern VictorSP *ballLoad;
 extern VictorSP *ballShooterMot;
 
@@ -31,7 +33,7 @@ extern Servo *shooterAimServo;
 extern AnalogPotentiometer *LFEncTurn;
 extern AnalogPotentiometer *LBEncTurn;
 extern AnalogPotentiometer *RFEncTurn;
-extern AnalogPotentiometer *RBEnc;
+extern AnalogPotentiometer *RBEncTurn;
 
 extern cntl *cntl1;
 extern cntl *cntl2;
@@ -49,6 +51,7 @@ extern Encoder *LFEncDrv;
 extern Encoder *RFEncDrv;
 extern Encoder *LBEncDrv;
 extern Encoder *RBEncDrv;
+extern Encoder *shooterEnc;
 
 extern float p, i, d;
 extern float comAng, comMag;
