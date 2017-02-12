@@ -67,9 +67,6 @@ commandOutput autoOutput;
 class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
-		//chooser.AddDefault(autoNameDefault, autoNameDefault);
-		//chooser.AddObject(autoNameCustom, autoNameCustom);
-		//frc::SmartDashboard::PutData("Auto Modes", &chooser);
 
 		//Instantiate the joysticks according to the controller class
 		cntl1 = new cntl(0, .2);
@@ -236,10 +233,7 @@ public:
 		//Gyro needs to be mounted in center of robot otherwise it will not work properly
 		currentFacing = fabs(gyroManagerRun->getLastValue());
 
-		if (currentFacing >= 360) {
-			currentFacing = ((int)currentFacing % 360);
-		}
-
+		if (currentFacing >= 360) currentFacing = ((int)currentFacing % 360);
 
 		currAng1 = swerveLib->whl->angleRF;
 		currAng2 = swerveLib->whl->angleLF;
@@ -285,28 +279,20 @@ public:
 		RBPID->SetSetpoint(swerveLib->whl->angleRB);
 		LBPID->SetSetpoint(swerveLib->whl->angleLB);
 
-		//If the commanded speeds are 0, keep the wheels in the position they were in  before
-		/*
-		if (fabs(cntl1->LX) == 0 && fabs(cntl1->LY) == 0 && fabs(cntl1->RX) == 0) {
-			RFPID->SetSetpoint(preAng1);
-			LFPID->SetSetpoint(preAng2);
-			RBPID->SetSetpoint(preAng4);
-			LBPID->SetSetpoint(preAng3);
-		}
-		*/
-
 		//Set the wheel speed based on what the calculations from the swervelib
 		LFMotDrv->Set(swerveLib->whl->speedLF);
 		RFMotDrv->Set(swerveLib->whl->speedRF);
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 
+		//TODO::Fix this...thing
+		x += 1;//and just WTF does this do!?
 
-		x += 1;
+
 		//Motor for Climbing
 		double climbSpeed;
 		climbSpeed = cntl1->RTrig;
-		if(cntl1->bY = true)
+		if(cntl1->bY->State == true)
 		{
 			ClimbMotDrv1->Set(-climbSpeed);
 			ClimbMotDrv2->Set(-climbSpeed);
@@ -325,13 +311,10 @@ public:
 		ballFeederMot->Set(feederSpeed);
 
 		//Toggle the shooter with the start button
-		if (cntl2->bStart->RE == true) {
-			runShooter = !runShooter;
-		}
+		if (cntl2->bStart->RE == true) runShooter = !runShooter;
 
 		if (runShooter == true) ballShooterMot->Set(1);
 		else ballShooterMot->Set(0);
-
 
 
 		//Aim the shooter up and down depending on how long the buttons are held down
@@ -339,7 +322,6 @@ public:
 		if (cntl2->bB->State == true) shooterAimLocation -= shooterAimIncrement;
 		if (shooterAimLocation > 1) shooterAimLocation = 1;
 		if (shooterAimLocation < 0) shooterAimLocation = 0;
-
 		shooterAimServo->Set(shooterAimLocation);
 
 		//Debug print statements
@@ -374,10 +356,7 @@ public:
 	}
 
 private:
-	frc::LiveWindow* lw = LiveWindow::GetInstance();
-	frc::SendableChooser<std::string> chooser;
-	const std::string autoNameDefault = "Default";
-	const std::string autoNameCustom = "My Auto";
+
 	std::string autoSelected;
 	gyroManager *gyroManagerRun;
 	CommandManager *autoCom;
