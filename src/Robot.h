@@ -12,6 +12,16 @@
 #include "gyroManager.h"
 #include "autoCommands\CommandManager.h"
 #include "autoCommands\CommandIO.h"
+#include <iostream>
+#include <memory>
+#include <string>
+#include <IterativeRobot.h>
+#include <LiveWindow/LiveWindow.h>
+#include <SmartDashboard/SendableChooser.h>
+#include <SmartDashboard/SmartDashboard.h>
+#include "Robot.h"
+#include "Calibrations.h"
+#include "Camera.h"
 
 extern VictorSP *LFMotDrv;
 extern VictorSP *LBMotDrv;

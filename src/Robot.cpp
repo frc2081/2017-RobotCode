@@ -1,13 +1,4 @@
-#include <iostream>
-#include <memory>
-#include <string>
-
-#include <IterativeRobot.h>
-#include <LiveWindow/LiveWindow.h>
-#include <SmartDashboard/SendableChooser.h>
-#include <SmartDashboard/SmartDashboard.h>
 #include "Robot.h"
-#include "Calibrations.h"
 
 VictorSP *LFMotDrv;
 VictorSP *LBMotDrv;
@@ -42,8 +33,6 @@ cntl *cntl2;
 
 swervelib *swerveLib;
 
-CameraServer *alignCam;
-
 PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
@@ -72,6 +61,9 @@ commandOutput autoOutput;
 class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
+
+        std::thread visionThread(VisionThread);
+        visionThread.detach();
 
 		//Instantiate the joysticks according to the controller class
 		cntl1 = new cntl(0, .2);
@@ -119,11 +111,6 @@ public:
 		ballFeederMot = new VictorSP(11);
 		ballShooterMot = new VictorSP(5);
 		shooterAimServo = new Servo(14);
-
-		CameraServer::GetInstance()->StartAutomaticCapture();
-
-		//cameras = new CAMERAFEEDS(stick);
-		//cameras->init();
 
 		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
@@ -226,9 +213,6 @@ public:
 	}
 
 	void TeleopPeriodic() {
-
-		CameraServer::GetInstance()->GetVideo();
-		CameraServer::GetInstance()->PutVideo("cam0", 1280, 800);
 
 		//Update the joystick values
 		cntl1->UpdateCntl();
