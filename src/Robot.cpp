@@ -48,6 +48,7 @@ PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
 PIDController *RBPID;
+PIDController *shooterPID;
 
 float currentAngle;
 float currentFacing;
@@ -82,7 +83,6 @@ public:
 		//alignCam->StartAutomaticCapture();
 
 		gyroManagerRun = gyroManager::Get();
-
 		gyroManagerRun->start();
 
 		autoGearStateMachine = DO_NOTHING;
@@ -125,16 +125,17 @@ public:
 		//cameras = new CAMERAFEEDS(stick);
 		//cameras->init();
 
+		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
+		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
+		LBEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
+		RBEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
+		shooterEnc->SetDistancePerPulse(shooterEncCntPerRev);
+
 		//Instantiate the PID controllers to their proper values
 		LFPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, LFEncTurn, LFMotTurn, period);
 		RFPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, RFEncTurn, RFMotTurn, period);
 		LBPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, LBEncTurn, LBMotTurn, period);
 		RBPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, RBEncTurn, RBMotTurn, period);
-
-		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
-		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
-		LBEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
-		RBEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 
 		//TODO: Put all this into a function
 		LFPID->SetInputRange(0,360);
@@ -162,6 +163,16 @@ public:
 		LBEncDrv->Reset();
 		RBEncDrv->Reset();
 
+
+		//NOTE: Shooter speed is revolutions per SECOND, not RPM
+		//VERY important that min command from PID be set to 0....otherwise the instant that the motor
+		//exceeded the target speed, it would attempt to reverse the shooter wheel!
+		shooterPID = new PIDController(shooterSpdP, shooterSpdI, shooterSpdD, shooterEnc, ballShooterMot, period);
+		shooterPID->SetInputRange(0,shooterMaxRevPerSec);
+		shooterPID->SetOutputRange(0,1);
+		shooterPID->SetSetpoint(0);
+		shooterPID->Enable();
+
 		//Distance in pixels between center of robot and camera
 		x = 10;
 
@@ -170,13 +181,9 @@ public:
 		feederSpeed = 0;
 		climbSpeed = 0;
 		shooterAimLocation = shooterAngNearShot;
-
 	}
 
 	void AutonomousInit() override {
-		//autoSelected = chooser.GetSelected();
-		// std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
-		//std::cout << "Auto selected: " << autoSelected << std::endl;
 		autoCom = new CommandManager(swerveLib, RED, ONE);
 	}
 
@@ -216,7 +223,6 @@ public:
 	}
 
 	void TeleopInit() {
-
 	}
 
 	void TeleopPeriodic() {
@@ -234,6 +240,7 @@ public:
 		//Gyro needs to be mounted in center of robot otherwise it will not work properly
 		currentFacing = fabs(gyroManagerRun->getLastValue());
 
+		//Limit the gyro to a 360 degree output
 		if (currentFacing >= 360) currentFacing = ((int)currentFacing % 360);
 
 		//Store current angles of the swerve wheels so we can calculate the angle delta later
@@ -318,8 +325,11 @@ public:
 
 		//Toggle the shooter on and off with the start button
 		if (cntl2->bStart->RE == true) runShooter = !runShooter;
-		if (runShooter == true) ballShooterMot->Set(shooterSpdNearShot);
-		else ballShooterMot->Set(0);
+		if (runShooter == true) shooterPID->SetSetpoint(shooterSpdNearShot);
+		else shooterPID->SetSetpoint(0);
+
+		//if (runShooter == true) ballShooterMot->Set(shooterSpdNearShot);
+		//else ballShooterMot->Set(0);
 
 		//Aim the shooter
 		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command

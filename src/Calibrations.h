@@ -9,13 +9,20 @@
 #define SRC_CALIBRATIONS_H_
 
 //SHOOTER cals
-double shooterAimIncrement = .1;
+double shooterSpdP = 0.001;
+double shooterSpdI = 0.01;
+double shooterSpdD = 0;
+double shooterMaxRevPerSec = 88.5;
+double shooterEncCntPerRev = .05;
 
+double shooterAimIncrement = .1;
 double shooterAngNearShot = .2;
 double shooterAngFarShot = .8;
+double shooterPwrNearShot = .7; //POWER is for directly commanding the shooter motor
+double shooterPwrFarShot = 1;
+double shooterSpdNearShot = 50; //SPEED is for PID control of shooter speed
+double shooterSpdFarShot = shooterMaxRevPerSec;
 
-double shooterSpdNearShot = .7;
-double shooterSpdFarShot = 1;
 
 //FEEDER cals
 double feederSpeedHigh = 1;
