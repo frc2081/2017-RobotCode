@@ -168,8 +168,9 @@ public:
 		//Init all control variables to safe states
 		runShooter = false;
 		feederSpeed = 0;
-		shooterAimLocation = shooterAngNearShot;
 		climbSpeed = 0;
+		shooterAimLocation = shooterAngNearShot;
+
 	}
 
 	void AutonomousInit() override {
@@ -296,11 +297,14 @@ public:
 		//Climbing is locked out unless the Y button of the drive controller is also held
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
-		if(cntl1->bY->State == true)
-		{
+		if(cntl1->bY->State == true){
 			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
 			ClimbMotDrv2->Set(-climbSpeed);
 			ClimbMotDrv3->Set(-climbSpeed);
+		} else {
+			ClimbMotDrv1->Set(0);
+			ClimbMotDrv2->Set(0);
+			ClimbMotDrv3->Set(0);
 		}
 
 		//Get ball intake command and set output
