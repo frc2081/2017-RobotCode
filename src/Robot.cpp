@@ -53,8 +53,6 @@ double feederSpeed;
 double shooterAimLocation;
 double climbSpeed;
 
-double x;
-
 commandInput autoInput;
 commandOutput autoOutput;
 
@@ -62,6 +60,8 @@ class Robot: public frc::IterativeRobot {
 public:
 	void RobotInit() {
 
+		//Create a new camera server in it's own thread
+		//ALWAYS put things like cameras in their own thread so if they crash and burn it doesn't take down the wholw control system
         std::thread visionThread(VisionThread);
         visionThread.detach();
 
@@ -71,8 +71,6 @@ public:
 
 		//Instantiate the swerve calculations library
 		swerveLib = new swervelib(27, 23.5);
-
-		//alignCam->StartAutomaticCapture();
 
 		gyroManagerRun = gyroManager::Get();
 		gyroManagerRun->start();
@@ -150,7 +148,6 @@ public:
 		LBEncDrv->Reset();
 		RBEncDrv->Reset();
 
-
 		//NOTE: Shooter speed is revolutions per SECOND, not RPM
 		//VERY important that min command from PID be set to 0....otherwise the instant that the motor
 		//exceeded the target speed, it would attempt to reverse the shooter wheel!
@@ -159,9 +156,6 @@ public:
 		shooterPID->SetOutputRange(0,1);
 		shooterPID->SetSetpoint(0);
 		shooterPID->Enable();
-
-		//Distance in pixels between center of robot and camera
-		x = 10;
 
 		//Init all control variables to safe states
 		runShooter = false;
@@ -281,8 +275,6 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 
-		//TODO::Fix this...thing
-		x += 1;//and just WTF does this do!?
 
 		//*********WINCH***********
 		//Climbing is locked out unless the Y button of the drive controller is also held
@@ -360,7 +352,6 @@ public:
 
 private:
 
-	std::string autoSelected;
 	gyroManager *gyroManagerRun;
 	CommandManager *autoCom;
 };
