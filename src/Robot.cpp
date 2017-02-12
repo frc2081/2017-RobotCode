@@ -301,6 +301,7 @@ public:
 		x += 1;//and just WTF does this do!?
 
 		//Motor for Climbing
+<<<<<<< HEAD
 		//Climbing is locked out unless the Y button of the drive controller is also held
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
@@ -308,35 +309,66 @@ public:
 			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
 			ClimbMotDrv2->Set(-climbSpeed);
 			ClimbMotDrv3->Set(-climbSpeed);
+=======
+		if(cntl2->bY->State==true){
+		ClimbMotDrv->Set(.5);
+>>>>>>> branch 'master' of https://github.com/frc2081/2017-RobotCode.git
 		} else {
 			ClimbMotDrv1->Set(0);
 			ClimbMotDrv2->Set(0);
 			ClimbMotDrv3->Set(0);
 		}
 
+<<<<<<< HEAD
 		//Get ball intake command and set output
 		if (cntl2->bLB->State == true) ballLoad->Set(fuelIntakeSpeedReverse);
 		else if (cntl2->bRB->State == true) ballLoad->Set(fuelIntakeSpeedForward);
+=======
+		//Set the ball load speeds. Speed values can be changed to whatever is needed
+		if (cntl2->bLB->State == true) ballLoad->Set(-.5);
+		else if (cntl2->bRB->State == true) ballLoad->Set(.5);
+>>>>>>> branch 'master' of https://github.com/frc2081/2017-RobotCode.git
 		else ballLoad->Set(0);
 
+<<<<<<< HEAD
 		//Get the ball feeder command and set output. The left trigger is subtracted because it runs the feeder in reverse
 		feederSpeed = cntl2->RTrig - cntl2->LTrig;
+=======
+		//Get the trigger values on the second controller. The left one is negative because it runs the feeder in reverse
+		feederSpeed = cntl2->RTrig - cntl2->LTrig;
+		//Set the ball feeder to the desired speed
+>>>>>>> branch 'master' of https://github.com/frc2081/2017-RobotCode.git
 		ballFeederMot->Set(feederSpeed);
 
+<<<<<<< HEAD
 		//Toggle the shooter on and off with the start button
 		if (cntl2->bStart->RE == true) runShooter = !runShooter;
 		if (runShooter == true) shooterPID->SetSetpoint(shooterSpdNearShot);
 		else shooterPID->SetSetpoint(0);
+=======
+		//Toggle the shooter with the start button
+		if (cntl2->bStart->RE == true) {
+			runShooter = !runShooter;
+		}
+>>>>>>> branch 'master' of https://github.com/frc2081/2017-RobotCode.git
 
 		//if (runShooter == true) ballShooterMot->Set(shooterSpdNearShot);
 		//else ballShooterMot->Set(0);
 
+<<<<<<< HEAD
 		//Aim the shooter
 		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command
 		//limiting the command here is needed because otherwise there is nothing stopping the command from
 		//being incremented outside of the valid command range of the servo
 		if (cntl2->bA->RE == true) shooterAimLocation += shooterAimIncrement;
 		if (cntl2->bB->RE == true) shooterAimLocation -= shooterAimIncrement;
+=======
+
+
+		//Aim the shooter up and down depending on how long the buttons are held down
+		if (cntl2->bA->State == true) shooterAimLocation += 0.01;
+		if (cntl2->bB->State == true) shooterAimLocation -= 0.01;
+>>>>>>> branch 'master' of https://github.com/frc2081/2017-RobotCode.git
 		if (shooterAimLocation > 1) shooterAimLocation = 1;
 		if (shooterAimLocation < 0) shooterAimLocation = 0;
 		shooterAimServo->Set(shooterAimLocation);
