@@ -284,7 +284,7 @@ public:
 		//TODO::Fix this...thing
 		x += 1;//and just WTF does this do!?
 
-		//Motor for Climbing
+		//*********WINCH***********
 		//Climbing is locked out unless the Y button of the drive controller is also held
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
@@ -298,15 +298,18 @@ public:
 			ClimbMotDrv3->Set(0);
 		}
 
+		//*********INTAKE*********
 		//Get ball intake command and set output
 		if (cntl2->bLB->State == true) ballLoad->Set(fuelIntakeSpeedReverse);
 		else if (cntl2->bRB->State == true) ballLoad->Set(fuelIntakeSpeedForward);
 		else ballLoad->Set(0);
 
+		//*********FEEDER********
 		//Get the ball feeder command and set output. The left trigger is subtracted because it runs the feeder in reverse
 		feederSpeed = cntl2->RTrig - cntl2->LTrig;
 		ballFeederMot->Set(feederSpeed);
 
+		//*********SHOOTER********
 		//Toggle the shooter on and off with the start button
 		if (cntl2->bStart->RE == true) runShooter = !runShooter;
 		if (runShooter == true) shooterPID->SetSetpoint(shooterSpdNearShot);
