@@ -48,16 +48,20 @@ PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
 PIDController *RBPID;
-float p, i, d;
+
 float currentAngle;
 float currentFacing;
 float comAng, comMag;
 double currAng1, currAng2, currAng3, currAng4;
-double feederSpeed;
-double shooterAimLocation;
-bool runShooter;
+
 double liftCenterDistance;
 autoGearStates autoGearStateMachine;
+
+//Declare all control variables
+bool runShooter;
+double feederSpeed;
+double shooterAimLocation;
+double climbSpeed;
 
 double x;
 
@@ -117,26 +121,22 @@ public:
 		shooterAimServo = new Servo(14);
 
 		CameraServer::GetInstance()->StartAutomaticCapture();
-		//If true, the shooter will run. If false, it will not
-		runShooter = false;
 
 		//cameras = new CAMERAFEEDS(stick);
 		//cameras->init();
 
 		//Instantiate the PID controllers to their proper values
-		p = .025;
-		i = 0;
-		d = 0;
-		LFPID = new PIDController(p, i, d, LFEncTurn, LFMotTurn, period);
-		RFPID = new PIDController(p, i, d, RFEncTurn, RFMotTurn, period);
-		LBPID = new PIDController(p, i, d, LBEncTurn, LBMotTurn, period);
-		RBPID = new PIDController(p, i, d, RBEncTurn, RBMotTurn, period);
+		LFPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, LFEncTurn, LFMotTurn, period);
+		RFPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, RFEncTurn, RFMotTurn, period);
+		LBPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, LBEncTurn, LBMotTurn, period);
+		RBPID = new PIDController(turnMotorP, turnMotorI, turnMotorD, RBEncTurn, RBMotTurn, period);
 
-		LFEncDrv->SetDistancePerPulse(.1904545454545);
-		RFEncDrv->SetDistancePerPulse(.1904545454545);
-		LBEncDrv->SetDistancePerPulse(.1904545454545);
-		RBEncDrv->SetDistancePerPulse(.1904545454545);
+		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
+		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
+		LBEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
+		RBEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 
+		//TODO: Put all this into a function
 		LFPID->SetInputRange(0,360);
 		LFPID->SetOutputRange(-1,1);
 		LFPID->SetContinuous();
@@ -162,14 +162,14 @@ public:
 		LBEncDrv->Reset();
 		RBEncDrv->Reset();
 
-
 		//Distance in pixels between center of robot and camera
 		x = 10;
 
-		//Init all control variables
-		double feederSpeed = 0;
-		double shooterAimLocation = shooterAngNearShot;
-
+		//Init all control variables to safe states
+		runShooter = false;
+		feederSpeed = 0;
+		shooterAimLocation = shooterAngNearShot;
+		climbSpeed = 0;
 	}
 
 	void AutonomousInit() override {
@@ -235,11 +235,15 @@ public:
 
 		if (currentFacing >= 360) currentFacing = ((int)currentFacing % 360);
 
+		//Store current angles of the swerve wheels so we can calculate the angle delta later
+		//This is so we can implement efficient swerve (no wheel ever turns more than 90 degrees)
 		currAng1 = swerveLib->whl->angleRF;
 		currAng2 = swerveLib->whl->angleLF;
 		currAng3 = swerveLib->whl->angleLB;
 		currAng4 = swerveLib->whl->angleRB;
 
+		//Calculate commanded robot motion from the drive controller stick
+		//Converts the two axes of the stick into a vector of angle comAng and magnitude comMag
 		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI);// + currentFacing;
 		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
 
@@ -288,38 +292,37 @@ public:
 		//TODO::Fix this...thing
 		x += 1;//and just WTF does this do!?
 
-
 		//Motor for Climbing
-		double climbSpeed;
+		//Climbing is locked out unless the Y button of the drive controller is also held
+		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
 		if(cntl1->bY->State == true)
 		{
-			ClimbMotDrv1->Set(-climbSpeed);
+			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
 			ClimbMotDrv2->Set(-climbSpeed);
 			ClimbMotDrv3->Set(-climbSpeed);
 		}
 
-
-		//Set the ball load speeds. Speed values can be changed to whatever is needed
-		if (cntl2->bLB->State == true) ballLoad->Set(-1);
-		else if (cntl2->bRB->State == true) ballLoad->Set(1);
+		//Get ball intake command and set output
+		if (cntl2->bLB->State == true) ballLoad->Set(fuelIntakeSpeedReverse);
+		else if (cntl2->bRB->State == true) ballLoad->Set(fuelIntakeSpeedForward);
 		else ballLoad->Set(0);
 
-		//Get the trigger values on the second controller. The left one is negative because it runs the feeder in reverse
+		//Get the ball feeder command and set output. The left trigger is subtracted because it runs the feeder in reverse
 		feederSpeed = cntl2->RTrig - cntl2->LTrig;
-		//Set the ball feeder to the desired speed
 		ballFeederMot->Set(feederSpeed);
 
-		//Toggle the shooter with the start button
+		//Toggle the shooter on and off with the start button
 		if (cntl2->bStart->RE == true) runShooter = !runShooter;
-
-		if (runShooter == true) ballShooterMot->Set(1);
+		if (runShooter == true) ballShooterMot->Set(shooterSpdNearShot);
 		else ballShooterMot->Set(0);
 
-
-		//Aim the shooter up and down depending on how long the buttons are held down
-		if (cntl2->bA->State == true) shooterAimLocation += shooterAimIncrement;
-		if (cntl2->bB->State == true) shooterAimLocation -= shooterAimIncrement;
+		//Aim the shooter
+		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command
+		//limiting the command here is needed because otherwise there is nothing stopping the command from
+		//being incremented outside of the valid command range of the servo
+		if (cntl2->bA->RE == true) shooterAimLocation += shooterAimIncrement;
+		if (cntl2->bB->RE == true) shooterAimLocation -= shooterAimIncrement;
 		if (shooterAimLocation > 1) shooterAimLocation = 1;
 		if (shooterAimLocation < 0) shooterAimLocation = 0;
 		shooterAimServo->Set(shooterAimLocation);
@@ -343,7 +346,6 @@ public:
 	}
 
 	void TestPeriodic() {
-		lw->Run();
 	}
 
 	void DisabledPeriodic() {
