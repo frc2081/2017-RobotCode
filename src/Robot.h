@@ -89,8 +89,6 @@ enum autoGearStates {
 };
 extern autoGearStates autoGearStateMachine;
 
-//extern CAMERAFEEDS *cameras;
-
 extern commandInput autoInput;
 extern commandOutput autoOutput;
 

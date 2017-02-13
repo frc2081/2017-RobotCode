@@ -342,12 +342,15 @@ public:
 	}
 
 	void DisabledPeriodic() {
-		printf("Shooter Encoder: %.2i\n", shooterEnc->Get());
-		printf("LFEnc Turn: %.2f\n", LFEncTurn->Get());
-		printf("RFEnc Turn: %.2f\n", RFEncTurn->Get());
-		printf("LBEnc Turn: %.2f\n", LBEncTurn->Get());
-		printf("RBEnc Turn: %.2f\n", RBEncTurn->Get());
-		printf("Gyro: %.5f\n\n", gyroManagerRun->getLastValue());
+		//printf("Shooter Encoder: %.2i\n", shooterEnc->Get());
+		//printf("LFEnc Turn: %.2f\n", LFEncTurn->Get());
+		//printf("RFEnc Turn: %.2f\n", RFEncTurn->Get());
+		//printf("LBEnc Turn: %.2f\n", LBEncTurn->Get());
+		//printf("RBEnc Turn: %.2f\n", RBEncTurn->Get());
+		//printf("Gyro: %.5f\n\n", gyroManagerRun->getLastValue());
+
+		printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
+
 	}
 
 private:
