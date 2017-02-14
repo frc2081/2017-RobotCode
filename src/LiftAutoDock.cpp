@@ -1,4 +1,5 @@
-#import liftAutoDock.h
+#include "liftAutoDock.h"
+#include <iostream>
 
 double liftAutoDock::getLADDrvMagCmd(){
 	return drvMagCmd;
@@ -21,9 +22,12 @@ liftAutoDock::liftAutoDock()
 	drvRotCmd = 0;
 	drvAngCmd = 0;
 	drvMagCmd = 0;
+
+	pegDistToImgCenter = 0;
+	targetDistApart = 0;
 }
 
-liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus, int leftTargetDisanceToImageCenter, int rightTargetDistanceToImageCenter){
+void liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus, int leftTargetDisanceToImageCenter, int rightTargetDistanceToImageCenter){
 
 	liftAutoDockCmd = autoDockCommand;
 	targetLock = targetLockStatus;
@@ -35,12 +39,12 @@ liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus, int 
 if(liftAutoDockCmd == false) {
 	liftAutoDockState = DO_NOTHING;	
 } else if(liftAutoDockCmd == true && targetLock == false){
-	printf("AutoDock: No Target Found\n")
+	printf("AutoDock: No Target Found\n");
 	liftAutoDockState = DO_NOTHING;	
 }
 
 //************Automatic lift docking state machine**************
-switch (autoGearStateMachine) {
+switch (liftAutoDockState) {
 	case DO_NOTHING:
 		if (liftAutoDockCmd == true && targetLock == true) {
 			liftAutoDockState = HORIZONTAL_LINEUP;
@@ -48,7 +52,7 @@ switch (autoGearStateMachine) {
 		break;
 		
 	case HORIZONTAL_LINEUP:		
-		int pegDistToImgCenter = (leftTargetDistToImgCenter + rightTargetDistToImgCenter) / 2;
+		pegDistToImgCenter = (leftTargetDistToImgCenter + rightTargetDistToImgCenter) / 2;
 		printf("AutoDock: Horizontal Lineup. CurrDist %i\n", pegDistToImgCenter);
 		
 		if(pegDistToImgCenter > horzLineUpTolerance){
@@ -68,7 +72,7 @@ switch (autoGearStateMachine) {
 		break;	
 		
 	case DRIVE_TO_SPRING:
-		int targetDistApart = (-leftTargetDistToImgCenter + rightTargetDistToImgCenter);
+		targetDistApart = (-leftTargetDistToImgCenter + rightTargetDistToImgCenter);
 		printf("AutoDock: Driving to Lift. CurrDist %i\n", targetDistApart);
 		
 		if(targetDistApart < distToLiftGoal){

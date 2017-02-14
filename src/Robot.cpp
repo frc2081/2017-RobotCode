@@ -204,13 +204,20 @@ public:
 	}
 
 	void TeleopInit() {
+		contourTable = NetworkTable::GetTable("GRIP/Contours");
 	}
 
 	void TeleopPeriodic() {
 
+		contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
+
+		if(contourHeights.size()>0) printf("contour1Area: %f\n", contourHeights[0]);
+
 		//Update the joystick values
 		cntl1->UpdateCntl();
 		cntl2->UpdateCntl();
+
+
 
 		//Soft limit the rotational speed so the gyro is not overloaded
 		cntl1->RX *= .9;
@@ -349,7 +356,7 @@ public:
 		//printf("RBEnc Turn: %.2f\n", RBEncTurn->Get());
 		//printf("Gyro: %.5f\n\n", gyroManagerRun->getLastValue());
 
-		printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
+		//printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
 
 	}
 

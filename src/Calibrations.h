@@ -29,7 +29,7 @@ double feederSpeedHigh = 1;
 
 //INTAKE cals
 double fuelIntakeSpeedForward = 1;
-double fuelIntakeSpeedReverse = 1;
+double fuelIntakeSpeedReverse = -1;
 
 //TURN MOTOR PID cals
 double turnMotorP = .025;

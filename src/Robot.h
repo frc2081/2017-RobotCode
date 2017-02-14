@@ -19,7 +19,6 @@
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
-#include "Robot.h"
 #include "Calibrations.h"
 #include "Camera.h"
 
@@ -71,6 +70,9 @@ extern double feederSpeed;
 extern bool runShooter;
 extern double shooterAimLocation;
 const float period = 0.05;
+
+std::shared_ptr<NetworkTable> contourTable;
+std::vector<double> contourHeights;
 
 extern double liftCenterDistance;
 enum autoGearStates {
