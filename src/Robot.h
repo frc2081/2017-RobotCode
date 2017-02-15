@@ -21,6 +21,7 @@
 #include <SmartDashboard/SmartDashboard.h>
 #include "Calibrations.h"
 #include "Camera.h"
+#include "liftAutoDock.h"
 
 extern VictorSP *LFMotDrv;
 extern VictorSP *LBMotDrv;
@@ -71,24 +72,19 @@ extern bool runShooter;
 extern double shooterAimLocation;
 const float period = 0.05;
 
+//Vision Code declarations
 std::shared_ptr<NetworkTable> contourTable;
 std::vector<double> contourHeights;
+std::vector<double> contourWidths;
+std::vector<double> contourAreas;
+std::vector<double> contourCenterXs;
+std::vector<double> contourCenterYs;
 
-extern double liftCenterDistance;
-enum autoGearStates {
-	//Driver has not yet engaged the autolock
-	DO_NOTHING,
-	//Make sure the target is in the camera's field of vision
-	TARGET_AQUIRED,
-	//Make the robot square against the desired target
-	TURN_TO_SQUARE,
-	//Line the robot up to drive straight into the spring
-	HORIZONTAL_LINEUP,
-	//Drive to the proper distance to unload the spring
-	DRIVE_TO_SPRING,
-	//Wait a few seconds, then let normal drive controls work again
-	DONE
-};
+int liftTargetLeftContour;
+int liftTargetRightContour;
+liftAutoDock AD = new liftAutoDock();
+double liftCenterDistance;
+
 extern autoGearStates autoGearStateMachine;
 
 extern commandInput autoInput;
