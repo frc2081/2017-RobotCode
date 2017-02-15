@@ -68,7 +68,9 @@ extern float comAng, comMag;
 extern float currentFacing;
 extern double currAng1, currAng2, currAng3, currAng4;
 extern double feederSpeed;
-extern bool runShooter;
+bool shooterToggle;
+int shooterAngle;
+int shooterSelection;
 extern double shooterAimLocation;
 const float period = 0.05;
 
@@ -82,10 +84,14 @@ std::vector<double> contourCenterYs;
 
 int liftTargetLeftContour;
 int liftTargetRightContour;
-liftAutoDock AD = new liftAutoDock();
-double liftCenterDistance;
+liftAutoDock *AD;
+int liftCenterDistance;
 
-extern autoGearStates autoGearStateMachine;
+int liftTargetLeft;
+int liftTargetRight;
+bool autoDockCmd;
+int liftTargetLeftDistToImgCenter;
+int liftTargetRightDistToImgCenter;
 
 extern commandInput autoInput;
 extern commandOutput autoOutput;
