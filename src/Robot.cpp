@@ -66,6 +66,9 @@ public:
         visionThread.detach();
 		
 		AD = new liftAutoDock();
+		//autoFieldPosition = new AutoSelector(4); //Analog input
+		//autoAction = new AutoSelector(5); //Analog input
+		autoEnable = new DigitalInput(10); //Digital input
 
 		//Instantiate the joysticks according to the controller class
 		cntl1 = new cntl(0, .2);
@@ -173,15 +176,39 @@ public:
 		SmartDashboard::PutNumber("Shooter D: ", shooterSpdP);
 		SmartDashboard::PutNumber("Shooter P: ", shooterSpdI);
 		SmartDashboard::PutNumber("Shooter I: ", shooterSpdD);
-
 	}
 
 	void AutonomousInit() override {
-		autoCom = new CommandManager(swerveLib, RED, ONE);
+		if(autoEnable->Get() == false) return; //if auto enable switch is off, do nothing
+		
+		/*	AutoAction values
+			0 = do nothing
+			1 = cross the midline only - probably will not implement
+			2 = place gear only
+			3 = shoot only
+			4 = shoot, place gear
+			5 - 8 = do nothing
+		*/
+		//autoAction->GetSelection();
+		
+		DriverStation::Alliance matchAlliance;
+		robotTeam matchTeam;
+		matchAlliance = DriverStation::GetInstance().GetAlliance();
+		if(matchAlliance == DriverStation::Alliance::kBlue) matchTeam = BLUE;
+		else matchTeam = RED;
+		
+		int matchStation;
+		int driverStationNumber = DriverStation::GetInstance().GetLocation();
+		if(driverStationNumber == 1) matchStation = ONE;
+		else if(driverStationNumber == 2) matchStation = TWO;
+		else(driverStationNumber == 3) matchStation = THREE;
+		
+		autoCom = new CommandManager(swerveLib, matchTeam, matchStation);
 	}
 
 	void AutonomousPeriodic() {
-
+		if(autoEnable->Get() == false) return; //if auto enable switch is off, do nothing
+		
 		autoInput.LFWhlDrvEnc = LFEncDrv->GetDistance();
 		autoInput.RFWhlDrvEnc = RFEncDrv->GetDistance();
 		autoInput.LBWhlDrvEnc = LBEncDrv->GetDistance();
@@ -219,38 +246,10 @@ public:
 	}
 
 	void TeleopPeriodic() {
-
-		//VISION CODE FOR LIFT AUTO DOCK
-		contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
-		contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
-		contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
-		contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
-		contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
-
-		//development code only, can remove later
-		if(contourHeights.size() > 1)
-		{
-			SmartDashboard::PutNumber("First Contour Center X Pos: ", contourCenterXs[0]);
-			SmartDashboard::PutNumber("Second Contour Center X Pos: ", contourCenterXs[1]);
-			SmartDashboard::PutNumber("First Contour Center Y Pos: ", contourCenterYs[0]);
-			SmartDashboard::PutNumber("Second Contour Center Y Pos: ", contourCenterYs[1]);
-			SmartDashboard::PutNumber("Contour Y Center Delta: ", abs(contourCenterYs[1] - contourCenterYs[0]));
-
-			liftTargetAcquired = false;
-			//for(int i : contourHeights){
-			//	if(contourCenterYs[i] > liftCenterMaxYPos) continue; //skip any contour that is too high in the image to be a vision target
-			//	for(int g : contourHeights){
-					if(abs(contourCenterYs[0] - contourCenterYs[1]) < liftCenterMaxYDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
-						liftTargetLeft = 0;
-						liftTargetRight = 1;
-						liftTargetAcquired = true;
-						liftTargetLeftDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
-						liftTargetRightDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
-					}
-				//}
-			//}
-		}
-			
+		
+		//someday this will be real class.....probably not
+		calcAutoDock();
+		
 		//Update the joystick values
 		cntl1->UpdateCntl();
 		cntl2->UpdateCntl();
@@ -445,6 +444,42 @@ public:
 
 		//printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
 
+	}
+	
+	void calcAutoDock(){
+			//VISION CODE FOR LIFT AUTO DOCK
+	contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
+	contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
+	contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
+	contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
+	contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
+
+	//development code only, can remove later
+	if(contourHeights.size() > 1) {
+		SmartDashboard::PutNumber("First Contour Center X Pos: ", contourCenterXs[0]);
+		SmartDashboard::PutNumber("Second Contour Center X Pos: ", contourCenterXs[1]);
+		SmartDashboard::PutNumber("First Contour Center Y Pos: ", contourCenterYs[0]);
+		SmartDashboard::PutNumber("Second Contour Center Y Pos: ", contourCenterYs[1]);
+		SmartDashboard::PutNumber("Contour Y Center Delta: ", abs(contourCenterYs[1] - contourCenterYs[0]));
+
+		liftTargetAcquired = false;
+		//for(int i : contourHeights){
+		//	if(contourCenterYs[i] > liftCenterMaxYPos) continue; //skip any contour that is too high in the image to be a vision target
+		//	for(int g : contourHeights){
+				if(abs(contourCenterYs[0] - contourCenterYs[1]) < liftCenterMaxYDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
+					liftTargetLeft = 0;
+					liftTargetRight = 1;
+					liftTargetAcquired = true;
+					liftTargetLeftDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
+					liftTargetRightDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
+				}
+				//}
+			//}
+		}
+	}
+	
+	void initPIDs(){
+		
 	}
 
 private:

@@ -22,6 +22,7 @@
 #include "Calibrations.h"
 #include "Camera.h"
 #include "liftAutoDock.h"
+#include "WPIlib.h"
 
 extern VictorSP *LFMotDrv;
 extern VictorSP *LBMotDrv;
@@ -92,6 +93,8 @@ int liftTargetRight;
 bool autoDockCmd;
 int liftTargetLeftDistToImgCenter;
 int liftTargetRightDistToImgCenter;
+
+DigitalInput *autoEnable;
 
 extern commandInput autoInput;
 extern commandOutput autoOutput;

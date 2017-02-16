@@ -37,7 +37,7 @@ double turnMotorI = 0;
 double turnMotorD = 0;
 
 //DRIVE MOTOR cals
-double drvWhlDistPerEncCnt = .1904545454545;
+double drvWhlDistPerEncCnt = .094; //InchesPerPulse
 
 //VISION cals
 //Cals are for a 320x240 image
