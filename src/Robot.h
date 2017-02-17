@@ -22,6 +22,7 @@
 #include "Calibrations.h"
 #include "Camera.h"
 #include "liftAutoDock.h"
+#include "AutoSelector.h"
 #include "WPIlib.h"
 
 extern VictorSP *LFMotDrv;
@@ -74,6 +75,8 @@ int shooterAngle;
 int shooterSelection;
 extern double shooterAimLocation;
 const float period = 0.05;
+
+AutoSelector *autoMode;
 
 //Vision Code declarations
 std::shared_ptr<NetworkTable> contourTable;

@@ -46,15 +46,12 @@ double currAng1, currAng2, currAng3, currAng4;
 
 //Declare all control variables
 bool runShooter;
-double shooterPower;
 double feederSpeed;
 double shooterAimLocation;
 double climbSpeed;
 
 commandInput autoInput;
 commandOutput autoOutput;
-
-double Encoder::PIDGet(){ return this->GetRate();}
 
 class Robot: public frc::IterativeRobot {
 public:
@@ -66,9 +63,6 @@ public:
         visionThread.detach();
 		
 		AD = new liftAutoDock();
-		//autoFieldPosition = new AutoSelector(4); //Analog input
-		//autoAction = new AutoSelector(5); //Analog input
-		autoEnable = new DigitalInput(10); //Digital input
 
 		//Instantiate the joysticks according to the controller class
 		cntl1 = new cntl(0, .2);
@@ -108,7 +102,7 @@ public:
 		ClimbMotDrv3 = new VictorSP(2);
 
 		//Located on the MXP expansion board
-		ballLoad = new VictorSP(15);
+		ballLoad = new VictorSP(10);
 		ballFeederMot = new VictorSP(11);
 		ballShooterMot = new VictorSP(5);
 		shooterAimServo = new Servo(14);
@@ -167,53 +161,17 @@ public:
 		shooterAimLocation = shooterAngNearShot;
 		autoDockCmd = false;
 		liftTargetAcquired = false;
-		shooterToggle = 0;
-		shooterSelection = 0;
-		shooterPower = 0;
 		
 		//Remove this later when shooter power levels have been determined
-		SmartDashboard::PutNumber("Shooter Speed Adjust: ", 0);
-		SmartDashboard::PutNumber("Shooter D: ", shooterSpdP);
-		SmartDashboard::PutNumber("Shooter P: ", shooterSpdI);
-		SmartDashboard::PutNumber("Shooter I: ", shooterSpdD);
-		SmartDashboard::PutNumber("Shooter Setpoint: ",0);
+		SmartDashboard::PutNumber("Shooter Power Adjust: ", 1);
 	}
 
 	void AutonomousInit() override {
-		if(autoEnable->Get() == false) return; //if auto enable switch is off, do nothing
-		
-		/*	AutoAction values
-			0 = do nothing
-			1 = cross the midline only - probably will not implement
-			2 = place gear only
-			3 = shoot only
-			4 = shoot, place gear
-			5 - 8 = do nothing
-		*/
-		//autoAction->GetSelection();
-		
-		DriverStation::Alliance matchAlliance;
-		robotTeam matchTeam;
-		matchAlliance = DriverStation::GetInstance().GetAlliance();
-		if(matchAlliance == DriverStation::Alliance::kBlue) matchTeam = BLUE;
-		else matchTeam = RED;
-		
-		robotAction matchMode;
-		autoMode = new AutoSelector(4);
-		matchMode = autoMode->getSelection();
-
-		robotStation matchStation;
-		int driverStationNumber = DriverStation::GetInstance().GetLocation();
-		if(driverStationNumber == 1) matchStation = ONE;
-		else if(driverStationNumber == 2) matchStation = TWO;
-		else matchStation = THREE;
-		
-		autoCom = new CommandManager(swerveLib, matchTeam, matchStation, matchMode);
+		autoCom = new CommandManager(swerveLib, RED, ONE);
 	}
 
 	void AutonomousPeriodic() {
-		if(autoEnable->Get() == false) return; //if auto enable switch is off, do nothing
-		
+
 		autoInput.LFWhlDrvEnc = LFEncDrv->GetDistance();
 		autoInput.RFWhlDrvEnc = RFEncDrv->GetDistance();
 		autoInput.LBWhlDrvEnc = LBEncDrv->GetDistance();
@@ -251,10 +209,36 @@ public:
 	}
 
 	void TeleopPeriodic() {
+
+		//VISION CODE FOR LIFT AUTO DOCK
+		contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
+		contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
+		contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
+		contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
+		contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
+
+		//development code only, can remove later
+		if(static_cast<int>contourHeights.size() > 0)
+		{
+			SmartDashboard::PutNumber("First Contour Center X Pos: ", contourCenterXs[i]);
+			SmartDashboard::PutNumber("First Contour Center Y Pos: ", contourCenterYs[i]);
+		}
 		
-		//someday this will be real class.....probably not
-		//calcAutoDock();
+		liftTargetAcquired = false;
+		for(int i : contourHeights){
+			if(contourCenterYs[i] > liftYCenterMaxPos) continue; //skip any contour that is too high in the image to be a vision target
+			for(int g : contourHeights){
+				if(fabs(contourCenterYs[i] - contourCenterYs[g]) < liftCenterYMaxDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
+					liftTargetLeft = i;
+					liftTargetRight = g;
+					liftTargetAcquired = true;
+					liftTargetLeftDistToImgCenter = contourCenterXs[i] - liftImageWidth/2;
+					liftTargetRightDistToImgCenter = contourCenterXs[g] - liftImageWidth/2;
+				}
+			}
+		}
 		
+			
 		//Update the joystick values
 		cntl1->UpdateCntl();
 		cntl2->UpdateCntl();
@@ -275,17 +259,18 @@ public:
 		currAng4 = swerveLib->whl->angleRB;
 
 		//Determine Lift auto docking command
-		if (cntl1->bA->State == true) autoDockCmd = true;
+		if (cntl2->bA->State == true) autoDockCmd = true;
 		else autoDockCmd = false;
 		
-		//AD->calcLiftAutoDock(autoDockCmd, liftTargetAcquired, liftTargetLeftDistToImgCenter, liftTargetRightDistToImgCenter);
+		AD->calcLiftAutoDock(autoDockCmd, liftTargetAcquired, liftTargetLeftDistToImgCenter, liftTargetRightDistToImgCenter)
 	
 		//If driver is commanding auto-align, it controls the drive train, otherwise, use joystick inputs
-		if(autoDockCmd == true){
-			comAng = AD->getLADDrvAngCmd();
-			comMag = AD->getLADDrvMagCmd();
-			comRot = AD->getLADDrvRotCmd();
-		} else {
+		if(autoDockCmd == true)
+		{
+			comAng = AD.getLADDrvAngCmd();
+			comMag = AD.getLADDrvMagCmd();
+			comRot = AD.getLADDrvRotCmd();
+		}else{
 		//Calculate commanded robot motion from the drive controller stick
 		//Converts the two axes of the stick into a vector of angle comAng and magnitude comMag
 		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI);// + currentFacing;
@@ -341,25 +326,10 @@ public:
 		//Climbing is locked out unless the Y button of the drive controller is also held
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
-
-		double winchDriveFactor = .6;
-		double winchDriveAngle = 0;
-
 		if(cntl1->bY->State == true){
 			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
 			ClimbMotDrv2->Set(-climbSpeed);
 			ClimbMotDrv3->Set(-climbSpeed);
-
-			RFPID->SetSetpoint(winchDriveAngle);
-			LFPID->SetSetpoint(winchDriveAngle);
-			RBPID->SetSetpoint(winchDriveAngle);
-			LBPID->SetSetpoint(winchDriveAngle);
-
-			LFMotDrv->Set(climbSpeed*winchDriveFactor);
-			RFMotDrv->Set(climbSpeed*winchDriveFactor);
-			RBMotDrv->Set(climbSpeed*winchDriveFactor);
-			LBMotDrv->Set(climbSpeed*winchDriveFactor);
-
 		} else {
 			ClimbMotDrv1->Set(0);
 			ClimbMotDrv2->Set(0);
@@ -371,7 +341,6 @@ public:
 		if (cntl2->bLB->State == true) ballLoad->Set(fuelIntakeSpeedReverse);
 		else if (cntl2->bRB->State == true) ballLoad->Set(fuelIntakeSpeedForward);
 		else ballLoad->Set(0);
-		//SmartDashboard::PutBoolean("BallLoadSpeed: ", cntl2->bY->State);
 
 		//*********FEEDER********
 		//Get the ball feeder command and set output. The left trigger is subtracted because it runs the feeder in reverse
@@ -380,31 +349,13 @@ public:
 
 		//*********SHOOTER********
 		//Toggle the shooter on and off with the start button
-		if (cntl2->bStart->RE == true) { shooterToggle = true;}
-		else {shooterToggle = false; }
+		if (cntl2->bStart->RE == true) runShooter = !runShooter;
+		//if (runShooter == true) shooterPID->SetSetpoint(shooterSpdNearShot);
+		//else shooterPID->SetSetpoint(0);
 
-		if (cntl2->bBack->RE) {runShooter = !runShooter;}
-
-		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
-		double shooterSpeedAdjust = SmartDashboard::GetNumber("Shooter Speed Adjust: ", 0);
-		shooterSpdP = SmartDashboard::GetNumber("Shooter D: ", 0);
-		shooterSpdI = SmartDashboard::GetNumber("Shooter P: ", 0);
-		shooterSpdD = SmartDashboard::GetNumber("Shooter I: ", 0);
-
-		//SHOOTER CONSTANT POWER CODE
-		if (shooterToggle == true) {
-			shooterSelection++;
-			if (shooterSelection >= 3) {shooterSelection = 0;}
-			if (shooterSelection == 0) {shooterPower = 0;}
-			if (shooterSelection == 1) {shooterPID->SetSetpoint(shooterSpdNearShot); shooterAngle = shooterAngNearShot;}
-			if (shooterSelection == 2) {shooterPID->SetSetpoint(shooterSpdFarShot); shooterAngle = shooterAngFarShot;}
-		}
-		//if(runShooter == false){ballShooterMot->Set(shooterPowerAdjust); }
-
-		//SHOOTER PID CODE
-		shooterPID->SetPID(shooterSpdP,shooterSpdI,shooterSpdD,0);
-		if (runShooter == true) { shooterPID->SetSetpoint(shooterSpeedAdjust /60); }
-		else shooterPID->SetSetpoint(0);
+		double shooterPwrAdjust = SmartDashboard::GetNumber("Shooter Power Adjust: ", 1);
+		if (runShooter == true) ballShooterMot->Set(shooterPwrAdjust);
+		else ballShooterMot->Set(0);
 
 		//Aim the shooter
 		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command
@@ -423,21 +374,22 @@ public:
 		SmartDashboard::PutNumber("RB: ", RBEncDrv->Get());
 		
 		SmartDashboard::PutNumber("Shooter Aim Position: ", shooterAimLocation);
-		SmartDashboard::PutNumber("Shooter Speed RPM: ", shooterEnc->GetRate()*60);
+		SmartDashboard::PutNumber("Shooter Power Near: ", shooterPwrNearShot);
+		SmartDashboard::PutNumber("Shooter Power Far: ", shooterPwrFarShot);
+		SmartDashboard::PutNumber("Shooter Speed RPS: ", shooterEnc->GetRate());
 		
 		SmartDashboard::PutNumber("LF Distance: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF Distance: ", RFEncDrv->Get());
-		SmartDashboard::PutNumber("LB Distance: ", LBEncDrv->Get());
-		SmartDashboard::PutNumber("RB Distance: ", RBEncDrv->Get());
+		SmartDashboard::PutNumber("LR Distance: ", LREncDrv->Get());
+		SmartDashboard::PutNumber("RR Distance: ", RREncDrv->Get());
 		
-		SmartDashboard::PutNumber("Number of Potential Targets: ", contourHeights.size());
-		//SmartDashboard::PutNumber("Left Target Center Pos: ", contourCenterYs[liftTargetLeft]);
-		//SmartDashboard::PutNumber("Right Target Center Pos: ", contourCenterYs[liftTargetRight]);
+		SmartDashboard::PutNumber("Number of Potential Targets: ", static_cast<int>contourHeights.size());
+		SmartDashboard::PutNumber("Left Target Center Pos: ", contourCenterYs[liftTargetLeft]);
+		SmartDashboard::PutNumber("Right Target Center Pos: ", contourCenterYs[liftTargetRight]);
 		SmartDashboard::PutNumber("Left Target Dist to Center: ", liftTargetLeftDistToImgCenter);
 		SmartDashboard::PutNumber("Right Target Dist to Center: ",liftTargetRightDistToImgCenter);
-		SmartDashboard::PutBoolean("Lift Target Acquired: ", liftTargetAcquired);
 		
-		/*printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF,
+		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF,
 				swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF,
 				swerveLib->whl->speedLB, swerveLib->whl->speedRB);
@@ -447,7 +399,7 @@ public:
 		printf("%.2f, %.2f\n", feederSpeed, ballFeederMot->Get());
 		printf("%d, %.2f\n", runShooter, ballShooterMot->Get());
 		printf("%.2f\n", ballLoad->Get());
-		printf("%.2i\n\n", shooterEnc->Get());*/
+		printf("%.2i\n\n", shooterEnc->Get());
 	}
 
 	void TestPeriodic() {
@@ -463,42 +415,6 @@ public:
 
 		//printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
 
-	}
-	
-	void calcAutoDock(){
-			//VISION CODE FOR LIFT AUTO DOCK
-	contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
-	contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
-	contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
-	contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
-	contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
-
-	//development code only, can remove later
-	if(contourHeights.size() > 1) {
-		SmartDashboard::PutNumber("First Contour Center X Pos: ", contourCenterXs[0]);
-		SmartDashboard::PutNumber("Second Contour Center X Pos: ", contourCenterXs[1]);
-		SmartDashboard::PutNumber("First Contour Center Y Pos: ", contourCenterYs[0]);
-		SmartDashboard::PutNumber("Second Contour Center Y Pos: ", contourCenterYs[1]);
-		SmartDashboard::PutNumber("Contour Y Center Delta: ", abs(contourCenterYs[1] - contourCenterYs[0]));
-
-		liftTargetAcquired = false;
-		//for(int i : contourHeights){
-		//	if(contourCenterYs[i] > liftCenterMaxYPos) continue; //skip any contour that is too high in the image to be a vision target
-		//	for(int g : contourHeights){
-				if(abs(contourCenterYs[0] - contourCenterYs[1]) < liftCenterMaxYDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
-					liftTargetLeft = 0;
-					liftTargetRight = 1;
-					liftTargetAcquired = true;
-					liftTargetLeftDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
-					liftTargetRightDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
-				}
-				//}
-			//}
-		}
-	}
-	
-	void initPIDs(){
-		
 	}
 
 private:

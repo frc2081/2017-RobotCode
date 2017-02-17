@@ -7,12 +7,12 @@
 
 #include <autoCommands/CommandVision.h>
 
-CommandVision::CommandVision() {
+CommandVision::CommandVision(swervelib *swerveLib) {
 	// TODO Auto-generated constructor stub
 
 }
 
-void init() {
+void CommandVision::init(commandInput input) {
 
 }
 

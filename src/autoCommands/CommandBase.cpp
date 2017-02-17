@@ -24,6 +24,11 @@ commandOutput CommandBase::doNothing() {
 bool CommandBase::isDone() {
 	return commandComplete;
 }
+
+bool CommandBase::compareDouble(double x, double y) {
+	double difference = fabs(x - y);
+	return difference <= 1;
+}
 CommandBase::~CommandBase() {
 	// TODO Auto-generated destructor stub
 }

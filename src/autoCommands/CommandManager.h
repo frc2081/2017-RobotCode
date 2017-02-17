@@ -14,20 +14,9 @@
 #include <queue>
 
 using namespace std;
-
-enum robotTeam {
-	BLUE,
-	RED
-};
-
-enum robotStation {
-	ONE,
-	TWO,
-	THREE
-};
 class CommandManager {
 public:
-	CommandManager(swervelib *swerveLib, robotTeam, robotStation);
+	CommandManager(swervelib *swerveLib, robotTeam, robotStation, robotAction);
 	virtual ~CommandManager();
 	commandOutput tick(commandInput input);
 
@@ -38,9 +27,17 @@ private:
 
 	queue<CommandBase*> commands;
 
-	void buildCommands(queue<CommandBase*> *queue,robotTeam, robotStation);
+	void buildCommands(queue<CommandBase*> *queue,robotTeam, robotStation, robotAction);
 
 	CommandBase *currCommand;
+
+	void crossMidline(queue<CommandBase*> *queue,robotTeam, robotStation);
+
+	void gearOnly(queue<CommandBase*> *queue,robotTeam, robotStation);
+
+	void shootOnly(queue<CommandBase*> *queue,robotTeam, robotStation);
+
+	void gearAndShoot(queue<CommandBase*> *queue,robotTeam, robotStation);
 };
 
 #endif /* SRC_AUTOCOMMANDS_COMMANDMANAGER_H_ */
