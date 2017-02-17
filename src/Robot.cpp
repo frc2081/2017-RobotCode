@@ -108,7 +108,7 @@ public:
 		ClimbMotDrv3 = new VictorSP(2);
 
 		//Located on the MXP expansion board
-		ballLoad = new VictorSP(10);
+		ballLoad = new VictorSP(15);
 		ballFeederMot = new VictorSP(11);
 		ballShooterMot = new VictorSP(5);
 		shooterAimServo = new Servo(14);
@@ -197,13 +197,17 @@ public:
 		if(matchAlliance == DriverStation::Alliance::kBlue) matchTeam = BLUE;
 		else matchTeam = RED;
 		
-		int matchStation;
+		robotAction matchMode;
+		autoMode = new AutoSelector(4);
+		matchMode = autoMode->getSelection();
+
+		robotStation matchStation;
 		int driverStationNumber = DriverStation::GetInstance().GetLocation();
 		if(driverStationNumber == 1) matchStation = ONE;
 		else if(driverStationNumber == 2) matchStation = TWO;
-		else(driverStationNumber == 3) matchStation = THREE;
+		else matchStation = THREE;
 		
-		autoCom = new CommandManager(swerveLib, matchTeam, matchStation);
+		autoCom = new CommandManager(swerveLib, matchTeam, matchStation, matchMode);
 	}
 
 	void AutonomousPeriodic() {

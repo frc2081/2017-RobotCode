@@ -32,7 +32,7 @@ commandOutput CommandTurn::tick(commandInput input) {
 	gyroReading =  input.currentGyroReading - gyroReadingInit;
 
 
-	if (input.currentGyroReading == _finalRot) {
+	if (compareDouble(input.currentGyroReading, _finalRot)) {
 		isDone();
 		return doNothing();
 	}

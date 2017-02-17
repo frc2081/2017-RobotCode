@@ -44,9 +44,6 @@ float currentFacing;
 float comAng, comMag, comRot;
 double currAng1, currAng2, currAng3, currAng4;
 
-double liftCenterDistance;
-autoGearStates autoGearStateMachine;
-
 //Declare all control variables
 bool runShooter;
 double feederSpeed;

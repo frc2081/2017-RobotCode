@@ -11,11 +11,11 @@
 
 class CommandVision : public CommandBase {
 public:
-	CommandVision();
+	CommandVision(swervelib *swerveLib);
 	virtual ~CommandVision();
 
 
-	void init();
+	void init(commandInput input);
 
 	commandOutput tick(commandInput input);
 private:
