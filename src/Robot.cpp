@@ -108,7 +108,7 @@ public:
 		ClimbMotDrv3 = new VictorSP(2);
 
 		//Located on the MXP expansion board
-		ballLoad = new VictorSP(10);
+		ballLoad = new VictorSP(15);
 		ballFeederMot = new VictorSP(11);
 		ballShooterMot = new VictorSP(5);
 		shooterAimServo = new Servo(14);
@@ -172,10 +172,11 @@ public:
 		shooterPower = 0;
 		
 		//Remove this later when shooter power levels have been determined
-		SmartDashboard::PutNumber("Shooter Power Adjust: ", 0);
+		SmartDashboard::PutNumber("Shooter Speed Adjust: ", 0);
 		SmartDashboard::PutNumber("Shooter D: ", shooterSpdP);
 		SmartDashboard::PutNumber("Shooter P: ", shooterSpdI);
 		SmartDashboard::PutNumber("Shooter I: ", shooterSpdD);
+		SmartDashboard::PutNumber("Shooter Setpoint: ",0);
 	}
 
 	void AutonomousInit() override {
@@ -201,9 +202,9 @@ public:
 		int driverStationNumber = DriverStation::GetInstance().GetLocation();
 		if(driverStationNumber == 1) matchStation = ONE;
 		else if(driverStationNumber == 2) matchStation = TWO;
-		else(driverStationNumber == 3) matchStation = THREE;
+		//else(driverStationNumber == 3) matchStation = THREE;
 		
-		autoCom = new CommandManager(swerveLib, matchTeam, matchStation);
+		//autoCom = new CommandManager(swerveLib, matchTeam, matchStation);
 	}
 
 	void AutonomousPeriodic() {
@@ -248,7 +249,7 @@ public:
 	void TeleopPeriodic() {
 		
 		//someday this will be real class.....probably not
-		calcAutoDock();
+		//calcAutoDock();
 		
 		//Update the joystick values
 		cntl1->UpdateCntl();
@@ -273,7 +274,7 @@ public:
 		if (cntl1->bA->State == true) autoDockCmd = true;
 		else autoDockCmd = false;
 		
-		AD->calcLiftAutoDock(autoDockCmd, liftTargetAcquired, liftTargetLeftDistToImgCenter, liftTargetRightDistToImgCenter);
+		//AD->calcLiftAutoDock(autoDockCmd, liftTargetAcquired, liftTargetLeftDistToImgCenter, liftTargetRightDistToImgCenter);
 	
 		//If driver is commanding auto-align, it controls the drive train, otherwise, use joystick inputs
 		if(autoDockCmd == true){
@@ -336,10 +337,25 @@ public:
 		//Climbing is locked out unless the Y button of the drive controller is also held
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
+
+		double winchDriveFactor = .6;
+		double winchDriveAngle = 0;
+
 		if(cntl1->bY->State == true){
 			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
 			ClimbMotDrv2->Set(-climbSpeed);
 			ClimbMotDrv3->Set(-climbSpeed);
+
+			RFPID->SetSetpoint(winchDriveAngle);
+			LFPID->SetSetpoint(winchDriveAngle);
+			RBPID->SetSetpoint(winchDriveAngle);
+			LBPID->SetSetpoint(winchDriveAngle);
+
+			LFMotDrv->Set(climbSpeed*winchDriveFactor);
+			RFMotDrv->Set(climbSpeed*winchDriveFactor);
+			RBMotDrv->Set(climbSpeed*winchDriveFactor);
+			LBMotDrv->Set(climbSpeed*winchDriveFactor);
+
 		} else {
 			ClimbMotDrv1->Set(0);
 			ClimbMotDrv2->Set(0);
@@ -351,6 +367,7 @@ public:
 		if (cntl2->bLB->State == true) ballLoad->Set(fuelIntakeSpeedReverse);
 		else if (cntl2->bRB->State == true) ballLoad->Set(fuelIntakeSpeedForward);
 		else ballLoad->Set(0);
+		//SmartDashboard::PutBoolean("BallLoadSpeed: ", cntl2->bY->State);
 
 		//*********FEEDER********
 		//Get the ball feeder command and set output. The left trigger is subtracted because it runs the feeder in reverse
@@ -364,8 +381,8 @@ public:
 
 		if (cntl2->bBack->RE) {runShooter = !runShooter;}
 
-		shooterSpdNearShot = SmartDashboard::GetNumber("Shooter Setpoint: ",0) / 60;
-		double shooterPowerAdjust = SmartDashboard::GetNumber("Shooter Power Adjust: ", 0);
+		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
+		double shooterSpeedAdjust = SmartDashboard::GetNumber("Shooter Speed Adjust: ", 0);
 		shooterSpdP = SmartDashboard::GetNumber("Shooter D: ", 0);
 		shooterSpdI = SmartDashboard::GetNumber("Shooter P: ", 0);
 		shooterSpdD = SmartDashboard::GetNumber("Shooter I: ", 0);
@@ -375,14 +392,14 @@ public:
 			shooterSelection++;
 			if (shooterSelection >= 3) {shooterSelection = 0;}
 			if (shooterSelection == 0) {shooterPower = 0;}
-			if (shooterSelection == 1) {shooterPower = shooterPwrNearShot; shooterAngle = shooterAngNearShot;}
-			if (shooterSelection == 2) {shooterPower = shooterPwrFarShot; shooterAngle = shooterAngFarShot;}
+			if (shooterSelection == 1) {shooterPID->SetSetpoint(shooterSpdNearShot); shooterAngle = shooterAngNearShot;}
+			if (shooterSelection == 2) {shooterPID->SetSetpoint(shooterSpdFarShot); shooterAngle = shooterAngFarShot;}
 		}
 		//if(runShooter == false){ballShooterMot->Set(shooterPowerAdjust); }
 
 		//SHOOTER PID CODE
 		shooterPID->SetPID(shooterSpdP,shooterSpdI,shooterSpdD,0);
-		if (runShooter == true) { shooterPID->SetSetpoint(shooterSpdNearShot); }
+		if (runShooter == true) { shooterPID->SetSetpoint(shooterSpeedAdjust /60); }
 		else shooterPID->SetSetpoint(0);
 
 		//Aim the shooter
@@ -402,8 +419,6 @@ public:
 		SmartDashboard::PutNumber("RB: ", RBEncDrv->Get());
 		
 		SmartDashboard::PutNumber("Shooter Aim Position: ", shooterAimLocation);
-		SmartDashboard::PutNumber("Shooter Power Near: ", shooterPwrNearShot);
-		SmartDashboard::PutNumber("Shooter Power Far: ", shooterPwrFarShot);
 		SmartDashboard::PutNumber("Shooter Speed RPM: ", shooterEnc->GetRate()*60);
 		
 		SmartDashboard::PutNumber("LF Distance: ", LFEncDrv->Get());
