@@ -10,20 +10,18 @@ double shooterMaxRevPerSec = 88.5;
 double shooterEncCntPerRev = .05;
 
 double shooterAimIncrement = .05;
-double shooterAngNearShot = .2;
-double shooterAngFarShot = .8;
-double shooterAngAutoNearShot = .7;
+double shooterAngNearShot = .3;
+double shooterAngFarShot = .4;
+double shooterAngAutoNearShot = .3;
 double shooterAngAutoMedShot = .8;
 double shooterAngAutoFarShot = 1;
 
-double shooterPwrNearShot = .7; //POWER is for directly commanding the shooter motor
-double shooterPwrFarShot = 1;
 double shooterPwrAutoNearShot = .7; //POWER is for directly commanding the shooter motor
 double shooterPwrAutoMedShot = .9; //POWER is for directly commanding the shooter motor
 double shooterPwrAutoFarShot = 1;
 
-double shooterSpdNearShot = 50; //SPEED is for PID control of shooter speed
-double shooterSpdFarShot = shooterMaxRevPerSec;
+double shooterSpdNearShot = 3300; //SPEED is for PID control of shooter speed in RPM
+double shooterSpdFarShot = 3600;
 
 //FEEDER cals
 
