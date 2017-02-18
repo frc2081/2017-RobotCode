@@ -68,7 +68,7 @@ public:
 		AD = new liftAutoDock();
 		//autoFieldPosition = new AutoSelector(4); //Analog input
 		//autoAction = new AutoSelector(5); //Analog input
-		autoEnable = new DigitalInput(10); //Digital input
+		autoEnable = new DigitalInput(22); //Digital input
 
 		//Instantiate the joysticks according to the controller class
 		cntl1 = new cntl(0, .2);
@@ -180,7 +180,10 @@ public:
 	}
 
 	void AutonomousInit() override {
-		if(autoEnable->Get() == false) return; //if auto enable switch is off, do nothing
+		if(autoEnable->Get() == false) {
+			printf("******************AUTO DISABLED!*********************");
+			return; //if auto enable switch is off, do nothing
+		}
 		
 		/*	AutoAction values
 			0 = do nothing
@@ -198,13 +201,15 @@ public:
 		if(matchAlliance == DriverStation::Alliance::kBlue) matchTeam = BLUE;
 		else matchTeam = RED;
 		
-		int matchStation;
+		robotStation matchStation;
 		int driverStationNumber = DriverStation::GetInstance().GetLocation();
 		if(driverStationNumber == 1) matchStation = ONE;
 		else if(driverStationNumber == 2) matchStation = TWO;
-		//else(driverStationNumber == 3) matchStation = THREE;
+		else matchStation = THREE;
 		
-		//autoCom = new CommandManager(swerveLib, matchTeam, matchStation);
+		robotAction RA = robotAction::CROSS_MIDLINE;
+
+		autoCom = new CommandManager(swerveLib, matchTeam, matchStation, RA);
 	}
 
 	void AutonomousPeriodic() {
@@ -222,7 +227,7 @@ public:
 
 		autoInput.currentGyroReading = gyroManagerRun->getLastValue();
 
-		printf("%.2f\n", autoInput.LBWhlDrvEnc);
+		//printf("%.2f\n", autoInput.LBWhlDrvEnc);
 		autoOutput = autoCom->tick(autoInput);
 
 		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
@@ -237,9 +242,11 @@ public:
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 
-		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
-		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
-		printf("%.2f, %.2f, %.2f\n\n", autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
+		printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
+
+		//printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
+		//printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
+		//printf("%.2f, %.2f, %.2f\n\n", autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
 	}
 
 	void TeleopInit() {
@@ -433,6 +440,8 @@ public:
 		SmartDashboard::PutNumber("Right Target Dist to Center: ",liftTargetRightDistToImgCenter);
 		SmartDashboard::PutBoolean("Lift Target Acquired: ", liftTargetAcquired);
 		
+		printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
+
 		/*printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF,
 				swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
 		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF,
@@ -450,7 +459,7 @@ public:
 	}
 
 	void DisabledPeriodic() {
-		//printf("Shooter Encoder: %.2i\n", shooterEnc->Get());
+		//printf("AutoEnable: %i\n", autoEnable->Get());
 		//printf("LFEnc Turn: %.2f\n", LFEncTurn->Get());
 		//printf("RFEnc Turn: %.2f\n", RFEncTurn->Get());
 		//printf("LBEnc Turn: %.2f\n", LBEncTurn->Get());
