@@ -249,7 +249,7 @@ public:
 	void TeleopPeriodic() {
 		
 		//someday this will be real class.....probably not
-		//calcAutoDock();
+		calcAutoDock();
 		
 		//Update the joystick values
 		cntl1->UpdateCntl();
@@ -274,29 +274,31 @@ public:
 		if (cntl1->bA->State == true) autoDockCmd = true;
 		else autoDockCmd = false;
 		
-		//AD->calcLiftAutoDock(autoDockCmd, liftTargetAcquired, liftTargetLeftDistToImgCenter, liftTargetRightDistToImgCenter);
+		AD->calcLiftAutoDock(autoDockCmd, liftTargetAcquired, liftTargetLeftDistToImgCenter, liftTargetRightDistToImgCenter);
 	
 		//If driver is commanding auto-align, it controls the drive train, otherwise, use joystick inputs
 		if(autoDockCmd == true){
 			comAng = AD->getLADDrvAngCmd();
 			comMag = AD->getLADDrvMagCmd();
+			printf("comMag: ", AD->getLADDrvMagCmd());
 			comRot = AD->getLADDrvRotCmd();
+			swerveLib->calcWheelVect(comMag, comAng, comRot);
 		} else {
 		//Calculate commanded robot motion from the drive controller stick
 		//Converts the two axes of the stick into a vector of angle comAng and magnitude comMag
 		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI);// + currentFacing;
 		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
 		comRot = cntl1->RX;
-		}
 
-		//Calculate the proper values for the swerve drive motion. If there are no inputs, keep the wheels in their previous position
-		if (cntl1->LX != 0 || cntl1->LY != 0 || cntl1->RX != 0) {
-			swerveLib->calcWheelVect(comMag, comAng, comRot);
-		} else {
-			swerveLib->whl->speedRF = 0;
-			swerveLib->whl->speedLF = 0;
-			swerveLib->whl->speedLB = 0;
-			swerveLib->whl->speedRB = 0;
+			//Calculate the proper values for the swerve drive motion. If there are no inputs, keep the wheels in their previous position
+			if (cntl1->LX != 0 || cntl1->LY != 0 || cntl1->RX != 0) {
+				swerveLib->calcWheelVect(comMag, comAng, comRot);
+			} else {
+				swerveLib->whl->speedRF = 0;
+				swerveLib->whl->speedLF = 0;
+				swerveLib->whl->speedLB = 0;
+				swerveLib->whl->speedRB = 0;
+			}
 		}
 
 		//Intelligent Swerve imeplementation - prevents any wheel from having to rotate more than 90 degrees to carry out a command
@@ -338,7 +340,7 @@ public:
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
 
-		double winchDriveFactor = .6;
+		double winchDriveFactor = .7;
 		double winchDriveAngle = 0;
 
 		if(cntl1->bY->State == true){

@@ -53,14 +53,16 @@ switch (liftAutoDockState) {
 		
 	case HORIZONTAL_LINEUP:		
 		pegDistToImgCenter = (leftTargetDistToImgCenter + rightTargetDistToImgCenter) / 2;
-		printf("AutoDock: Horizontal Lineup. CurrDist %i\n", pegDistToImgCenter);
+		printf("AutoDock: Horizontal Lineup. HorzDist %i\n", pegDistToImgCenter);
 		
+		if(abs(pegDistToImgCenter) > horzLineUpTolerance * 2) drvMagCmd = horzLineUpDrvPwrHigh;
+		else drvMagCmd = horzLineUpDrvPwrLow;
+
+		drvRotCmd = 0;
 		if(pegDistToImgCenter > horzLineUpTolerance){
 			drvAngCmd = 0; //Moving towards 0 degrees moves peg to the left in the image
-			drvMagCmd = horzLineUpDrvPwr;
 		} else if(pegDistToImgCenter < -horzLineUpTolerance){
 			drvAngCmd = 180; //Moving towards 180 degrees moves peg to the right in the image
-			drvMagCmd = horzLineUpDrvPwr;
 		} else {
 			drvMagCmd = 0;
 			liftAutoDockState = DRIVE_TO_SPRING;
@@ -72,14 +74,24 @@ switch (liftAutoDockState) {
 		break;	
 		
 	case DRIVE_TO_SPRING:
+		pegDistToImgCenter = (leftTargetDistToImgCenter + rightTargetDistToImgCenter) / 2;
+		printf("AutoDock: Horizontal Lineup. HorzDist %i", pegDistToImgCenter);
+
 		targetDistApart = (-leftTargetDistToImgCenter + rightTargetDistToImgCenter);
-		printf("AutoDock: Driving to Lift. CurrDist %i\n", targetDistApart);
+		printf("AutoDock: Driving to Lift. VertDist %i\n", targetDistApart);
+
+		if(abs(pegDistToImgCenter) > horzLineUpTolerance * 2)
+		{
+			liftAutoDockState = HORIZONTAL_LINEUP;
+		}
 		
 		if(targetDistApart < distToLiftGoal){
-			drvAngCmd = 270;
+			drvAngCmd = 90;
 			drvMagCmd = driveToLiftPwr; 
+			drvRotCmd = driveToLiftRot;
 		} else {
 			drvMagCmd = 0;
+			drvRotCmd = 0;
 			liftAutoDockState = DONE;
 		}
 		break;	

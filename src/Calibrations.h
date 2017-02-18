@@ -9,16 +9,20 @@ double shooterSpdD = 0;
 double shooterMaxRevPerSec = 88.5;
 double shooterEncCntPerRev = .05;
 
+//Near shot is 4 Anthony Feet from corner of boiler and driver wall to robot gear guard
+//Med shot is 8 Anthony Feet from corner of boiler and driver wall to robot gear guard
+//
+
 double shooterAimIncrement = .05;
 double shooterAngNearShot = .3;
 double shooterAngFarShot = .4;
-double shooterAngAutoNearShot = .3;
-double shooterAngAutoMedShot = .8;
+double shooterAngAutoNearShot = .45;
+double shooterAngAutoMedShot = .6;
 double shooterAngAutoFarShot = 1;
 
-double shooterPwrAutoNearShot = .7; //POWER is for directly commanding the shooter motor
-double shooterPwrAutoMedShot = .9; //POWER is for directly commanding the shooter motor
-double shooterPwrAutoFarShot = 1;
+double shooterSpdAutoNearShot = 3700; //POWER is for directly commanding the shooter motor
+double shooterSpdAutoMedShot = 3900; //POWER is for directly commanding the shooter motor
+double shooterSpdAutoFarShot = 4600;
 
 double shooterSpdNearShot = 3300; //SPEED is for PID control of shooter speed in RPM
 double shooterSpdFarShot = 3600;
