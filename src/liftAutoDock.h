@@ -26,14 +26,21 @@ class liftAutoDock
 		double drvRotCmd, drvAngCmd, drvMagCmd;
 		
 		//Cals
-		double horzLineUpDrvPwr = .4;
+		double horzLineUpDrvPwrHigh = .4;
+		double horzLineUpDrvPwrLow = .2;
 		double driveToLiftPwr = .4;
+		double driveToLiftRot = -0.05;
 		int horzLineUpTolerance = 10; //Target max distance from center of lift to center of image
 		int distToLiftGoal = 300; //When moving toward the lift peg for final docking, how far apart
 									//the targets have to be to indicate the robot has reached the goal
+		int centerHoldAngle = 0;
+									
+		double centerHoldFactor = -0.2;
 
 		int pegDistToImgCenter;
 		int targetDistApart;
+		
+		void zeroDrive();
 	
 	public:
 		liftAutoDock();

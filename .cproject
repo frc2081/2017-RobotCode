@@ -63,9 +63,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.180990920" name="Robot_vision.cpp" rcbsApplicability="disable" resourcePath="src/Robot_vision.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1505235107.1554426959">
-						<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1505235107.1554426959" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1505235107"/>
-					</fileInfo>
 					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1104744751.820075552" name="swervelib.h" rcbsApplicability="disable" resourcePath="src/swervelib.h" toolsToInvoke="">
 						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.43338647" name="Resource Custom Build Step">
 							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2031543069" name="Resource Custom Build Step Input Type">
