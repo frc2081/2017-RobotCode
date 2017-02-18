@@ -1,6 +1,19 @@
 #include "liftAutoDock.h"
 #include <iostream>
 
+liftAutoDock::liftAutoDock()
+{
+	targetLock = false;
+	leftTargetDistToImgCenter = 0;
+	rightTargetDistToImgCenter = 0;
+	liftAutoDockCmd = false;
+	
+	pegDistToImgCenter = 0;
+	targetDistApart = 0;
+	
+	zeroDrive();
+}
+
 double liftAutoDock::getLADDrvMagCmd(){
 	return drvMagCmd;
 }
@@ -13,18 +26,10 @@ double liftAutoDock::getLADDrvRotCmd(){
 	return drvRotCmd;
 }
 
-liftAutoDock::liftAutoDock()
-{
-	targetLock = false;
-	leftTargetDistToImgCenter = 0;
-	rightTargetDistToImgCenter = 0;
-	liftAutoDockCmd = false;
-	drvRotCmd = 0;
+void liftAutoDock::zeroDrive(){
 	drvAngCmd = 0;
 	drvMagCmd = 0;
-
-	pegDistToImgCenter = 0;
-	targetDistApart = 0;
+	drvRotCmd = 0;
 }
 
 void liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus, int leftTargetDisanceToImageCenter, int rightTargetDistanceToImageCenter){
@@ -34,71 +39,70 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus,
 	leftTargetDistToImgCenter = leftTargetDisanceToImageCenter;
 	rightTargetDistToImgCenter = rightTargetDistanceToImageCenter;
 	
-//Abort the entire state machine if the auto dock command is removed
-//or if the target is not found/lost during docking
-if(liftAutoDockCmd == false) {
-	liftAutoDockState = DO_NOTHING;	
-} else if(liftAutoDockCmd == true && targetLock == false){
-	printf("AutoDock: No Target Found\n");
-	liftAutoDockState = DO_NOTHING;	
-}
-
-//************Automatic lift docking state machine**************
-switch (liftAutoDockState) {
-	case DO_NOTHING:
-		if (liftAutoDockCmd == true && targetLock == true) {
-			liftAutoDockState = HORIZONTAL_LINEUP;
-		}
-		break;
-		
-	case HORIZONTAL_LINEUP:		
+	//Zero out all drive commands to prevent values from previous executions from being used
+	zeroDrive();
+	
+	//Abort the entire state machine if the auto dock command is removed or if the target is not found/lost during docking
+	if(liftAutoDockCmd == false) {
+		liftAutoDockState = DO_NOTHING;	
+	} else if(liftAutoDockCmd == true && targetLock == false){
+		printf("AutoDock: No Target Found ");
+		liftAutoDockState = DO_NOTHING;	
+	}
+	
+	//Calculate all info about the lift target positions that is needed to guide the robot
+	if(targetLock == true){
 		pegDistToImgCenter = (leftTargetDistToImgCenter + rightTargetDistToImgCenter) / 2;
-		printf("AutoDock: Horizontal Lineup. HorzDist %i\n", pegDistToImgCenter);
-		
-		if(abs(pegDistToImgCenter) > horzLineUpTolerance * 2) drvMagCmd = horzLineUpDrvPwrHigh;
-		else drvMagCmd = horzLineUpDrvPwrLow;
-
-		drvRotCmd = 0;
-		if(pegDistToImgCenter > horzLineUpTolerance){
-			drvAngCmd = 0; //Moving towards 0 degrees moves peg to the left in the image
-		} else if(pegDistToImgCenter < -horzLineUpTolerance){
-			drvAngCmd = 180; //Moving towards 180 degrees moves peg to the right in the image
-		} else {
-			drvMagCmd = 0;
-			liftAutoDockState = DRIVE_TO_SPRING;
-		}
-		
-		break;	
-		
-	case TURN_TO_SQUARE://not currently used
-		break;	
-		
-	case DRIVE_TO_SPRING:
-		pegDistToImgCenter = (leftTargetDistToImgCenter + rightTargetDistToImgCenter) / 2;
-		printf("AutoDock: Horizontal Lineup. HorzDist %i", pegDistToImgCenter);
-
 		targetDistApart = (-leftTargetDistToImgCenter + rightTargetDistToImgCenter);
-		printf("AutoDock: Driving to Lift. VertDist %i\n", targetDistApart);
+	}
 
-		if(abs(pegDistToImgCenter) > horzLineUpTolerance * 2)
-		{
-			liftAutoDockState = HORIZONTAL_LINEUP;
-		}
-		
-		if(targetDistApart < distToLiftGoal){
-			drvAngCmd = 90;
-			drvMagCmd = driveToLiftPwr; 
-			drvRotCmd = driveToLiftRot;
-		} else {
-			drvMagCmd = 0;
-			drvRotCmd = 0;
-			liftAutoDockState = DONE;
-		}
-		break;	
-		
-	case DONE:
-		printf("AutoDock: Done\n");
-		break;
-	}	
-}
+	//************Automatic lift docking state machine**************
+	switch (liftAutoDockState) {
+		case DO_NOTHING:
+			if (liftAutoDockCmd == true && targetLock == true) {
+				liftAutoDockState = HORIZONTAL_LINEUP;
+			}
+			break;
+			
+		case HORIZONTAL_LINEUP:	
+			printf("AutoDock: Horz Lineup. ");
+			
+			if(abs(pegDistToImgCenter) > horzLineUpTolerance * 4) drvMagCmd = horzLineUpDrvPwrHigh;
+			else drvMagCmd = horzLineUpDrvPwrLow;
+
+			if(pegDistToImgCenter > horzLineUpTolerance){
+				drvAngCmd = 0; //Moving towards 0 degrees moves peg to the left in the image
+			} else if(pegDistToImgCenter < -horzLineUpTolerance){
+				drvAngCmd = 180; //Moving towards 180 degrees moves peg to the right in the image
+			} else {
+				drvMagCmd = 0;
+				liftAutoDockState = DRIVE_TO_SPRING;
+			}
+			break;	
+			
+		case TURN_TO_SQUARE://not currently used
+			break;	
+			
+		case DRIVE_TO_SPRING:
+			printf("AutoDock: Drv to Lift. ");	
+			centerHoldAngle = pegDistToImgCenter * centerHoldFactor;
+			
+			if(targetDistApart < distToLiftGoal){
+				drvAngCmd = 90 + centerHoldAngle;
+				drvMagCmd = driveToLiftPwr; 
+			} else {
+				drvMagCmd = 0;
+				drvRotCmd = 0;
+				liftAutoDockState = DONE;
+			}
+			break;	
+			
+		case DONE:
+			printf("AutoDock: Done ");
+			break;
+		}	
+		printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd);
+	}
+	
+
 		

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include "Robot.h"
 
 VictorSP *LFMotDrv;
