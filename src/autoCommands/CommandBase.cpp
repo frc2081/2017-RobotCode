@@ -6,6 +6,7 @@
  */
 
 #include "CommandBase.h"
+#include <iostream>
 
 
 CommandBase::CommandBase() {
@@ -14,6 +15,7 @@ CommandBase::CommandBase() {
 }
 
 void CommandBase::setComplete() {
+	printf("COMMAND COMPLETE\n");
 	commandComplete = true;
 }
 

@@ -37,7 +37,7 @@ class liftAutoDock
 									//the targets have to be to indicate the robot has reached the goal
 		int centerHoldAngle = 0;
 									
-		double centerHoldFactor = -0.2;
+		double centerHoldFactor = -0.4;
 
 		int pegDistToImgCenter;
 		int targetDistApart;

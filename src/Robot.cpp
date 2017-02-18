@@ -68,7 +68,7 @@ public:
 		AD = new liftAutoDock();
 		//autoFieldPosition = new AutoSelector(4); //Analog input
 		//autoAction = new AutoSelector(5); //Analog input
-		autoEnable = new DigitalInput(22); //Digital input
+		autoEnable = new AnalogInput(5); //Digital input
 
 		//Instantiate the joysticks according to the controller class
 		cntl1 = new cntl(0, .2);
@@ -180,10 +180,10 @@ public:
 	}
 
 	void AutonomousInit() override {
-		if(autoEnable->Get() == false) {
-			printf("******************AUTO DISABLED!*********************");
-			return; //if auto enable switch is off, do nothing
-		}
+		//if(autoEnable->GetVoltage() <= 2.5) {
+		//	printf("******************AUTO DISABLED!*********************");
+		//	return; //if auto enable switch is off, do nothing
+		//}
 		
 		/*	AutoAction values
 			0 = do nothing
@@ -213,7 +213,7 @@ public:
 	}
 
 	void AutonomousPeriodic() {
-		if(autoEnable->Get() == false) return; //if auto enable switch is off, do nothing
+		//if(autoEnable->GetVoltage() <= 2.5) return; //if auto enable switch is off, do nothing
 		
 		autoInput.LFWhlDrvEnc = LFEncDrv->GetDistance();
 		autoInput.RFWhlDrvEnc = RFEncDrv->GetDistance();
@@ -242,7 +242,7 @@ public:
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 
-		printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
+		//printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
 
 		//printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
 		//printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
@@ -410,6 +410,8 @@ public:
 		if (runShooter == true) { shooterPID->SetSetpoint(shooterSpeedAdjust /60); }
 		else shooterPID->SetSetpoint(0);
 
+		printf("ballShooterMot: %f", ballShooterMot->Get());
+
 		//Aim the shooter
 		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command
 		//limiting the command here is needed because otherwise there is nothing stopping the command from
@@ -459,7 +461,7 @@ public:
 	}
 
 	void DisabledPeriodic() {
-		//printf("AutoEnable: %i\n", autoEnable->Get());
+		//printf("AutoEnable: %f\n", autoEnable->GetVoltage());
 		//printf("LFEnc Turn: %.2f\n", LFEncTurn->Get());
 		//printf("RFEnc Turn: %.2f\n", RFEncTurn->Get());
 		//printf("LBEnc Turn: %.2f\n", LBEncTurn->Get());

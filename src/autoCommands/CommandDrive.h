@@ -12,7 +12,7 @@
 class CommandDrive : public CommandBase {
 public:
 	//Distance to travel is in imperial units
-	CommandDrive(swervelib *swerveLib, double toTravel);
+	CommandDrive(swervelib *swerveLib, double toTravel, double directon);
 	virtual ~CommandDrive();
 
 	commandOutput tick(commandInput input);
@@ -34,6 +34,7 @@ private:
 	double RBWhlDrvEncInit;
 
 	double _toTravel;
+	double _direction;
 
 	//infinite ducks
 };

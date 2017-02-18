@@ -31,11 +31,12 @@ void CommandTurn::init (commandInput input) {
 }
 
 commandOutput CommandTurn::tick(commandInput input) {
+	printf("TURNING\n");
 	gyroReading =  input.currentGyroReading - gyroReadingInit;
-
-	//compare double is borked, I think
-	if (compareDouble(input.currentGyroReading, _finalRot)) {
-		isDone();
+	if (gyroReading >= 360) gyroReading = ((int)gyroReading % 360);
+	if (gyroReading >= _finalRot) {
+		setComplete();
+		printf("TURN COMPLETE\n");
 		return doNothing();
 	}
 

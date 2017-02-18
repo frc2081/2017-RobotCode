@@ -30,6 +30,7 @@ commandOutput CommandManager::tick(commandInput input) {
 
 
 	if (currCommand == NULL || currCommand->isDone()) {
+		printf("COMMAND COMPLETE. GETTING NEXT COMMAND");
 		currCommand = getNextCommand();
 		currCommand->init(input);
 	}
@@ -72,24 +73,29 @@ void CommandManager::buildCommands(queue<CommandBase*> *queue, robotTeam team, r
 //ALL VALUES IN COMMANDS ARE PLACEHOLDERS FOR ACTUAL VALUES
 void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 	if (station == TWO) {
-		queue->push(new CommandTurn(_swerveLib, 90));
-		queue->push(new CommandDrive(_swerveLib, 20));
-		queue->push(new CommandTurn(_swerveLib, 270));
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 40, 0));
+		//queue->push(new CommandTurn(_swerveLib, 90));
+		queue->push(new CommandDrive(_swerveLib, 84, 270));
+		//queue->push(new CommandTurn(_swerveLib, 270));
+		queue->push(new CommandDrive(_swerveLib, 100, 0));
 	}
 }
 
 void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 	if (station == TWO) {
+		//drive forward 50 inchrs
+		queue->push(new CommandDrive(_swerveLib, 50, 90));
 		queue->push(new CommandVision(_swerveLib));
 		return;
 	}
 	if ((station == ONE && team == RED) || (station == THREE && team == BLUE)) {
-			queue->push(new CommandDrive(_swerveLib, 20));
-			queue->push(new CommandTurn (_swerveLib, 30));
+		//forward 75 inches
+		//turn 45 degrees right
+			queue->push(new CommandDrive(_swerveLib, 45, 0));
+			queue->push(new CommandTurn (_swerveLib, 45));
 			queue->push(new CommandVision(_swerveLib));
 		} else {
-			queue->push(new CommandDrive(_swerveLib, 20));
+			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn (_swerveLib, 330));
 			queue->push(new CommandVision(_swerveLib));
 		}
@@ -106,11 +112,11 @@ void CommandManager::gearAndShoot(queue<CommandBase*> *queue,robotTeam team, rob
 
 	queue->push(new CommandShoot(10));
 	if (team == BLUE) {
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn(_swerveLib, 130));
 		queue->push(new CommandVision(_swerveLib));
 	} else {
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn(_swerveLib, 230));
 		queue->push(new CommandVision(_swerveLib));
 	}
@@ -119,29 +125,29 @@ void CommandManager::gearAndShoot(queue<CommandBase*> *queue,robotTeam team, rob
 void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 
 	if (station == TWO) {
-		queue->push(new CommandDrive(_swerveLib, 10));
+		queue->push(new CommandDrive(_swerveLib, 10, 0));
 		queue->push(new CommandTurn(_swerveLib, 90));
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn (_swerveLib, 180));
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 20, 90));
 		queue->push(new CommandTurn(_swerveLib, 270));
 		queue->push(new CommandShoot(10));
 		return;
 	}
 	if ((station == ONE && team == RED) || (station == THREE && team == BLUE)) {
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn(_swerveLib, 270));
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn (_swerveLib, 180));
-		queue->push(new CommandDrive(_swerveLib, 20));
+		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn(_swerveLib, 90));
 		queue->push(new CommandShoot(10));
 		} else {
-			queue->push(new CommandDrive(_swerveLib, 20));
+			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn(_swerveLib, 90));
-			queue->push(new CommandDrive(_swerveLib, 20));
+			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn (_swerveLib, 180));
-			queue->push(new CommandDrive(_swerveLib, 20));
+			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn(_swerveLib, 270));
 			queue->push(new CommandShoot(10));
 		}

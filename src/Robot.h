@@ -92,8 +92,7 @@ int liftTargetRight;
 bool autoDockCmd;
 int liftTargetLeftDistToImgCenter;
 int liftTargetRightDistToImgCenter;
-
-DigitalInput *autoEnable;
+AnalogInput *autoEnable;
 
 extern commandInput autoInput;
 extern commandOutput autoOutput;

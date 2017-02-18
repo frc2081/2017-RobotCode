@@ -8,22 +8,25 @@
 #include <autoCommands/CommandDrive.h>
 #include <stdio.h>
 
-CommandDrive::CommandDrive(swervelib *swerveLib, double toTravel) {
+CommandDrive::CommandDrive(swervelib *swerveLib, double toTravel, double direction) {
 	// TODO Auto-generated constructor stub
 	_swerveLib = swerveLib;
 	_toTravel = toTravel;
+	_direction = direction;
 }
 
 commandOutput CommandDrive::tick(commandInput input) {
+	printf("DRIVING\n");
 
 	if (checkDistance(input) >= _toTravel) {
 		setComplete();
+		printf("DRIVE COMPLETE\n");
 		return doNothing();
 	}
 
 	double gyroReading = input.currentGyroReading;
 
-	return commandOutput(.5, gyroReading, 0);
+	return commandOutput(.5, _direction, 0);
 
 }
 
