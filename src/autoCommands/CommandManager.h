@@ -38,6 +38,8 @@ private:
 	void shootOnly(queue<CommandBase*> *queue,robotTeam, robotStation);
 
 	void gearAndShoot(queue<CommandBase*> *queue,robotTeam, robotStation);
+
+	void shootOnlyBin(queue<CommandBase*> *queue,robotTeam, robotStation);
 };
 
 #endif /* SRC_AUTOCOMMANDS_COMMANDMANAGER_H_ */

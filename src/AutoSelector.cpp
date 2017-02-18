@@ -11,6 +11,8 @@ AutoSelector::AutoSelector(int Channel) {
 		action = SHOOT_ONLY;
 	} else if (autoDials->GetVoltage() >= rangeFourLow && autoDials->GetVoltage() <= rangeFourHigh) {
 		action = GEAR_AND_SHOOT;
+	} else if (autoDials->GetVoltage() >= rangeFiveLow && autoDials->GetVoltage() <= rangeFiveHigh) {
+		action = SHOOT_ONLY_BIN;
 	}
 
 }

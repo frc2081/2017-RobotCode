@@ -8,6 +8,7 @@
 #ifndef SRC_AUTOCOMMANDS_COMMANDVISION_H_
 #define SRC_AUTOCOMMANDS_COMMANDVISION_H_
 #include "CommandBase.h"
+#include "../liftAutoDock.h"
 
 class CommandVision : public CommandBase {
 public:
@@ -18,8 +19,19 @@ public:
 	void init(commandInput input);
 
 	commandOutput tick(commandInput input);
+
+
 private:
 
+	liftAutoDock *AD;
+
+	double autoMag;
+
+	double autoAng;
+
+	double autoRot;
+
+	commandInput _input;
 };
 
 #endif /* SRC_AUTOCOMMANDS_COMMANDVISION_H_ */
