@@ -1,9 +1,10 @@
-#include "wpilib.h"
+#include "WPILib.h"
+#include "autoCommands/CommandIO.h"
 
 class AutoSelector{
 	public:
 		AutoSelector(int Channel);
-		int getSelection();
+		robotAction getSelection();
 	
 	private:
 		double rangeDiagLow = 0.5;
@@ -24,4 +25,6 @@ class AutoSelector{
 		double rangeSevenHigh = 3.98;
 		double rangeEightLow = 4.0875;
 		double rangeEightHigh = 4.5;
+		robotAction action;
+		AnalogInput *autoDials;
 };

@@ -18,6 +18,7 @@ public:
 protected:
 	void setComplete();
 	commandOutput doNothing();
+	bool compareDouble(double x, double y);
 private:
 	bool commandComplete;
 };

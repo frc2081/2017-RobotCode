@@ -16,12 +16,13 @@ double shooterEncCntPerRev = .05;
 double shooterAimIncrement = .05;
 double shooterAngNearShot = .3;
 double shooterAngFarShot = .4;
+
 double shooterAngAutoNearShot = .45;
 double shooterAngAutoMedShot = .6;
 double shooterAngAutoFarShot = 1;
 
-double shooterSpdAutoNearShot = 3700; //POWER is for directly commanding the shooter motor
-double shooterSpdAutoMedShot = 3900; //POWER is for directly commanding the shooter motor
+double shooterSpdAutoNearShot = 3700;
+double shooterSpdAutoMedShot = 3900;
 double shooterSpdAutoFarShot = 4600;
 
 double shooterSpdNearShot = 3300; //SPEED is for PID control of shooter speed in RPM
