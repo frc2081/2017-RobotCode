@@ -1,3 +1,5 @@
+#include "WPILib.h"
+
 
 class liftAutoDock
 {
@@ -35,18 +37,38 @@ class liftAutoDock
 		int horzLineUpTolerance = 10; //Target max distance from center of lift to center of image
 		int distToLiftGoal = 300; //When moving toward the lift peg for final docking, how far apart
 									//the targets have to be to indicate the robot has reached the goal
+		//IMAGE PROCESSING CALS
+		//Cals are for a 320x240 image
+		int liftImageWidth = 320;
+		int liftImageHeight = 240;
+		double liftMaxRatio = 7;
+		double liftMinRatio = 1.5;
+		int liftCenterMaxYDiff = 15;
+		int liftCenterMaxYPos = 200;
+		int liftCenterMaxXDist = 300;
+		int liftCenterMinXDiff = 50;
+
 		int centerHoldAngle = 0;
 									
 		double centerHoldFactor = -0.4;
 
 		int pegDistToImgCenter;
 		int targetDistApart;
+		int liftTargetLeftContour;
+		int liftTargetRightContour;
+		int liftCenterDistance;
+		int liftTargetLeft;
+		int liftTargetRight;
 		
 		void zeroDrive();
+
+		std::shared_ptr<NetworkTable> contourTable;
+
+		void prepVisionData();
 	
 	public:
 		liftAutoDock();
-		void calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus, int leftTargetDisanceToImageCenter, int rightTargetDistanceToImageCenter);
+		void calcLiftAutoDock(bool liftAutoDockCmd);
 		double getLADDrvMagCmd();
 		double getLADDrvAngCmd();
 		double getLADDrvRotCmd();

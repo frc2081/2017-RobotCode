@@ -76,22 +76,11 @@ int shooterSelection;
 extern double shooterAimLocation;
 const float period = 0.05;
 
+bool autoDockCmd;
 AutoSelector *autoMode;
 
-//Vision Code declarations
-std::shared_ptr<NetworkTable> contourTable;
-
-
-int liftTargetLeftContour;
-int liftTargetRightContour;
 liftAutoDock *AD;
-int liftCenterDistance;
 
-int liftTargetLeft;
-int liftTargetRight;
-bool autoDockCmd;
-int liftTargetLeftDistToImgCenter;
-int liftTargetRightDistToImgCenter;
 AnalogInput *autoEnable;
 
 extern commandInput autoInput;

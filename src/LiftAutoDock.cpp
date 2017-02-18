@@ -3,6 +3,7 @@
 
 liftAutoDock::liftAutoDock()
 {
+	contourTable = NetworkTable::GetTable("GRIP/Contours");
 	targetLock = false;
 	leftTargetDistToImgCenter = 0;
 	rightTargetDistToImgCenter = 0;
@@ -32,15 +33,38 @@ void liftAutoDock::zeroDrive(){
 	drvRotCmd = 0;
 }
 
-void liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus, int leftTargetDisanceToImageCenter, int rightTargetDistanceToImageCenter){
+void liftAutoDock::prepVisionData(){
+			//VISION CODE FOR LIFT AUTO DOCK
+	std::vector<double> contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
+	std::vector<double> contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
+	std::vector<double>contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
+	std::vector<double> contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
+	std::vector<double> contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
 
-	liftAutoDockCmd = autoDockCommand;
-	targetLock = targetLockStatus;
-	leftTargetDistToImgCenter = leftTargetDisanceToImageCenter;
-	rightTargetDistToImgCenter = rightTargetDistanceToImageCenter;
-	
+	//development code only, can remove later
+	if(contourCenterXs.size() > 1 && contourCenterYs.size() > 1) {
+		//SmartDashboard::PutNumber("First Contour Center X Pos: ", contourCenterXs[0]);
+		//SmartDashboard::PutNumber("Second Contour Center X Pos: ", contourCenterXs[1]);
+		//SmartDashboard::PutNumber("First Contour Center Y Pos: ", contourCenterYs[0]);
+		//SmartDashboard::PutNumber("Second Contour Center Y Pos: ", contourCenterYs[1]);
+		//SmartDashboard::PutNumber("Contour Y Center Delta: ", abs(contourCenterYs[1] - contourCenterYs[0]));
+
+		if(abs(contourCenterYs[0] - contourCenterYs[1]) < liftCenterMaxYDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
+			liftTargetLeft = 0;
+			liftTargetRight = 1;
+			targetLock = true;
+			leftTargetDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
+			rightTargetDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
+			}
+		}
+	}
+
+void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
+
 	//Zero out all drive commands to prevent values from previous executions from being used
 	zeroDrive();
+	liftAutoDockCmd = autoDockCommand;
+	prepVisionData();
 	
 	//Abort the entire state machine if the auto dock command is removed or if the target is not found/lost during docking
 	if(liftAutoDockCmd == false) {

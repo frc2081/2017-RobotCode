@@ -21,7 +21,7 @@ void CommandVision::init(commandInput input) {
 
 commandOutput CommandVision::tick(commandInput input) {
 
-	AD->calcLiftAutoDock();
+	AD->calcLiftAutoDock(true);
 	autoAng = AD->getLADDrvAngCmd();
 	autoMag = AD->getLADDrvMagCmd();
 	autoRot = AD->getLADDrvRotCmd();

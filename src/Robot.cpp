@@ -166,7 +166,6 @@ public:
 		climbSpeed = 0;
 		shooterAimLocation = shooterAngNearShot;
 		autoDockCmd = false;
-		liftTargetAcquired = false;
 		shooterToggle = 0;
 		shooterSelection = 0;
 		shooterPower = 0;
@@ -250,14 +249,10 @@ public:
 	}
 
 	void TeleopInit() {
-		contourTable = NetworkTable::GetTable("GRIP/Contours");
+
 	}
 
 	void TeleopPeriodic() {
-		
-		//someday this will be real class.....probably not
-		calcAutoDock();
-		
 		//Update the joystick values
 		cntl1->UpdateCntl();
 		cntl2->UpdateCntl();
@@ -281,7 +276,7 @@ public:
 		if (cntl1->bA->State == true) autoDockCmd = true;
 		else autoDockCmd = false;
 		
-		AD->calcLiftAutoDock(autoDockCmd, liftTargetAcquired, liftTargetLeftDistToImgCenter, liftTargetRightDistToImgCenter);
+		AD->calcLiftAutoDock(autoDockCmd);
 	
 		//If driver is commanding auto-align, it controls the drive train, otherwise, use joystick inputs
 		if(autoDockCmd == true){
@@ -438,9 +433,9 @@ public:
 		
 		//SmartDashboard::PutNumber("Left Target Center Pos: ", contourCenterYs[liftTargetLeft]);
 		//SmartDashboard::PutNumber("Right Target Center Pos: ", contourCenterYs[liftTargetRight]);
-		SmartDashboard::PutNumber("Left Target Dist to Center: ", liftTargetLeftDistToImgCenter);
-		SmartDashboard::PutNumber("Right Target Dist to Center: ",liftTargetRightDistToImgCenter);
-		SmartDashboard::PutBoolean("Lift Target Acquired: ", liftTargetAcquired);
+		//SmartDashboard::PutNumber("Left Target Dist to Center: ", liftTargetLeftDistToImgCenter);
+		//SmartDashboard::PutNumber("Right Target Dist to Center: ",liftTargetRightDistToImgCenter);
+		//SmartDashboard::PutBoolean("Lift Target Acquired: ", liftTargetAcquired);
 		
 		printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
 
@@ -470,33 +465,6 @@ public:
 
 		//printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
 
-	}
-	
-	void calcAutoDock(){
-			//VISION CODE FOR LIFT AUTO DOCK
-	std::vector<double> contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
-	std::vector<double> contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
-	std::vector<double>contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
-	std::vector<double> contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
-	std::vector<double> contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
-
-	//development code only, can remove later
-	if(contourCenterXs.size() > 1 && contourCenterYs.size() > 1) {
-		SmartDashboard::PutNumber("First Contour Center X Pos: ", contourCenterXs[0]);
-		SmartDashboard::PutNumber("Second Contour Center X Pos: ", contourCenterXs[1]);
-		SmartDashboard::PutNumber("First Contour Center Y Pos: ", contourCenterYs[0]);
-		SmartDashboard::PutNumber("Second Contour Center Y Pos: ", contourCenterYs[1]);
-		SmartDashboard::PutNumber("Contour Y Center Delta: ", abs(contourCenterYs[1] - contourCenterYs[0]));
-
-		liftTargetAcquired = false;
-		if(abs(contourCenterYs[0] - contourCenterYs[1]) < liftCenterMaxYDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
-			liftTargetLeft = 0;
-			liftTargetRight = 1;
-			liftTargetAcquired = true;
-			liftTargetLeftDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
-			liftTargetRightDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
-			}
-		}
 	}
 	
 	void initPIDs(){

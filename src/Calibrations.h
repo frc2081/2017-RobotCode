@@ -42,16 +42,6 @@ double turnMotorD = 0;
 //DRIVE MOTOR cals
 double drvWhlDistPerEncCnt = .094; //InchesPerPulse
 
-//VISION cals
-//Cals are for a 320x240 image
-int liftImageWidth = 320;
-int liftImageHeight = 240;
-double liftMaxRatio = 7;
-double liftMinRatio = 1.5;
-int liftCenterMaxYDiff = 15;
-int liftCenterMaxYPos = 200;
-int liftCenterMaxXDist = 300;
-int liftCenterMinXDiff = 50;
-bool liftTargetAcquired = false;
+
 
 #endif /* SRC_CALIBRATIONS_H_ */
