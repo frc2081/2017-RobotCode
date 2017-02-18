@@ -93,13 +93,13 @@ void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotSt
 
 void CommandManager::shootOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 
-	queue->push(new CommandShoot(10, .5));
+	queue->push(new CommandShoot(10));
 
 }
 
 void CommandManager::gearAndShoot(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 
-	queue->push(new CommandShoot(10, .5));
+	queue->push(new CommandShoot(10));
 	if (team == BLUE) {
 		//queue->push(new CommandDrive(_swerveLib))
 	}

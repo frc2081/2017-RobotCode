@@ -1,4 +1,4 @@
-#include "wpilib.h"
+#include "WPILib.h"
 #include "autoCommands/CommandIO.h"
 
 class AutoSelector{
