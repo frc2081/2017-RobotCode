@@ -8,6 +8,7 @@ liftAutoDock::liftAutoDock()
 	leftTargetDistToImgCenter = 0;
 	rightTargetDistToImgCenter = 0;
 	liftAutoDockCmd = false;
+	liftAutoDockState = DO_NOTHING;
 	
 	pegDistToImgCenter = 0;
 	targetDistApart = 0;
@@ -69,6 +70,7 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 	//Abort the entire state machine if the auto dock command is removed or if the target is not found/lost during docking
 	if(liftAutoDockCmd == false) {
 		liftAutoDockState = DO_NOTHING;	
+		printf("AutoDock: No Command ");
 	} else if(liftAutoDockCmd == true && targetLock == false){
 		printf("AutoDock: No Target Found ");
 		liftAutoDockState = DO_NOTHING;	

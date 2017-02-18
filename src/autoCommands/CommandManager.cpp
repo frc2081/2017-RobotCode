@@ -83,8 +83,8 @@ void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, rob
 
 void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 	if (station == TWO) {
-		//drive forward 50 inchrs
-		queue->push(new CommandDrive(_swerveLib, 50, 90));
+		//drive forward 50 inches
+		//queue->push(new CommandDrive(_swerveLib, 50, 90));
 		queue->push(new CommandVision(_swerveLib));
 		return;
 	}

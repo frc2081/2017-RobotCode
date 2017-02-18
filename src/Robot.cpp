@@ -172,10 +172,12 @@ public:
 		
 		//Remove this later when shooter power levels have been determined
 		SmartDashboard::PutNumber("Shooter Speed Adjust: ", 0);
-		SmartDashboard::PutNumber("Shooter D: ", shooterSpdP);
-		SmartDashboard::PutNumber("Shooter P: ", shooterSpdI);
-		SmartDashboard::PutNumber("Shooter I: ", shooterSpdD);
 		SmartDashboard::PutNumber("Shooter Setpoint: ",0);
+
+		SmartDashboard::PutNumber("LF Offset: ", LFOffset);
+		SmartDashboard::PutNumber("RF Offset: ", RFOffset);
+		SmartDashboard::PutNumber("LB Offset: ", LBOffset);
+		SmartDashboard::PutNumber("RB Offset: ", RBOffset);
 	}
 
 	void AutonomousInit() override {
@@ -206,7 +208,7 @@ public:
 		else if(driverStationNumber == 2) matchStation = TWO;
 		else matchStation = THREE;
 		
-		robotAction RA = robotAction::CROSS_MIDLINE;
+		robotAction RA = robotAction::GEAR_ONLY;
 
 		autoCom = new CommandManager(swerveLib, matchTeam, matchStation, RA);
 	}
@@ -335,6 +337,7 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 
+		driveTrainCompensation();
 
 		//*********WINCH***********
 		//Climbing is locked out unless the Y button of the drive controller is also held
@@ -469,6 +472,20 @@ public:
 	
 	void initPIDs(){
 		
+	}
+
+	void driveTrainCompensation(){
+
+		LFOffset = SmartDashboard::GetNumber("LF Offset: ", LFOffset);
+		RFOffset = SmartDashboard::GetNumber("RF Offset: ", RFOffset);
+		LBOffset = SmartDashboard::GetNumber("LB Offset: ", LBOffset);
+		RBOffset = SmartDashboard::GetNumber("RB Offset: ", RBOffset);
+
+		LFMotDrv->Set(LFMotDrv->Get() * LFOffset);
+		RFMotDrv->Set(LFMotDrv->Get() * RFOffset);
+		LBMotDrv->Set(LFMotDrv->Get() * LBOffset);
+		RBMotDrv->Set(LFMotDrv->Get() * RBOffset);
+
 	}
 
 private:

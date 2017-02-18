@@ -41,7 +41,10 @@ double turnMotorD = 0;
 
 //DRIVE MOTOR cals
 double drvWhlDistPerEncCnt = .094; //InchesPerPulse
-
+double LFOffset = 1;
+double RFOffset = 1;
+double LBOffset = 1;
+double RBOffset = 1;
 
 
 #endif /* SRC_CALIBRATIONS_H_ */
