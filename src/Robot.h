@@ -80,11 +80,7 @@ AutoSelector *autoMode;
 
 //Vision Code declarations
 std::shared_ptr<NetworkTable> contourTable;
-std::vector<double> contourHeights;
-std::vector<double> contourWidths;
-std::vector<double> contourAreas;
-std::vector<double> contourCenterXs;
-std::vector<double> contourCenterYs;
+
 
 int liftTargetLeftContour;
 int liftTargetRightContour;

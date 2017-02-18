@@ -427,7 +427,6 @@ public:
 		SmartDashboard::PutNumber("LB Distance: ", LBEncDrv->Get());
 		SmartDashboard::PutNumber("RB Distance: ", RBEncDrv->Get());
 		
-		SmartDashboard::PutNumber("Number of Potential Targets: ", contourHeights.size());
 		//SmartDashboard::PutNumber("Left Target Center Pos: ", contourCenterYs[liftTargetLeft]);
 		//SmartDashboard::PutNumber("Right Target Center Pos: ", contourCenterYs[liftTargetRight]);
 		SmartDashboard::PutNumber("Left Target Dist to Center: ", liftTargetLeftDistToImgCenter);
@@ -464,14 +463,14 @@ public:
 	
 	void calcAutoDock(){
 			//VISION CODE FOR LIFT AUTO DOCK
-	contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
-	contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
-	contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
-	contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
-	contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
+	std::vector<double> contourHeights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
+	std::vector<double> contourWidths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
+	std::vector<double>contourAreas = contourTable->GetNumberArray("area", llvm::ArrayRef<double>());
+	std::vector<double> contourCenterXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
+	std::vector<double> contourCenterYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
 
 	//development code only, can remove later
-	if(contourHeights.size() > 1) {
+	if(contourCenterXs.size() > 1 && contourCenterYs.size() > 1) {
 		SmartDashboard::PutNumber("First Contour Center X Pos: ", contourCenterXs[0]);
 		SmartDashboard::PutNumber("Second Contour Center X Pos: ", contourCenterXs[1]);
 		SmartDashboard::PutNumber("First Contour Center Y Pos: ", contourCenterYs[0]);
@@ -479,18 +478,13 @@ public:
 		SmartDashboard::PutNumber("Contour Y Center Delta: ", abs(contourCenterYs[1] - contourCenterYs[0]));
 
 		liftTargetAcquired = false;
-		//for(int i : contourHeights){
-		//	if(contourCenterYs[i] > liftCenterMaxYPos) continue; //skip any contour that is too high in the image to be a vision target
-		//	for(int g : contourHeights){
-				if(abs(contourCenterYs[0] - contourCenterYs[1]) < liftCenterMaxYDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
-					liftTargetLeft = 0;
-					liftTargetRight = 1;
-					liftTargetAcquired = true;
-					liftTargetLeftDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
-					liftTargetRightDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
-				}
-				//}
-			//}
+		if(abs(contourCenterYs[0] - contourCenterYs[1]) < liftCenterMaxYDiff){ //Any two contours left at this point with Y centers near each other are probably the lift targets
+			liftTargetLeft = 0;
+			liftTargetRight = 1;
+			liftTargetAcquired = true;
+			liftTargetLeftDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
+			liftTargetRightDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
+			}
 		}
 	}
 	

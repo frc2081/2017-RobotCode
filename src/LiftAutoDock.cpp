@@ -53,7 +53,7 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus,
 	//Calculate all info about the lift target positions that is needed to guide the robot
 	if(targetLock == true){
 		pegDistToImgCenter = (leftTargetDistToImgCenter + rightTargetDistToImgCenter) / 2;
-		targetDistApart = (-leftTargetDistToImgCenter + rightTargetDistToImgCenter);
+		targetDistApart = abs(-leftTargetDistToImgCenter + rightTargetDistToImgCenter);
 	}
 
 	//************Automatic lift docking state machine**************
@@ -89,7 +89,8 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus,
 			
 			if(targetDistApart < distToLiftGoal){
 				drvAngCmd = 90 + centerHoldAngle;
-				drvMagCmd = driveToLiftPwr; 
+				if(targetDistApart < driveToListSlowDownVerDist ) drvMagCmd = driveToLiftPwrHigh;
+				else drvMagCmd = driveToLiftPwrLow;
 			} else {
 				drvMagCmd = 0;
 				drvRotCmd = 0;
@@ -100,8 +101,9 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand, bool targetLockStatus,
 		case DONE:
 			printf("AutoDock: Done ");
 			break;
-		}	
-		printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd);
+		}
+
+		if(liftAutoDockCmd == true) {printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd);}
 	}
 	
 

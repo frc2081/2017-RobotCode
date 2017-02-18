@@ -27,8 +27,10 @@ class liftAutoDock
 		
 		//Cals
 		double horzLineUpDrvPwrHigh = .4;
-		double horzLineUpDrvPwrLow = .2;
-		double driveToLiftPwr = .4;
+		double horzLineUpDrvPwrLow = .3;
+		double driveToLiftPwrHigh = .4;
+		double driveToLiftPwrLow = .3;
+		double driveToListSlowDownVerDist = 100;
 		double driveToLiftRot = -0.05;
 		int horzLineUpTolerance = 10; //Target max distance from center of lift to center of image
 		int distToLiftGoal = 300; //When moving toward the lift peg for final docking, how far apart
