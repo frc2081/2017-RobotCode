@@ -30,8 +30,6 @@ commandOutput CommandDrive::tick(commandInput input) {
 
 void CommandDrive::init(commandInput input) {
 
-	printf("DRIVE INIT\n");
-
 	LFWhlDrvEncInit = input.LFWhlDrvEnc;
 	RFWhlDrvEncInit = input.RFWhlDrvEnc;
 	LBWhlDrvEncInit = input.LBWhlDrvEnc;
@@ -51,6 +49,8 @@ double CommandDrive::checkDistance(commandInput input) {
 	double RBWhlDrvEnc = fabs(input.RBWhlDrvEnc - RBWhlDrvEncInit);
 
 	double EncAvg = (LFWhlDrvEnc + RFWhlDrvEnc + LBWhlDrvEnc + RBWhlDrvEnc) / 4;
+
+	printf("ENcAvg: %f", EncAvg);
 
 	return EncAvg;
 

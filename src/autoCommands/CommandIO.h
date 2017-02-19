@@ -14,23 +14,40 @@
 		double autoRot;
 		double autoShooterSpd;
 		double autoLoadSpd;
+		double autoAimAng;
+		double autoIntakePwr;
 
 		commandOutput() {
 			autoAng = 0;
 			autoSpeed = 0;
 			autoRot = 0;
 			autoShooterSpd = 0;
+			autoLoadSpd = 0;
+			autoIntakePwr = 0;
+			autoAimAng = .4;
 		}
 
 		commandOutput(double mag, double ang, double rot) {
 			autoAng = ang;
 			autoSpeed = mag;
 			autoRot = rot;
+			autoAimAng = .4;
 		}
 
 		commandOutput(double shootSpd, double rotSpd) {
 			autoShooterSpd = shootSpd;
 			autoLoadSpd = rotSpd;
+			autoAimAng = .4;
+		}
+
+		commandOutput(double mag, double ang, double rot, double shootSpd, double rotSpd, double aimAng, double intakePwr){
+			autoAng = ang;
+			autoSpeed = mag;
+			autoRot = rot;
+			autoShooterSpd = shootSpd;
+			autoLoadSpd = rotSpd;
+			autoAimAng = aimAng;
+			autoIntakePwr = intakePwr;
 		}
 	};
 

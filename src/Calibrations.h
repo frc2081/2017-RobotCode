@@ -11,7 +11,7 @@ double shooterEncCntPerRev = .05;
 
 //Near shot is 4 Anthony Feet from corner of boiler and driver wall to robot gear guard
 //Med shot is 8 Anthony Feet from corner of boiler and driver wall to robot gear guard
-//
+//Far shot is 12 Anthony Feet from corner of boiler and driver wall to robot gear guard
 
 double shooterAimIncrement = .05;
 double shooterAngNearShot = .3;
@@ -48,5 +48,7 @@ double RFOffset = 1;
 double LBOffset = 1;
 double RBOffset = 1;
 
+double winchDriveFactor = .7;
+double winchDriveAngle = 0;
 
 #endif /* SRC_CALIBRATIONS_H_ */

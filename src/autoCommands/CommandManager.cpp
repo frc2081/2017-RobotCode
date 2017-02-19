@@ -12,7 +12,6 @@
 #include "CommandVision.h"
 #include "CommandShoot.h"
 #include <stdio.h>
-//#include "Calibrations.h"
 
 CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStation station, robotAction action) {
 	// TODO Auto-generated constructor stub
@@ -105,13 +104,14 @@ void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotSt
 
 void CommandManager::shootOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 
-	queue->push(new CommandShoot(10));
+
+	queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
 
 }
 
 void CommandManager::gearAndShoot(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 
-	queue->push(new CommandShoot(10));
+		queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
 	if (team == BLUE) {
 		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn(_swerveLib, 130));
@@ -132,7 +132,7 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 		queue->push(new CommandTurn (_swerveLib, 180));
 		queue->push(new CommandDrive(_swerveLib, 20, 90));
 		queue->push(new CommandTurn(_swerveLib, 270));
-		queue->push(new CommandShoot(10));
+		queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
 		return;
 	}
 	if ((station == ONE && team == RED) || (station == THREE && team == BLUE)) {
@@ -142,7 +142,7 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 		queue->push(new CommandTurn (_swerveLib, 180));
 		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn(_swerveLib, 90));
-		queue->push(new CommandShoot(10));
+		queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
 		} else {
 			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn(_swerveLib, 90));
@@ -150,9 +150,29 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 			queue->push(new CommandTurn (_swerveLib, 180));
 			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn(_swerveLib, 270));
-			queue->push(new CommandShoot(10));
+			queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
 		}
 
+}
+
+double CommandManager::configShooterSpd(robotStation RS)
+{
+	double shooterSpd = 0;
+	if(RS == ONE) shooterSpd = 3700;
+	else if (RS == TWO) shooterSpd = 3900;
+	else if (RS == THREE) shooterSpd = 4600;
+
+	return shooterSpd;
+ }
+
+double CommandManager::configShooterAng(robotStation RS)
+{
+	double shooterAng = 0;
+	if(RS == ONE) shooterAng = .4;
+	else if (RS == TWO) shooterAng = .6;
+	else if (RS == THREE) shooterAng = 1;
+
+	return shooterAng;
 }
 
 CommandManager::~CommandManager() {

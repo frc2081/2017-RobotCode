@@ -12,6 +12,7 @@
 #include "CommandIO.h"
 #include "CommandBase.h"
 #include <queue>
+//#include "Calibrations.h"
 
 using namespace std;
 class CommandManager {
@@ -40,6 +41,10 @@ private:
 	void gearAndShoot(queue<CommandBase*> *queue,robotTeam, robotStation);
 
 	void shootOnlyBin(queue<CommandBase*> *queue,robotTeam, robotStation);
+
+	double configShooterAng(robotStation);
+
+	double configShooterSpd(robotStation);
 };
 
 #endif /* SRC_AUTOCOMMANDS_COMMANDMANAGER_H_ */

@@ -234,10 +234,13 @@ public:
 
 		autoInput.currentGyroReading = gyroManagerRun->getLastValue();
 
-		//printf("%.2f\n", autoInput.LBWhlDrvEnc);
 		autoOutput = autoCom->tick(autoInput);
 
 		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
+		shooterPID->SetSetpoint(autoOutput.autoShooterSpd / 60);
+		ballFeederMot->Set(autoOutput.autoLoadSpd);
+		shooterAimServo->Set(autoOutput.autoAimAng);
+		ballLoad->Set(autoOutput.autoIntakePwr);
 
 		LFPID->SetSetpoint(swerveLib->whl->angleLF);
 		RFPID->SetSetpoint(swerveLib->whl->angleRF);
@@ -249,15 +252,10 @@ public:
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 
-		//printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
-
-		//printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF, swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
-		//printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF, swerveLib->whl->speedLB, swerveLib->whl->speedRB);
-		//printf("%.2f, %.2f, %.2f\n\n", autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
 	}
 
 	void TeleopInit() {
-
+		shooterPID->SetSetpoint(0);
 	}
 
 	void TeleopPeriodic() {
@@ -331,8 +329,6 @@ public:
 			swerveLib->whl->speedRB *= -1;
 		}
 
-		driveTrainCompensation();
-
 		//Set the PID controllers to angle the wheels properly
 		RFPID->SetSetpoint(swerveLib->whl->angleRF);
 		LFPID->SetSetpoint(swerveLib->whl->angleLF);
@@ -345,15 +341,12 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 
-
-
 		//*********WINCH***********
 		//Climbing is locked out unless the Y button of the drive controller is also held
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
 
-		double winchDriveFactor = .7;
-		double winchDriveAngle = 0;
+
 
 		if(cntl1->bY->State == true){
 			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
@@ -397,9 +390,9 @@ public:
 
 		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
 		double shooterSpeedAdjust = SmartDashboard::GetNumber("Shooter Speed Adjust: ", 0);
-		shooterSpdP = SmartDashboard::GetNumber("Shooter D: ", 0);
-		shooterSpdI = SmartDashboard::GetNumber("Shooter P: ", 0);
-		shooterSpdD = SmartDashboard::GetNumber("Shooter I: ", 0);
+		//shooterSpdP = SmartDashboard::GetNumber("Shooter D: ", 0);
+		//shooterSpdI = SmartDashboard::GetNumber("Shooter P: ", 0);
+		//shooterSpdD = SmartDashboard::GetNumber("Shooter I: ", 0);
 
 		//SHOOTER CONSTANT POWER CODE
 		if (shooterToggle == true) {
@@ -415,8 +408,6 @@ public:
 		shooterPID->SetPID(shooterSpdP,shooterSpdI,shooterSpdD,0);
 		if (runShooter == true) { shooterPID->SetSetpoint(shooterSpeedAdjust /60); }
 		else shooterPID->SetSetpoint(0);
-
-		printf("ballShooterMot: %f", ballShooterMot->Get());
 
 		//Aim the shooter
 		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command
@@ -448,7 +439,7 @@ public:
 		//SmartDashboard::PutNumber("Right Target Dist to Center: ",liftTargetRightDistToImgCenter);
 		//SmartDashboard::PutBoolean("Lift Target Acquired: ", liftTargetAcquired);
 		
-		printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
+		//printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
 
 		/*printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF,
 				swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
