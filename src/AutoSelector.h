@@ -4,9 +4,14 @@
 class AutoSelector{
 	public:
 		AutoSelector(int Channel);
-		robotAction getSelection();
+		robotAction getAction();
+		robotStation getFieldPosition();
 	
 	private:
+		robotAction action;
+		robotStation fieldPosition;
+		AnalogInput *autoDials;
+
 		double rangeDiagLow = 0.5;
 		double rangeDiagHigh = 4.5;
 		double rangeOneLow = 0.5;
@@ -25,6 +30,5 @@ class AutoSelector{
 		double rangeSevenHigh = 3.98;
 		double rangeEightLow = 4.0875;
 		double rangeEightHigh = 4.5;
-		robotAction action;
-		AnalogInput *autoDials;
+
 };

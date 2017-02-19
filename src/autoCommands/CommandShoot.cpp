@@ -16,6 +16,8 @@ CommandShoot::CommandShoot(double fireTimeSec) {
 
 void CommandShoot::init(commandInput input) {
 	_initTime = time(NULL);
+
+
 }
 commandOutput CommandShoot::tick(commandInput input) {
 	time_t currentTime = time(NULL);

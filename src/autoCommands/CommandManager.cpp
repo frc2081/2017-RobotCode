@@ -12,6 +12,7 @@
 #include "CommandVision.h"
 #include "CommandShoot.h"
 #include <stdio.h>
+//#include "Calibrations.h"
 
 CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStation station, robotAction action) {
 	// TODO Auto-generated constructor stub
@@ -25,12 +26,11 @@ CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStatio
 
 }
 
-
 commandOutput CommandManager::tick(commandInput input) {
 
 
 	if (currCommand == NULL || currCommand->isDone()) {
-		printf("COMMAND COMPLETE. GETTING NEXT COMMAND");
+		printf("COMMAND COMPLETE. GETTING NEXT COMMAND\n");
 		currCommand = getNextCommand();
 		currCommand->init(input);
 	}
@@ -42,6 +42,7 @@ CommandBase *CommandManager::getNextCommand() {
 	CommandBase *commandPop =  commands.front();
 	commands.pop();
 
+	//Need to add NULL protection here in case no command was added to the queue prior to the pop
 	if (currCommand != NULL) delete currCommand;
 
 	printf("COMMAND GOTTEN\n");
@@ -78,7 +79,7 @@ void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, rob
 		queue->push(new CommandDrive(_swerveLib, 84, 270));
 		//queue->push(new CommandTurn(_swerveLib, 270));
 		queue->push(new CommandDrive(_swerveLib, 100, 0));
-	}
+	} else { queue->push(new CommandPause(1)); }
 }
 
 void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {

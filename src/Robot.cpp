@@ -66,9 +66,9 @@ public:
         visionThread.detach();
 		
 		AD = new liftAutoDock();
-		//autoFieldPosition = new AutoSelector(4); //Analog input
-		//autoAction = new AutoSelector(5); //Analog input
-		autoEnable = new AnalogInput(5); //Digital input
+		autoEnable = new AnalogInput(4);
+		autoAction = new AutoSelector(7);
+		autoFieldPosition = new AutoSelector(6);
 
 		//Instantiate the joysticks according to the controller class
 		cntl1 = new cntl(0, .2);
@@ -181,10 +181,10 @@ public:
 	}
 
 	void AutonomousInit() override {
-		//if(autoEnable->GetVoltage() <= 2.5) {
-		//	printf("******************AUTO DISABLED!*********************");
-		//	return; //if auto enable switch is off, do nothing
-		//}
+		if(autoEnable->GetVoltage() <= 1) {
+			printf("******************AUTO DISABLED!*********************");
+			return; //if auto enable switch is off, do nothing
+		}
 		
 		/*	AutoAction values
 			0 = do nothing
@@ -194,7 +194,8 @@ public:
 			4 = shoot, place gear
 			5 - 8 = do nothing
 		*/
-		//autoAction->GetSelection();
+		robotAction RA = autoAction->getAction();
+		robotStation RS = autoFieldPosition->getFieldPosition();
 		
 		DriverStation::Alliance matchAlliance;
 		robotTeam matchTeam;
@@ -207,14 +208,19 @@ public:
 		if(driverStationNumber == 1) matchStation = ONE;
 		else if(driverStationNumber == 2) matchStation = TWO;
 		else matchStation = THREE;
-		
-		robotAction RA = robotAction::GEAR_ONLY;
 
-		autoCom = new CommandManager(swerveLib, matchTeam, matchStation, RA);
+		printf("\n\n\n***********************INIT AUTONOMOUS MODE*************************\n");
+		printf("Auto Action: %i\n", RA);
+		printf("Field Position: %i\n", RS );
+		printf("Alliance: %i\n", matchAlliance);
+		printf("Driver Station Number: %i\n", matchStation);
+		printf("*********************************************************************\n\n\n");
+
+		autoCom = new CommandManager(swerveLib, matchTeam, RS, RA);
 	}
 
 	void AutonomousPeriodic() {
-		//if(autoEnable->GetVoltage() <= 2.5) return; //if auto enable switch is off, do nothing
+		if(autoEnable->GetVoltage() <= 1) return; //if auto enable switch is off, do nothing
 		
 		autoInput.LFWhlDrvEnc = LFEncDrv->GetDistance();
 		autoInput.RFWhlDrvEnc = RFEncDrv->GetDistance();
@@ -325,6 +331,8 @@ public:
 			swerveLib->whl->speedRB *= -1;
 		}
 
+		driveTrainCompensation();
+
 		//Set the PID controllers to angle the wheels properly
 		RFPID->SetSetpoint(swerveLib->whl->angleRF);
 		LFPID->SetSetpoint(swerveLib->whl->angleLF);
@@ -337,7 +345,7 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 
-		driveTrainCompensation();
+
 
 		//*********WINCH***********
 		//Climbing is locked out unless the Y button of the drive controller is also held
@@ -459,7 +467,14 @@ public:
 	}
 
 	void DisabledPeriodic() {
-		//printf("AutoEnable: %f\n", autoEnable->GetVoltage());
+
+	//	robotAction RA = autoAction->getAction();
+		//robotStation RS = autoFieldPosition->getFieldPosition();
+
+		//printf("Auto Action: %i\n", RA);
+	//	printf("Field Position: %i\n", RS);
+
+		//printf("AutoAction: %f\n\n\n", autoEnable->GetVoltage());
 		//printf("LFEnc Turn: %.2f\n", LFEncTurn->Get());
 		//printf("RFEnc Turn: %.2f\n", RFEncTurn->Get());
 		//printf("LBEnc Turn: %.2f\n", LBEncTurn->Get());
@@ -481,10 +496,10 @@ public:
 		LBOffset = SmartDashboard::GetNumber("LB Offset: ", LBOffset);
 		RBOffset = SmartDashboard::GetNumber("RB Offset: ", RBOffset);
 
-		LFMotDrv->Set(LFMotDrv->Get() * LFOffset);
-		RFMotDrv->Set(LFMotDrv->Get() * RFOffset);
-		LBMotDrv->Set(LFMotDrv->Get() * LBOffset);
-		RBMotDrv->Set(LFMotDrv->Get() * RBOffset);
+		swerveLib->whl->angleLF = swerveLib->whl->angleLF * LFOffset;
+		swerveLib->whl->angleRF = swerveLib->whl->angleRF * RFOffset;
+		swerveLib->whl->angleLB = swerveLib->whl->angleLB * LBOffset;
+		swerveLib->whl->angleRB = swerveLib->whl->angleRB * RBOffset;
 
 	}
 

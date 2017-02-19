@@ -15,15 +15,17 @@ double shooterEncCntPerRev = .05;
 
 double shooterAimIncrement = .05;
 double shooterAngNearShot = .3;
-double shooterAngFarShot = .4;
+double shooterAngFarShot = .45;
 
-double shooterAngAutoNearShot = .45;
+double shooterAngAutoNearShot = .4;
 double shooterAngAutoMedShot = .6;
 double shooterAngAutoFarShot = 1;
+double shooterAngBinShot = .4;
 
 double shooterSpdAutoNearShot = 3700;
 double shooterSpdAutoMedShot = 3900;
 double shooterSpdAutoFarShot = 4600;
+double shooterSpdAutoBinShot = 3700;
 
 double shooterSpdNearShot = 3300; //SPEED is for PID control of shooter speed in RPM
 double shooterSpdFarShot = 3600;

@@ -24,13 +24,13 @@ commandOutput CommandDrive::tick(commandInput input) {
 		return doNothing();
 	}
 
-	double gyroReading = input.currentGyroReading;
-
 	return commandOutput(.5, _direction, 0);
 
 }
 
 void CommandDrive::init(commandInput input) {
+
+	printf("DRIVE INIT\n");
 
 	LFWhlDrvEncInit = input.LFWhlDrvEnc;
 	RFWhlDrvEncInit = input.RFWhlDrvEnc;
@@ -41,8 +41,6 @@ void CommandDrive::init(commandInput input) {
 	RFWhlTurnEncInit = input.RFWhlTurnEnc;
 	LBWhlTurnEncInit = input.LBWhlTurnEnc;
 	RBWhlTurnEncInit = input.RBWhlTurnEnc;
-
-	printf("DRIVE INIT\n");
 }
 
 double CommandDrive::checkDistance(commandInput input) {

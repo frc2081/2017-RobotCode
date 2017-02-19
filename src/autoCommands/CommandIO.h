@@ -48,17 +48,20 @@
 	};
 
 	enum robotTeam {
+		NONE,
 		BLUE,
 		RED
 	};
 
 	enum robotStation {
+		UNKNOWN,
 		ONE,
 		TWO,
 		THREE
 	};
 
 	enum robotAction {
+		NO_AUTO,
 		CROSS_MIDLINE,
 		GEAR_ONLY,
 		SHOOT_ONLY,

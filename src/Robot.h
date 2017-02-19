@@ -77,11 +77,12 @@ extern double shooterAimLocation;
 const float period = 0.05;
 
 bool autoDockCmd;
-AutoSelector *autoMode;
-
-liftAutoDock *AD;
 
 AnalogInput *autoEnable;
+AutoSelector *autoFieldPosition;
+AutoSelector *autoAction;
+
+liftAutoDock *AD;
 
 extern commandInput autoInput;
 extern commandOutput autoOutput;
