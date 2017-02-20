@@ -463,9 +463,9 @@ public:
 	//	printf("Field Position: %i\n", RS);
 
 		//printf("AutoAction: %f\n\n\n", autoEnable->GetVoltage());
-		//printf("LFEnc Turn: %.2f\n", LFEncTurn->Get());
-		//printf("RFEnc Turn: %.2f\n", RFEncTurn->Get());
-		//printf("LBEnc Turn: %.2f\n", LBEncTurn->Get());
+		//printf("LFEnc Turn: %.2f ", LFEncTurn->Get());
+		//printf("RFEnc Turn: %.2f ", RFEncTurn->Get());
+		//printf("LBEnc Turn: %.2f ", LBEncTurn->Get());
 		//printf("RBEnc Turn: %.2f\n", RBEncTurn->Get());
 		//printf("Gyro: %.5f\n\n", gyroManagerRun->getLastValue());
 

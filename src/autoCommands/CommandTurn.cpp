@@ -28,13 +28,22 @@ void CommandTurn::init (commandInput input) {
 	}
 	_finalRot = comboAng;
 
+	double delta = gyroReadingInit - _finalRot;
+	if(abs(delta) > 180){
+		if(delta > 0) _turnDirection = 1;
+		else _turnDirection = -1;
+	} else {
+		if(delta > 0) _turnDirection = -1;
+		else _turnDirection = 1;
+	}
+
 }
 
 commandOutput CommandTurn::tick(commandInput input) {
 	printf("TURNING\n");
 	gyroReading =  input.currentGyroReading - gyroReadingInit;
 	if (gyroReading >= 360) gyroReading = ((int)gyroReading % 360);
-	if (gyroReading >= _finalRot) {
+	if (gyroReading >= _finalRot - _targetTolerance && gyroReading <= _finalRot + _targetTolerance) {
 		setComplete();
 		printf("TURN COMPLETE\n");
 		return doNothing();
@@ -42,7 +51,7 @@ commandOutput CommandTurn::tick(commandInput input) {
 
 	printf("Target: %f Gyro %f\n", _finalRot, gyroReading );
 
-	return commandOutput(0, _finalRot, .5);
+	return commandOutput(0, _turnRate * _turnDirection);
 }
 
 CommandTurn::~CommandTurn() {

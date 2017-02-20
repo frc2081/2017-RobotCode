@@ -37,6 +37,10 @@ private:
 
 	double _toTravel;
 
+	double _turnDirection = 1; //positive = clockwise, negative = counterClockwise;
+	double _turnRate = 0.4; //radians per sec
+	double _targetTolerance = 5; //maximum allowed delta from target angle to consider turn complete
+
 	//infinite ducks
 };
 
