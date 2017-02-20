@@ -384,10 +384,10 @@ public:
 		if (cntl2->bStart->RE == true) { shooterToggle = true;}
 		else {shooterToggle = false; }
 
-		if (cntl2->bBack->RE) {runShooter = !runShooter;}
+		//if (cntl2->bBack->RE) {runShooter = !runShooter;}
 
 		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
-		double shooterSpeedAdjust = SmartDashboard::GetNumber("Shooter Speed Adjust: ", 0);
+		//double shooterSpeedAdjust = SmartDashboard::GetNumber("Shooter Speed Adjust: ", 0);
 
 		//SHOOTER CONSTANT POWER CODE
 		if (shooterToggle == true) {
@@ -400,9 +400,9 @@ public:
 		//if(runShooter == false){ballShooterMot->Set(shooterPowerAdjust); }
 
 		//SHOOTER PID CODE
-		shooterPID->SetPID(shooterSpdP,shooterSpdI,shooterSpdD,0);
-		if (runShooter == true) { shooterPID->SetSetpoint(shooterSpeedAdjust /60); }
-		else shooterPID->SetSetpoint(0);
+		//shooterPID->SetPID(shooterSpdP,shooterSpdI,shooterSpdD,0);
+		//if (runShooter == true) { shooterPID->SetSetpoint(shooterSpeedAdjust /60); }
+		//else shooterPID->SetSetpoint(0);
 
 		//Aim the shooter
 
