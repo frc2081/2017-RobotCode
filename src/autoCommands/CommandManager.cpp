@@ -28,9 +28,8 @@ CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStatio
 commandOutput CommandManager::tick(commandInput input) {
 
 
-	if (currCommand == NULL || currCommand->isDone()) {
+	if ((currCommand == NULL || currCommand->isDone()) && (currCommand = getNextCommand()) != NULL) {
 		printf("COMMAND COMPLETE. GETTING NEXT COMMAND\n");
-		currCommand = getNextCommand();
 		currCommand->init(input);
 	}
 
@@ -68,23 +67,20 @@ void CommandManager::buildCommands(queue<CommandBase*> *queue, robotTeam team, r
 	default:
 		break;
 	}
+	queue->push(new CommandPause(-1));
 }
 
 //ALL VALUES IN COMMANDS ARE PLACEHOLDERS FOR ACTUAL VALUES
 void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 	if (station == TWO) {
 		queue->push(new CommandDrive(_swerveLib, 40, 0));
-		//queue->push(new CommandTurn(_swerveLib, 90));
 		queue->push(new CommandDrive(_swerveLib, 84, 270));
-		//queue->push(new CommandTurn(_swerveLib, 270));
 		queue->push(new CommandDrive(_swerveLib, 100, 0));
 	} else { queue->push(new CommandPause(1)); }
 }
 
 void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 	if (station == TWO) {
-		//drive forward 50 inches
-		//queue->push(new CommandDrive(_swerveLib, 50, 90));
 		queue->push(new CommandVision(_swerveLib));
 		return;
 	}
@@ -99,14 +95,10 @@ void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotSt
 			queue->push(new CommandTurn (_swerveLib, 330));
 			queue->push(new CommandVision(_swerveLib));
 		}
-
 }
 
 void CommandManager::shootOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
-
-
-	queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
-
+	queue->push(new CommandShoot(15, configShooterSpd(station), configShooterAng(station)));
 }
 
 void CommandManager::gearAndShoot(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
@@ -152,7 +144,6 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 			queue->push(new CommandTurn(_swerveLib, 270));
 			queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
 		}
-
 }
 
 double CommandManager::configShooterSpd(robotStation RS)

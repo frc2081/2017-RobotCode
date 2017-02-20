@@ -31,10 +31,17 @@
 			autoAng = ang;
 			autoSpeed = mag;
 			autoRot = rot;
+			autoShooterSpd = 0;
+			autoLoadSpd = 0;
+			autoIntakePwr = 0;
 			autoAimAng = .4;
 		}
 
 		commandOutput(double shootSpd, double rotSpd) {
+			autoAng = 0;
+			autoSpeed = 0;
+			autoRot = 0;
+			autoIntakePwr = 0;
 			autoShooterSpd = shootSpd;
 			autoLoadSpd = rotSpd;
 			autoAimAng = .4;

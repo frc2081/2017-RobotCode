@@ -346,8 +346,6 @@ public:
 		//This is to prevent accidental command of the winch before the robot is ready to climb
 		climbSpeed = cntl1->RTrig;
 
-
-
 		if(cntl1->bY->State == true){
 			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
 			ClimbMotDrv2->Set(-climbSpeed);
@@ -390,9 +388,6 @@ public:
 
 		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
 		double shooterSpeedAdjust = SmartDashboard::GetNumber("Shooter Speed Adjust: ", 0);
-		//shooterSpdP = SmartDashboard::GetNumber("Shooter D: ", 0);
-		//shooterSpdI = SmartDashboard::GetNumber("Shooter P: ", 0);
-		//shooterSpdD = SmartDashboard::GetNumber("Shooter I: ", 0);
 
 		//SHOOTER CONSTANT POWER CODE
 		if (shooterToggle == true) {
@@ -410,6 +405,8 @@ public:
 		else shooterPID->SetSetpoint(0);
 
 		//Aim the shooter
+
+		//remove this for prod release
 		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command
 		//limiting the command here is needed because otherwise there is nothing stopping the command from
 		//being incremented outside of the valid command range of the servo
@@ -476,24 +473,6 @@ public:
 
 	}
 	
-	void initPIDs(){
-		
-	}
-
-	void driveTrainCompensation(){
-
-		LFOffset = SmartDashboard::GetNumber("LF Offset: ", LFOffset);
-		RFOffset = SmartDashboard::GetNumber("RF Offset: ", RFOffset);
-		LBOffset = SmartDashboard::GetNumber("LB Offset: ", LBOffset);
-		RBOffset = SmartDashboard::GetNumber("RB Offset: ", RBOffset);
-
-		swerveLib->whl->angleLF = swerveLib->whl->angleLF * LFOffset;
-		swerveLib->whl->angleRF = swerveLib->whl->angleRF * RFOffset;
-		swerveLib->whl->angleLB = swerveLib->whl->angleLB * LBOffset;
-		swerveLib->whl->angleRB = swerveLib->whl->angleRB * RBOffset;
-
-	}
-
 private:
 
 	gyroManager *gyroManagerRun;

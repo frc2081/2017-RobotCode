@@ -25,7 +25,6 @@ commandOutput CommandDrive::tick(commandInput input) {
 	}
 
 	return commandOutput(.5, _direction, 0);
-
 }
 
 void CommandDrive::init(commandInput input) {
