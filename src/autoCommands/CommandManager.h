@@ -22,7 +22,8 @@ public:
 	commandOutput tick(commandInput input);
 
 protected:
-	CommandBase *getNextCommand();
+	CommandBase *getNextCommand(commandInput input);
+
 private:
 	swervelib *_swerveLib;
 
@@ -45,6 +46,8 @@ private:
 	double configShooterAng(robotStation);
 
 	double configShooterSpd(robotStation);
+
+	CommandBase *_doNothing;
 };
 
 #endif /* SRC_AUTOCOMMANDS_COMMANDMANAGER_H_ */

@@ -14,37 +14,42 @@
 #include <stdio.h>
 
 CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStation station, robotAction action) {
-	// TODO Auto-generated constructor stub
 
 	commands = queue<CommandBase*>();
 	buildCommands(&commands, team, station, action);
 
 	_swerveLib = swerveLib;
 
-	currCommand = NULL;
-
+	commands.push(_doNothing = new CommandPause(-1));
+	currCommand = commands.front();
 }
 
 commandOutput CommandManager::tick(commandInput input) {
 
+	if (currCommand == NULL || currCommand->isDone())
+		currCommand = getNextCommand(input);
 
-	if ((currCommand == NULL || currCommand->isDone()) && (currCommand = getNextCommand()) != NULL) {
-		printf("COMMAND COMPLETE. GETTING NEXT COMMAND\n");
-		currCommand->init(input);
-	}
-
-	return currCommand->tick(input);
+	return currCommand == NULL
+		? commandOutput()
+		: currCommand->tick(input);
 }
 
-CommandBase *CommandManager::getNextCommand() {
-	CommandBase *commandPop =  commands.front();
+CommandBase *CommandManager::getNextCommand(commandInput input) {
+
+	// In the event that all prior commands have been popped off the queue, do nothing.
+	if (commands.size() < 1)
+		return _doNothing;
+
+	CommandBase *nextCommand =  commands.front();
 	commands.pop();
 
 	//Need to add NULL protection here in case no command was added to the queue prior to the pop
 	if (currCommand != NULL) delete currCommand;
 
+	
 	printf("COMMAND GOTTEN\n");
-	return commandPop;
+	nextCommand->init(input);
+	return nextCommand;
 }
 
 void CommandManager::buildCommands(queue<CommandBase*> *queue, robotTeam team, robotStation station, robotAction action) {
@@ -67,7 +72,6 @@ void CommandManager::buildCommands(queue<CommandBase*> *queue, robotTeam team, r
 	default:
 		break;
 	}
-	queue->push(new CommandPause(-1));
 }
 
 //ALL VALUES IN COMMANDS ARE PLACEHOLDERS FOR ACTUAL VALUES
