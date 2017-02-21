@@ -21,7 +21,7 @@ CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStatio
 	_swerveLib = swerveLib;
 
 	commands.push(_doNothing = new CommandPause(-1));
-	currCommand = commands.front();
+	currCommand = NULL;
 }
 
 commandOutput CommandManager::tick(commandInput input) {
@@ -54,6 +54,7 @@ CommandBase *CommandManager::getNextCommand(commandInput input) {
 
 	printf("Retrieved a %s Command from the queue.\n", nextCommand->getCommandName());
 	nextCommand->init(input);
+	printf("Command Init Successful\n");
 	return nextCommand;
 }
 
@@ -97,12 +98,12 @@ void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotSt
 	if ((station == ONE && team == RED) || (station == THREE && team == BLUE)) {
 		//forward 75 inches
 		//turn 45 degrees right
-			queue->push(new CommandDrive(_swerveLib, 45, 0));
+			queue->push(new CommandDrive(_swerveLib, 85, 90));
 			queue->push(new CommandTurn (_swerveLib, 45));
 			queue->push(new CommandVision(_swerveLib));
 		} else {
-			queue->push(new CommandDrive(_swerveLib, 20, 0));
-			queue->push(new CommandTurn (_swerveLib, 330));
+			queue->push(new CommandDrive(_swerveLib, 85, 90));
+			queue->push(new CommandTurn (_swerveLib, 315));
 			queue->push(new CommandVision(_swerveLib));
 		}
 }
