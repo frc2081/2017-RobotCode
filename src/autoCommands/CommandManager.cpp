@@ -98,12 +98,12 @@ void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotSt
 	if ((station == ONE && team == RED) || (station == THREE && team == BLUE)) {
 		//forward 75 inches
 		//turn 45 degrees right
-			queue->push(new CommandDrive(_swerveLib, 85, 90));
-			queue->push(new CommandTurn (_swerveLib, 45));
+			queue->push(new CommandDrive(_swerveLib, 75, 180));
+			queue->push(new CommandTurn (_swerveLib, 340));
 			queue->push(new CommandVision(_swerveLib));
 		} else {
-			queue->push(new CommandDrive(_swerveLib, 85, 90));
-			queue->push(new CommandTurn (_swerveLib, 315));
+			queue->push(new CommandDrive(_swerveLib, 75, 180));
+			queue->push(new CommandTurn (_swerveLib, 235));
 			queue->push(new CommandVision(_swerveLib));
 		}
 }
@@ -114,16 +114,8 @@ void CommandManager::shootOnly(queue<CommandBase*> *queue,robotTeam team, robotS
 
 void CommandManager::gearAndShoot(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 
-		queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
-	if (team == BLUE) {
-		queue->push(new CommandDrive(_swerveLib, 20, 0));
-		queue->push(new CommandTurn(_swerveLib, 130));
-		queue->push(new CommandVision(_swerveLib));
-	} else {
-		queue->push(new CommandDrive(_swerveLib, 20, 0));
-		queue->push(new CommandTurn(_swerveLib, 230));
-		queue->push(new CommandVision(_swerveLib));
-	}
+		queue->push(new CommandShoot(8, configShooterSpd(station), configShooterAng(station)));
+		gearOnly(queue, team, station);
 }
 
 void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
