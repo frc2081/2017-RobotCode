@@ -372,7 +372,6 @@ public:
 		if (cntl2->bLB->State == true) ballLoad->Set(fuelIntakeSpeedReverse);
 		else if (cntl2->bRB->State == true) ballLoad->Set(fuelIntakeSpeedForward);
 		else ballLoad->Set(0);
-		//SmartDashboard::PutBoolean("BallLoadSpeed: ", cntl2->bY->State);
 
 		//*********FEEDER********
 		//Get the ball feeder command and set output. The left trigger is subtracted because it runs the feeder in reverse
@@ -380,41 +379,12 @@ public:
 		ballFeederMot->Set(feederSpeed);
 
 		//*********SHOOTER********
-		//Toggle the shooter on and off with the start button
-		if (cntl2->bStart->RE == true) { shooterToggle = true;}
-		else {shooterToggle = false; }
-
-		//if (cntl2->bBack->RE) {runShooter = !runShooter;}
-
 		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
-		//double shooterSpeedAdjust = SmartDashboard::GetNumber("Shooter Speed Adjust: ", 0);
 
-		//SHOOTER CONSTANT POWER CODE
-		if (shooterToggle == true) {
-			shooterSelection++;
-			if (shooterSelection >= 3) {shooterSelection = 0;}
-			if (shooterSelection == 0) {shooterPower = 0;}
-			if (shooterSelection == 1) {shooterPID->SetSetpoint(shooterSpdNearShot); shooterAngle = shooterAngNearShot;}
-			if (shooterSelection == 2) {shooterPID->SetSetpoint(shooterSpdFarShot); shooterAngle = shooterAngFarShot;}
-		}
-		//if(runShooter == false){ballShooterMot->Set(shooterPowerAdjust); }
-
-		//SHOOTER PID CODE
-		//shooterPID->SetPID(shooterSpdP,shooterSpdI,shooterSpdD,0);
-		//if (runShooter == true) { shooterPID->SetSetpoint(shooterSpeedAdjust /60); }
-		//else shooterPID->SetSetpoint(0);
-
-		//Aim the shooter
-
-		//remove this for prod release
-		//Each button press moves the shooter up or down by a fixed increment within the limits of the servo command
-		//limiting the command here is needed because otherwise there is nothing stopping the command from
-		//being incremented outside of the valid command range of the servo
-		if (cntl2->bA->RE == true) shooterAimLocation += shooterAimIncrement;
-		if (cntl2->bB->RE == true) shooterAimLocation -= shooterAimIncrement;
-		if (shooterAimLocation > 1) shooterAimLocation = 1;
-		if (shooterAimLocation < 0) shooterAimLocation = 0;
-		shooterAimServo->Set(shooterAimLocation);
+		if (cntl2->bStart->RE == true) {shooterPID->SetSetpoint(shooterSpdNearShot / 60); shooterAngle = shooterAngNearShot;	}
+		if (cntl2->bBack->RE == true) {shooterPID->SetSetpoint(shooterSpdFarShot / 60); shooterAngle = shooterAngFarShot;	}
+		if (cntl2->bBack->State == true && cntl2->bStart->State == true) {shooterPID->SetSetpoint(0); }
+		shooterAimServo->Set(shooterAngle);
 
 		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());

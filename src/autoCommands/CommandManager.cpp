@@ -72,6 +72,7 @@ void CommandManager::buildCommands(queue<CommandBase*> *queue, robotTeam team, r
 	default:
 		break;
 	}
+	queue->push(new CommandPause(-1));
 }
 
 //ALL VALUES IN COMMANDS ARE PLACEHOLDERS FOR ACTUAL VALUES

@@ -71,7 +71,7 @@ extern float currentFacing;
 extern double currAng1, currAng2, currAng3, currAng4;
 extern double feederSpeed;
 bool shooterToggle;
-int shooterAngle;
+double shooterAngle;
 int shooterSelection;
 extern double shooterAimLocation;
 const float period = 0.05;
