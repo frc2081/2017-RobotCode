@@ -36,7 +36,11 @@ void CommandTurn::init (commandInput input) {
 		if(delta > 0) _turnDirection = -1;
 		else _turnDirection = 1;
 	}
+}
 
+const char* CommandTurn::getCommandName()
+{
+	return "Turn";
 }
 
 commandOutput CommandTurn::tick(commandInput input) {

@@ -14,6 +14,7 @@ public:
 	virtual commandOutput tick(commandInput input) = 0;
 	virtual void init(commandInput input) = 0;
 	virtual bool isDone() = 0;
+	virtual const char* getCommandName() = 0;
 };
 
 

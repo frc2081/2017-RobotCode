@@ -20,6 +20,11 @@ void CommandShoot::init(commandInput input) {
 	_initTime = time(NULL);
 }
 
+const char* CommandShoot::getCommandName()
+{
+	return "Shoot";
+}
+
 commandOutput CommandShoot::tick(commandInput input) {
 	time_t currentTime = time(NULL);
 

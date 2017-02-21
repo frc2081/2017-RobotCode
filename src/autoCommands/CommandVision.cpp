@@ -16,7 +16,11 @@ CommandVision::CommandVision(swervelib *swerveLib) {
 }
 
 void CommandVision::init(commandInput input) {
+}
 
+const char* CommandVision::getCommandName()
+{
+	return "Vision";
 }
 
 commandOutput CommandVision::tick(commandInput input) {

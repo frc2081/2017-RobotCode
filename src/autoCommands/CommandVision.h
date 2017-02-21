@@ -15,10 +15,9 @@ public:
 	CommandVision(swervelib *swerveLib);
 	virtual ~CommandVision();
 
-
 	void init(commandInput input);
-
 	commandOutput tick(commandInput input);
+	const char* getCommandName();
 
 
 private:

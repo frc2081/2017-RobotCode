@@ -17,6 +17,7 @@ public:
 
 	commandOutput tick(commandInput input);
 	void init(commandInput input);
+	const char* getCommandName();
 
 protected:
 	double checkDistance(commandInput input);

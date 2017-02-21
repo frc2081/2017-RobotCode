@@ -16,8 +16,8 @@ public:
 	virtual ~CommandPause();
 
 	commandOutput tick(commandInput input);
-
 	void init(commandInput input);
+	const char* getCommandName();
 
 private:
 	time_t _initTime;

@@ -33,6 +33,11 @@ commandOutput CommandPause::tick(commandInput input) {
 void CommandPause::init(commandInput input) {
 }
 
+const char* CommandPause::getCommandName()
+{
+	return "Pause";
+}
+
 CommandPause::~CommandPause() {
 	// TODO Auto-generated destructor stub
 }

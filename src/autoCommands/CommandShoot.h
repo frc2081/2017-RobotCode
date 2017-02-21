@@ -17,6 +17,7 @@ public:
 
 	void init(commandInput input);
 	commandOutput tick(commandInput input);
+	const char* getCommandName();
 private:
 	time_t _initTime;
 

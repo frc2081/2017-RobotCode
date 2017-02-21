@@ -40,6 +40,11 @@ void CommandDrive::init(commandInput input) {
 	RBWhlTurnEncInit = input.RBWhlTurnEnc;
 }
 
+const char* CommandDrive::getCommandName()
+{
+	return "Drive";
+}
+
 double CommandDrive::checkDistance(commandInput input) {
 
 	double LFWhlDrvEnc = fabs(input.LFWhlDrvEnc - LFWhlDrvEncInit);

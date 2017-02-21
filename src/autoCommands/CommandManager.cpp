@@ -46,8 +46,13 @@ CommandBase *CommandManager::getNextCommand(commandInput input) {
 	//Need to add NULL protection here in case no command was added to the queue prior to the pop
 	if (currCommand != NULL) delete currCommand;
 
-	
-	printf("COMMAND GOTTEN\n");
+	if(nextCommand == NULL)
+	{
+		printf("Received a null command from the queue.\n");
+		return _doNothing;
+	}
+
+	printf("Retrieved a %s Command from the queue.\n", nextCommand->getCommandName());
 	nextCommand->init(input);
 	return nextCommand;
 }
