@@ -159,7 +159,7 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 double CommandManager::configShooterSpd(robotStation RS)
 {
 	double shooterSpd = 0;
-	if(RS == ONE) shooterSpd = 3700;
+	if(RS == ONE) shooterSpd = 3000;
 	else if (RS == TWO) shooterSpd = 3900;
 	else if (RS == THREE) shooterSpd = 4600;
 

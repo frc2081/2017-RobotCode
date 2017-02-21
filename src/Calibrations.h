@@ -37,7 +37,7 @@ double fuelIntakeSpeedForward = 1;
 double fuelIntakeSpeedReverse = -1;
 
 //TURN MOTOR PID cals
-double turnMotorP = .025;
+double turnMotorP = .04;
 double turnMotorI = 0;
 double turnMotorD = 0;
 

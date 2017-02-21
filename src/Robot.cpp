@@ -408,11 +408,16 @@ public:
 		
 		//printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
 
-		/*printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF,
-				swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
-		printf("%.2f, %.2f, %.2f, %.2f\n\n", swerveLib->whl->speedRF, swerveLib->whl->speedLF,
+
+		printf("LFEnc: %.2f ", LFEncTurn->Get());
+		printf("RFEnc: %.2f ", RFEncTurn->Get());
+		printf("LBEnc: %.2f ", LBEncTurn->Get());
+		printf("RBEnc: %.2f\n", RBEncTurn->Get());
+		//printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->angleRF,
+				//swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
+		printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->speedLF, swerveLib->whl->speedRF,
 				swerveLib->whl->speedLB, swerveLib->whl->speedRB);
-		printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
+		/*printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
 		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
 		std::cout << cntl1->bA->RE << ClimbMotDrv1->Get() << "\n\n";
 		printf("%.2f, %.2f\n", feederSpeed, ballFeederMot->Get());
@@ -433,10 +438,7 @@ public:
 	//	printf("Field Position: %i\n", RS);
 
 		//printf("AutoAction: %f\n\n\n", autoEnable->GetVoltage());
-		//printf("LFEnc Turn: %.2f ", LFEncTurn->Get());
-		//printf("RFEnc Turn: %.2f ", RFEncTurn->Get());
-		//printf("LBEnc Turn: %.2f ", LBEncTurn->Get());
-		//printf("RBEnc Turn: %.2f\n", RBEncTurn->Get());
+
 		//printf("Gyro: %.5f\n\n", gyroManagerRun->getLastValue());
 
 		//printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
