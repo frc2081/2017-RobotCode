@@ -83,7 +83,11 @@ void CommandManager::buildCommands(queue<CommandBase*> *queue, robotTeam team, r
 
 //ALL VALUES IN COMMANDS ARE PLACEHOLDERS FOR ACTUAL VALUES
 void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
-	if (station == TWO) {
+	if (station == TWO && team == robotTeam::BLUE) {
+		queue->push(new CommandDrive(_swerveLib, 40, 0));
+		queue->push(new CommandDrive(_swerveLib, 84, 90));
+		queue->push(new CommandDrive(_swerveLib, 100, 0));
+	} else if (station == TWO && team == robotTeam::RED){
 		queue->push(new CommandDrive(_swerveLib, 40, 0));
 		queue->push(new CommandDrive(_swerveLib, 84, 270));
 		queue->push(new CommandDrive(_swerveLib, 100, 0));
@@ -91,30 +95,40 @@ void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, rob
 }
 
 void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
-	if (station == TWO) {
+	if (station == TWO && team == robotTeam::RED) {
+		queue->push(new CommandDrive(_swerveLib, 20, 180));
+		queue->push(new CommandTurn (_swerveLib, 270));
 		queue->push(new CommandVision(_swerveLib));
-		return;
+	} else if (station == TWO && team == robotTeam::BLUE){
+		queue->push(new CommandDrive(_swerveLib, 20, 0));
+		queue->push(new CommandTurn (_swerveLib, 90));
+		queue->push(new CommandVision(_swerveLib));
+	} else if (station == ONE && team == RED) {
+		queue->push(new CommandDrive(_swerveLib, 75, 180));
+		queue->push(new CommandTurn (_swerveLib, 340));
+		queue->push(new CommandVision(_swerveLib));
+	} else if (station == THREE && team == RED) {
+		queue->push(new CommandDrive(_swerveLib, 75, 180));
+		queue->push(new CommandTurn (_swerveLib, 235));
+		queue->push(new CommandVision(_swerveLib));
+	} else if (station == ONE && team == BLUE) {
+		queue->push(new CommandDrive(_swerveLib, 75, 0));
+		queue->push(new CommandTurn (_swerveLib, 110));
+		queue->push(new CommandVision(_swerveLib));
+	} else if (station == THREE && team == BLUE) {
+		queue->push(new CommandDrive(_swerveLib, 75, 0));
+		queue->push(new CommandTurn (_swerveLib, 340));
+		queue->push(new CommandVision(_swerveLib));
 	}
-	if ((station == ONE && team == RED) || (station == THREE && team == BLUE)) {
-		//forward 75 inches
-		//turn 45 degrees right
-			queue->push(new CommandDrive(_swerveLib, 75, 180));
-			queue->push(new CommandTurn (_swerveLib, 340));
-			queue->push(new CommandVision(_swerveLib));
-		} else {
-			queue->push(new CommandDrive(_swerveLib, 75, 180));
-			queue->push(new CommandTurn (_swerveLib, 235));
-			queue->push(new CommandVision(_swerveLib));
-		}
 }
 
 void CommandManager::shootOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
-	queue->push(new CommandShoot(15, configShooterSpd(station), configShooterAng(station)));
+	queue->push(new CommandShoot(15, configShooterSpd(team ,station), configShooterAng(team, station)));
 }
 
 void CommandManager::gearAndShoot(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 
-		queue->push(new CommandShoot(8, configShooterSpd(station), configShooterAng(station)));
+		queue->push(new CommandShoot(8, configShooterSpd(team, station), configShooterAng(team, station)));
 		gearOnly(queue, team, station);
 }
 
@@ -127,7 +141,7 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 		queue->push(new CommandTurn (_swerveLib, 180));
 		queue->push(new CommandDrive(_swerveLib, 20, 90));
 		queue->push(new CommandTurn(_swerveLib, 270));
-		queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
+		queue->push(new CommandShoot(10, configShooterSpd(team, station), configShooterAng(team, station)));
 		return;
 	}
 	if ((station == ONE && team == RED) || (station == THREE && team == BLUE)) {
@@ -137,7 +151,7 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 		queue->push(new CommandTurn (_swerveLib, 180));
 		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn(_swerveLib, 90));
-		queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
+		queue->push(new CommandShoot(10, configShooterSpd(team, station), configShooterAng(team, station)));
 		} else {
 			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn(_swerveLib, 90));
@@ -145,26 +159,40 @@ void CommandManager::shootOnlyBin(queue<CommandBase*> *queue,robotTeam team, rob
 			queue->push(new CommandTurn (_swerveLib, 180));
 			queue->push(new CommandDrive(_swerveLib, 20, 0));
 			queue->push(new CommandTurn(_swerveLib, 270));
-			queue->push(new CommandShoot(10, configShooterSpd(station), configShooterAng(station)));
+			queue->push(new CommandShoot(10, configShooterSpd(team, station), configShooterAng(team, station)));
 		}
 }
 
-double CommandManager::configShooterSpd(robotStation RS)
+double CommandManager::configShooterSpd(robotTeam team, robotStation RS)
 {
 	double shooterSpd = 0;
-	if(RS == ONE) shooterSpd = 3000;
-	else if (RS == TWO) shooterSpd = 3900;
-	else if (RS == THREE) shooterSpd = 4600;
+	if(team == robotTeam::RED)
+	{
+		if(RS == ONE) shooterSpd = 3000;
+		else if (RS == TWO) shooterSpd = 3900;
+		else if (RS == THREE) shooterSpd = 4600;
+	} else {
+		if(RS == THREE) shooterSpd = 3000;
+		else if (RS == TWO) shooterSpd = 3900;
+		else if (RS == ONE) shooterSpd = 4600;
+	}
 
 	return shooterSpd;
  }
 
-double CommandManager::configShooterAng(robotStation RS)
+double CommandManager::configShooterAng(robotTeam team, robotStation RS)
 {
 	double shooterAng = 0;
-	if(RS == ONE) shooterAng = .4;
-	else if (RS == TWO) shooterAng = .6;
-	else if (RS == THREE) shooterAng = 1;
+	if(team == robotTeam::RED)
+	{
+		if(RS == ONE) shooterAng = .4;
+		else if (RS == TWO) shooterAng = .6;
+		else if (RS == THREE) shooterAng = 1;
+	} else {
+		if(RS == THREE) shooterAng = .4;
+		else if (RS == TWO) shooterAng = .6;
+		else if (RS == ONE) shooterAng = 1;
+	}
 
 	return shooterAng;
 }

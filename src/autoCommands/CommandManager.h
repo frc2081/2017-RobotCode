@@ -43,9 +43,9 @@ private:
 
 	void shootOnlyBin(queue<CommandBase*> *queue,robotTeam, robotStation);
 
-	double configShooterAng(robotStation);
+	double configShooterAng(robotTeam, robotStation);
 
-	double configShooterSpd(robotStation);
+	double configShooterSpd(robotTeam, robotStation);
 
 	CommandBase *_doNothing;
 };
