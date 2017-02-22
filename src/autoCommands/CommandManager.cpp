@@ -96,28 +96,28 @@ void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, rob
 
 void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 	if (station == TWO && team == robotTeam::RED) {
-		queue->push(new CommandDrive(_swerveLib, 20, 180));
-		queue->push(new CommandTurn (_swerveLib, 270));
-		queue->push(new CommandVision(_swerveLib));
-	} else if (station == TWO && team == robotTeam::BLUE){
 		queue->push(new CommandDrive(_swerveLib, 20, 0));
 		queue->push(new CommandTurn (_swerveLib, 90));
 		queue->push(new CommandVision(_swerveLib));
+	} else if (station == TWO && team == robotTeam::BLUE){
+		queue->push(new CommandDrive(_swerveLib, 20, 180));
+		queue->push(new CommandTurn (_swerveLib, 270));
+		queue->push(new CommandVision(_swerveLib));
 	} else if (station == ONE && team == RED) {
-		queue->push(new CommandDrive(_swerveLib, 75, 180));
-		queue->push(new CommandTurn (_swerveLib, 340));
+		queue->push(new CommandDrive(_swerveLib, 75, 0));
+		queue->push(new CommandTurn (_swerveLib, 130));
 		queue->push(new CommandVision(_swerveLib));
 	} else if (station == THREE && team == RED) {
-		queue->push(new CommandDrive(_swerveLib, 75, 180));
-		queue->push(new CommandTurn (_swerveLib, 235));
+		queue->push(new CommandDrive(_swerveLib, 75, 0));
+		queue->push(new CommandTurn (_swerveLib, 20));
 		queue->push(new CommandVision(_swerveLib));
 	} else if (station == ONE && team == BLUE) {
-		queue->push(new CommandDrive(_swerveLib, 75, 0));
-		queue->push(new CommandTurn (_swerveLib, 110));
+		queue->push(new CommandDrive(_swerveLib, 75, 180));
+		queue->push(new CommandTurn (_swerveLib, 340));
 		queue->push(new CommandVision(_swerveLib));
 	} else if (station == THREE && team == BLUE) {
-		queue->push(new CommandDrive(_swerveLib, 75, 0));
-		queue->push(new CommandTurn (_swerveLib, 340));
+		queue->push(new CommandDrive(_swerveLib, 75, 180));
+		queue->push(new CommandTurn (_swerveLib, 230));
 		queue->push(new CommandVision(_swerveLib));
 	}
 }
