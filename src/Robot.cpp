@@ -13,7 +13,7 @@ VictorSP *ClimbMotDrv2;
 VictorSP *ClimbMotDrv3;
 VictorSP *ballLoad;
 VictorSP *ballFeederMot;
-VictorSP *ballShooterMot;
+CANTalon *ballShooterMot;
 
 Servo *shooterAimServo;
 
@@ -110,8 +110,14 @@ public:
 		//Located on the MXP expansion board
 		ballLoad = new VictorSP(15);
 		ballFeederMot = new VictorSP(11);
-		ballShooterMot = new VictorSP(5);
+		ballShooterMot = new CANTalon(0);
 		shooterAimServo = new Servo(14);
+
+		ballShooterMot->SetControlMode(CANSpeedController::kSpeed);
+		ballShooterMot->SetP(0);
+		ballShooterMot->SetI(0);
+		ballShooterMot->SetD(0);
+		ballShooterMot->SetF(0);
 
 		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
@@ -408,6 +414,7 @@ public:
 		
 		//printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
 
+		ballShooterMot->Set(500);
 
 		printf("LFEnc: %.2f ", LFEncTurn->Get());
 		printf("RFEnc: %.2f ", RFEncTurn->Get());
@@ -424,6 +431,7 @@ public:
 		printf("%d, %.2f\n", runShooter, ballShooterMot->Get());
 		printf("%.2f\n", ballLoad->Get());
 		printf("%.2i\n\n", shooterEnc->Get());*/
+		printf("Ball Shooter PID: %.2f", ballShooterMot->Get());
 	}
 
 	void TestPeriodic() {

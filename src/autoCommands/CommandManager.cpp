@@ -97,11 +97,11 @@ void CommandManager::crossMidline(queue<CommandBase*> *queue,robotTeam team, rob
 void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotStation station) {
 	if (station == TWO && team == robotTeam::RED) {
 		queue->push(new CommandDrive(_swerveLib, 20, 0));
-		queue->push(new CommandTurn (_swerveLib, 90));
+		queue->push(new CommandTurn (_swerveLib, 75));
 		queue->push(new CommandVision(_swerveLib));
 	} else if (station == TWO && team == robotTeam::BLUE){
 		queue->push(new CommandDrive(_swerveLib, 20, 180));
-		queue->push(new CommandTurn (_swerveLib, 270));
+		queue->push(new CommandTurn (_swerveLib, 285));
 		queue->push(new CommandVision(_swerveLib));
 	} else if (station == ONE && team == RED) {
 		queue->push(new CommandDrive(_swerveLib, 75, 0));

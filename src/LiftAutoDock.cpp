@@ -54,8 +54,8 @@ void liftAutoDock::prepVisionData(){
 			liftTargetLeft = 0;
 			liftTargetRight = 1;
 			targetLock = true;
-			leftTargetDistToImgCenter = contourCenterXs[0] - liftImageWidth/2;
-			rightTargetDistToImgCenter = contourCenterXs[1] - liftImageWidth/2;
+			leftTargetDistToImgCenter = contourCenterXs[0] - (liftImageWidth/2 -2);
+			rightTargetDistToImgCenter = contourCenterXs[1] - (liftImageWidth/2 -2);
 			}
 		}
 	}

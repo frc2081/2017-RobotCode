@@ -24,6 +24,7 @@
 #include "liftAutoDock.h"
 #include "AutoSelector.h"
 #include "WPIlib.h"
+#include "CANTalon.h"
 
 extern VictorSP *LFMotDrv;
 extern VictorSP *LBMotDrv;
@@ -38,7 +39,7 @@ extern VictorSP *ClimbMotDrv1;
 extern VictorSP *ClimbMotDrv2;
 extern VictorSP *ClimbMotDrv3;
 extern VictorSP *ballLoad;
-extern VictorSP *ballShooterMot;
+extern CANTalon *ballShooterMot;
 
 extern Servo *shooterAimServo;
 

@@ -27,7 +27,7 @@ double shooterSpdAutoMedShot = 3900;
 double shooterSpdAutoFarShot = 4600;
 double shooterSpdAutoBinShot = 3700;
 
-double shooterSpdNearShot = 3300; //SPEED is for PID control of shooter speed in RPM
+double shooterSpdNearShot = 3000; //SPEED is for PID control of shooter speed in RPM
 double shooterSpdFarShot = 3600;
 
 //FEEDER cals
