@@ -51,6 +51,8 @@ double feederSpeed;
 double shooterAimLocation;
 double climbSpeed;
 
+double shooterP, shooterI, shooterD;
+
 commandInput autoInput;
 commandOutput autoOutput;
 
@@ -173,6 +175,10 @@ public:
 		//Remove this later when shooter power levels have been determined
 		SmartDashboard::PutNumber("Shooter Speed Adjust: ", 0);
 		SmartDashboard::PutNumber("Shooter Setpoint: ",0);
+
+		//SmartDashboard::PutNumber("d:", shooterP);
+		//SmartDashboard::PutNumber("p:", shooterI);
+		//SmartDashboard::PutNumber("i:", shooterD);
 
 		SmartDashboard::PutNumber("LF Offset: ", LFOffset);
 		SmartDashboard::PutNumber("RF Offset: ", RFOffset);
@@ -385,7 +391,6 @@ public:
 		if (cntl2->bBack->RE == true) {shooterPID->SetSetpoint(shooterSpdFarShot / 60); shooterAngle = shooterAngFarShot;	}
 		if (cntl2->bBack->State == true && cntl2->bStart->State == true) {shooterPID->SetSetpoint(0); }
 		shooterAimServo->Set(shooterAngle);
-
 		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());
@@ -400,6 +405,12 @@ public:
 		SmartDashboard::PutNumber("LB Distance: ", LBEncDrv->Get());
 		SmartDashboard::PutNumber("RB Distance: ", RBEncDrv->Get());
 		
+		//shooterSpdP = SmartDashboard::GetNumber("d:", shooterP);
+		//shooterSpdI = SmartDashboard::GetNumber("p:", shooterI);
+		//shooterSpdD = SmartDashboard::GetNumber("i:", shooterD);
+
+		//shooterPID->SetPID(shooterSpdP, shooterSpdI, shooterSpdD);
+
 		//SmartDashboard::PutNumber("Left Target Center Pos: ", contourCenterYs[liftTargetLeft]);
 		//SmartDashboard::PutNumber("Right Target Center Pos: ", contourCenterYs[liftTargetRight]);
 		//SmartDashboard::PutNumber("Left Target Dist to Center: ", liftTargetLeftDistToImgCenter);
