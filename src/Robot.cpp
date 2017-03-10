@@ -113,6 +113,8 @@ public:
 		ballShooterMot = new VictorSP(5);
 		shooterAimServo = new Servo(14);
 
+		targetLight == new Relay(0);
+
 		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 		LBEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
@@ -386,6 +388,10 @@ public:
 		if (cntl2->bBack->State == true && cntl2->bStart->State == true) {shooterPID->SetSetpoint(0); }
 		shooterAimServo->Set(shooterAngle);
 
+
+		//Light
+		if (cntl1->bX->State == true) targetLight->Set(Relay::kOn);
+		else targetLight->Set(Relay::kOff);
 		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF: ", RFEncDrv->Get());

@@ -78,6 +78,8 @@ const float period = 0.05;
 
 bool autoDockCmd;
 
+Relay *targetLight;
+
 AnalogInput *autoEnable;
 AutoSelector *autoFieldPosition;
 AutoSelector *autoAction;
