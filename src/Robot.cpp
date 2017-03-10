@@ -110,12 +110,16 @@ public:
 		//Located on the MXP expansion board
 		ballLoad = new VictorSP(15);
 		ballFeederMot = new VictorSP(11);
-		ballShooterMot = new CANTalon(0);
+		ballShooterMot = new CANTalon(1);
 		shooterAimServo = new Servo(14);
 
-		ballShooterMot->SetControlMode(CANSpeedController::kSpeed);
-		ballShooterMot->SetP(0);
-		ballShooterMot->SetI(0);
+		ballShooterMot->SetControlMode(CANSpeedController::kPercentVbus);
+		ballShooterMot->SetFeedbackDevice(CANTalon::QuadEncoder);
+		ballShooterMot->ConfigEncoderCodesPerRev(20);
+		ballShooterMot->SetSensorDirection(false);
+		ballShooterMot->ConfigPeakOutputVoltage(+12, -12);
+		ballShooterMot->SetP(0.01);
+		ballShooterMot->SetI(0.01);
 		ballShooterMot->SetD(0);
 		ballShooterMot->SetF(0);
 
@@ -387,10 +391,12 @@ public:
 		//*********SHOOTER********
 		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
 
-		if (cntl2->bStart->RE == true) {shooterPID->SetSetpoint(shooterSpdNearShot / 60); shooterAngle = shooterAngNearShot;	}
-		if (cntl2->bBack->RE == true) {shooterPID->SetSetpoint(shooterSpdFarShot / 60); shooterAngle = shooterAngFarShot;	}
-		if (cntl2->bBack->State == true && cntl2->bStart->State == true) {shooterPID->SetSetpoint(0); }
+	//	if (cntl2->bStart->RE == true) {ballShooterMot->Set(shooterSpdNearShot); shooterAngle = shooterAngNearShot;	}
+		//if (cntl2->bBack->RE == true) {ballShooterMot->Set(shooterSpdFarShot); shooterAngle = shooterAngFarShot;	}
+		//if (cntl2->bBack->State == true && cntl2->bStart->State == true) {ballShooterMot->Set(0); }
 		shooterAimServo->Set(shooterAngle);
+
+		ballShooterMot->Set(.5);
 
 		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
@@ -398,8 +404,9 @@ public:
 		SmartDashboard::PutNumber("LB: ", LBEncDrv->Get());
 		SmartDashboard::PutNumber("RB: ", RBEncDrv->Get());
 		
+
 		SmartDashboard::PutNumber("Shooter Aim Position: ", shooterAimLocation);
-		SmartDashboard::PutNumber("Shooter Speed RPM: ", shooterEnc->GetRate()*60);
+		SmartDashboard::PutNumber("Shooter Speed RPM: ", ballShooterMot->GetEncVel());
 		
 		SmartDashboard::PutNumber("LF Distance: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF Distance: ", RFEncDrv->Get());
@@ -414,7 +421,6 @@ public:
 		
 		//printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
 
-		ballShooterMot->Set(500);
 
 		printf("LFEnc: %.2f ", LFEncTurn->Get());
 		printf("RFEnc: %.2f ", RFEncTurn->Get());
