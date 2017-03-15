@@ -113,15 +113,21 @@ public:
 		ballShooterMot = new CANTalon(1);
 		shooterAimServo = new Servo(14);
 
-		ballShooterMot->SetControlMode(CANSpeedController::kPercentVbus);
+		ballShooterMot->SetTalonControlMode(CANTalon::kSpeedMode);
 		ballShooterMot->SetFeedbackDevice(CANTalon::QuadEncoder);
 		ballShooterMot->ConfigEncoderCodesPerRev(20);
 		ballShooterMot->SetSensorDirection(false);
-		ballShooterMot->ConfigPeakOutputVoltage(+12, -12);
-		ballShooterMot->SetP(0.01);
-		ballShooterMot->SetI(0.01);
+		ballShooterMot->ConfigPeakOutputVoltage(+12, 0);
+		ballShooterMot->SetP(0);
+		ballShooterMot->SetI(0);
 		ballShooterMot->SetD(0);
-		ballShooterMot->SetF(0);
+		ballShooterMot->SetF(1.7);
+		ballShooterMot->SetAllowableClosedLoopErr(3);
+		ballShooterMot->SetVoltageRampRate(48);
+		ballShooterMot->SetVelocityMeasurementPeriod(CANTalon::VelocityMeasurementPeriod::Period_10Ms);
+		ballShooterMot->SetVelocityMeasurementWindow(16);
+
+		ballShooterMot->SetSetpoint(0);
 
 		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
@@ -161,15 +167,6 @@ public:
 		LBEncDrv->Reset();
 		RBEncDrv->Reset();
 
-		//NOTE: Shooter speed is revolutions per SECOND, not RPM
-		//VERY important that min command from PID be set to 0....otherwise the instant that the motor
-		//exceeded the target speed, it would attempt to reverse the shooter wheel!
-		shooterPID = new PIDController(shooterSpdP, shooterSpdI, shooterSpdD, shooterEnc, ballShooterMot, period);
-		shooterPID->SetInputRange(0,shooterMaxRevPerSec);
-		shooterPID->SetOutputRange(0,1);
-		shooterPID->SetSetpoint(0);
-		shooterPID->Enable();
-
 		//Init all control variables to safe states
 		runShooter = false;
 		feederSpeed = 0;
@@ -188,6 +185,11 @@ public:
 		SmartDashboard::PutNumber("RF Offset: ", RFOffset);
 		SmartDashboard::PutNumber("LB Offset: ", LBOffset);
 		SmartDashboard::PutNumber("RB Offset: ", RBOffset);
+
+		SmartDashboard::PutNumber("p: ", 1);
+		SmartDashboard::PutNumber("i: ", 0.2);
+		SmartDashboard::PutNumber("d: ", 0);
+		SmartDashboard::PutNumber("f: ", 1.7);
 	}
 
 	void AutonomousInit() override {
@@ -247,7 +249,7 @@ public:
 		autoOutput = autoCom->tick(autoInput);
 
 		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
-		shooterPID->SetSetpoint(autoOutput.autoShooterSpd / 60);
+		shooterPID->SetSetpoint(autoOutput.autoShooterSpd);
 		ballFeederMot->Set(autoOutput.autoLoadSpd);
 		shooterAimServo->Set(autoOutput.autoAimAng);
 		ballLoad->Set(autoOutput.autoIntakePwr);
@@ -265,7 +267,6 @@ public:
 	}
 
 	void TeleopInit() {
-		shooterPID->SetSetpoint(0);
 	}
 
 	void TeleopPeriodic() {
@@ -278,7 +279,7 @@ public:
 
 		//Gyro needs to be mounted in center of robot otherwise it will not work properly	
 		//Limit the gyro to a 360 degree output
-		currentFacing = fabs(gyroManagerRun->getLastValue());
+		//currentFacing = fabs(gyroManagerRun->getLastValue());
 		if (currentFacing >= 360) currentFacing = ((int)currentFacing % 360);
 
 		//Store current angles of the swerve wheels so we can calculate the angle delta later
@@ -389,14 +390,22 @@ public:
 		ballFeederMot->Set(feederSpeed);
 
 		//*********SHOOTER********
-		SmartDashboard::PutNumber("Shooter Setpoint: ",shooterPID->GetSetpoint() / 60);
+		//SmartDashboard::PutNumber("Shooter Speed: ",ballShooterMot->GetSpeed());
 
-	//	if (cntl2->bStart->RE == true) {ballShooterMot->Set(shooterSpdNearShot); shooterAngle = shooterAngNearShot;	}
-		//if (cntl2->bBack->RE == true) {ballShooterMot->Set(shooterSpdFarShot); shooterAngle = shooterAngFarShot;	}
-		//if (cntl2->bBack->State == true && cntl2->bStart->State == true) {ballShooterMot->Set(0); }
+		if (cntl2->bStart->RE == true) {ballShooterMot->SetSetpoint(shooterSpdNearShot); shooterAngle = shooterAngNearShot;	}
+		if (cntl2->bBack->RE == true) {ballShooterMot->SetSetpoint(shooterSpdFarShot); shooterAngle = shooterAngFarShot;	}
+		if (cntl2->bBack->State == true && cntl2->bStart->State == true) {ballShooterMot->Set(0); }
 		shooterAimServo->Set(shooterAngle);
 
-		ballShooterMot->Set(.5);
+		double p = SmartDashboard::GetNumber("p: ", 0);
+		double i = SmartDashboard::GetNumber("i: ", 0);
+		double d = SmartDashboard::GetNumber("d: ", 0);
+		double f = SmartDashboard::GetNumber("f: ", 0);
+
+		if(ballShooterMot->GetSpeed() < 2400) ballShooterMot->SetPID(0, 0, 0, 1.8);
+		else ballShooterMot->SetPID(p,i,d,f);
+
+		//ballShooterMot->SetSetpoint(3000);
 
 		//Debug print statements
 		SmartDashboard::PutNumber("LF: ", LFEncDrv->Get());
@@ -406,7 +415,10 @@ public:
 		
 
 		SmartDashboard::PutNumber("Shooter Aim Position: ", shooterAimLocation);
-		SmartDashboard::PutNumber("Shooter Speed RPM: ", ballShooterMot->GetEncVel());
+		SmartDashboard::PutNumber("Shooter Speed RPM: ", ballShooterMot->GetSpeed());
+		SmartDashboard::PutNumber("Shooter Motor Command: ", ballShooterMot->GetOutputCurrent());
+		SmartDashboard::PutNumber("Shooter Motor Voltage: ", ballShooterMot->GetOutputVoltage());
+		SmartDashboard::PutNumber("Shooter Motor Error: ", ballShooterMot->GetClosedLoopError());
 		
 		SmartDashboard::PutNumber("LF Distance: ", LFEncDrv->Get());
 		SmartDashboard::PutNumber("RF Distance: ", RFEncDrv->Get());
