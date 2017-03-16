@@ -284,11 +284,14 @@ public:
 		if(cntl1->bB->RE) { targetLightState = !targetLightState; targetLightTracker = 0;}
 
 		if(targetLightState) {targetLight->Set(Relay::kForward);}
-		else if (targetLightTracker == 0) {targetLight->Set(Relay::kOff); targetLightTracker++;}
-		else if (targetLightTracker == 1) {targetLight->Set(Relay::kForward); targetLightTracker++;}
-		else if (targetLightTracker == 2) {targetLight->Set(Relay::kOff); targetLightTracker++;}
-		//else if (targetLightTracker == 3) {targetLight->Set(Relay::kForward); targetLightTracker++;}
-		//else if (targetLightTracker == 4) {targetLight->Set(Relay::kOff); targetLightTracker++;}
+		else {targetLightTracker++;
+
+		if (targetLightTracker == 0) {targetLight->Set(Relay::kOff); targetLightTracker++;}
+		else if (targetLightTracker == 5) {targetLight->Set(Relay::kForward); targetLightTracker++;}
+		else if (targetLightTracker == 10) {targetLight->Set(Relay::kOff); targetLightTracker++;}
+		else if (targetLightTracker == 15) {targetLight->Set(Relay::kForward); targetLightTracker++;}
+		else if (targetLightTracker == 20) {targetLight->Set(Relay::kOff); targetLightTracker++;}
+		}
 
 		//Soft limit the rotational speed so the gyro is not overloaded
 		cntl1->RX *= .9;
