@@ -172,11 +172,11 @@ double CommandManager::configShooterSpd(robotTeam team, robotStation RS)
 	double shooterSpd = 0;
 	if(team == robotTeam::RED)
 	{
-		if(RS == ONE) shooterSpd = 3000;
+		if(RS == ONE) shooterSpd = 3700;
 		else if (RS == TWO) shooterSpd = 3900;
 		else if (RS == THREE) shooterSpd = 4600;
 	} else {
-		if(RS == THREE) shooterSpd = 3000;
+		if(RS == THREE) shooterSpd = 3700;
 		else if (RS == TWO) shooterSpd = 3900;
 		else if (RS == ONE) shooterSpd = 4600;
 	}
