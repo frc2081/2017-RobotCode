@@ -15,6 +15,8 @@ VictorSP *ballLoad;
 VictorSP *ballFeederMot;
 CANTalon *ballShooterMot;
 
+Relay *targetLight;
+
 Servo *shooterAimServo;
 
 AnalogPotentiometer *LFEncTurn;
@@ -46,6 +48,8 @@ double currAng1, currAng2, currAng3, currAng4;
 
 //Declare all control variables
 bool runShooter;
+bool targetLightState = false;
+int targetLightTracker = 0;
 double shooterPower;
 double feederSpeed;
 double shooterAimLocation;
@@ -65,6 +69,9 @@ public:
         std::thread visionThread(VisionThread);
         visionThread.detach();
 		
+        targetLight = new Relay(0);
+        targetLight->Set(Relay::kOff);
+
 		AD = new liftAutoDock();
 		autoEnable = new AnalogInput(4);
 		autoAction = new AutoSelector(7);
@@ -274,6 +281,15 @@ public:
 		cntl1->UpdateCntl();
 		cntl2->UpdateCntl();
 
+		if(cntl1->bB->RE) { targetLightState = !targetLightState; targetLightTracker = 0;}
+
+		if(targetLightState) {targetLight->Set(Relay::kForward);}
+		else if (targetLightTracker == 0) {targetLight->Set(Relay::kOff); targetLightTracker++;}
+		else if (targetLightTracker == 1) {targetLight->Set(Relay::kForward); targetLightTracker++;}
+		else if (targetLightTracker == 2) {targetLight->Set(Relay::kOff); targetLightTracker++;}
+		//else if (targetLightTracker == 3) {targetLight->Set(Relay::kForward); targetLightTracker++;}
+		//else if (targetLightTracker == 4) {targetLight->Set(Relay::kOff); targetLightTracker++;}
+
 		//Soft limit the rotational speed so the gyro is not overloaded
 		cntl1->RX *= .9;
 
@@ -397,10 +413,10 @@ public:
 		if (cntl2->bBack->State == true && cntl2->bStart->State == true) {ballShooterMot->Set(0); }
 		shooterAimServo->Set(shooterAngle);
 
-		double p = SmartDashboard::GetNumber("p: ", 0);
-		double i = SmartDashboard::GetNumber("i: ", 0);
+		double p = SmartDashboard::GetNumber("p: ", 1);
+		double i = SmartDashboard::GetNumber("i: ", 0.2);
 		double d = SmartDashboard::GetNumber("d: ", 0);
-		double f = SmartDashboard::GetNumber("f: ", 0);
+		double f = SmartDashboard::GetNumber("f: ", 1.7);
 
 		if(ballShooterMot->GetSpeed() < 2400) ballShooterMot->SetPID(0, 0, 0, 1.8);
 		else ballShooterMot->SetPID(p,i,d,f);
