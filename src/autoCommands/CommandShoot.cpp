@@ -39,7 +39,6 @@ commandOutput CommandShoot::tick(commandInput input) {
 		return doNothing();
 	}
 
-	//.7 is for short shots, the only time auto shooting will be done
 	return commandOutput(0,0,0, _shootSpd, 1, _shootAng, 1);
 }
 

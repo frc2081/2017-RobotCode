@@ -26,8 +26,12 @@ CommandManager::CommandManager(swervelib *swerveLib, robotTeam team, robotStatio
 
 commandOutput CommandManager::tick(commandInput input) {
 
+	printf("Tick...");
+
 	if (currCommand == NULL || currCommand->isDone())
 		currCommand = getNextCommand(input);
+
+	printf("Tock...");
 
 	return currCommand == NULL
 		? commandOutput()

@@ -39,7 +39,6 @@ PIDController *LFPID;
 PIDController *LBPID;
 PIDController *RFPID;
 PIDController *RBPID;
-PIDController *shooterPID;
 
 float currentAngle;
 float currentFacing;
@@ -255,8 +254,10 @@ public:
 
 		autoOutput = autoCom->tick(autoInput);
 
+		printf("Tick Complete\n");
+
 		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
-		shooterPID->SetSetpoint(autoOutput.autoShooterSpd);
+		ballShooterMot->SetSetpoint(autoOutput.autoShooterSpd);
 		ballFeederMot->Set(autoOutput.autoLoadSpd);
 		shooterAimServo->Set(autoOutput.autoAimAng);
 		ballLoad->Set(autoOutput.autoIntakePwr);
@@ -270,7 +271,6 @@ public:
 		RFMotDrv->Set(swerveLib->whl->speedRF);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 		RBMotDrv->Set(swerveLib->whl->speedRB);
-
 	}
 
 	void TeleopInit() {
