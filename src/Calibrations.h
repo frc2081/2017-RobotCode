@@ -22,7 +22,7 @@ double shooterAngAutoMedShot = .6;
 double shooterAngAutoFarShot = 1;
 double shooterAngBinShot = .4;
 
-double shooterSpdAutoNearShot = 3700;
+double shooterSpdAutoNearShot = 3000;
 double shooterSpdAutoMedShot = 3900;
 double shooterSpdAutoFarShot = 4600;
 double shooterSpdAutoBinShot = 3700;

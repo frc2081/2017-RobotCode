@@ -421,7 +421,7 @@ public:
 		double d = SmartDashboard::GetNumber("d: ", 0);
 		double f = SmartDashboard::GetNumber("f: ", 1.7);
 
-		if(ballShooterMot->GetSpeed() < 2400) ballShooterMot->SetPID(0, 0, 0, 1.8);
+		if(ballShooterMot->GetSpeed() < 2200) ballShooterMot->SetPID(0, 0, 0, 1.8);
 		else ballShooterMot->SetPID(p,i,d,f);
 
 		//ballShooterMot->SetSetpoint(3000);
