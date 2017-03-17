@@ -124,8 +124,8 @@ public:
 		ballShooterMot->ConfigEncoderCodesPerRev(20);
 		ballShooterMot->SetSensorDirection(false);
 		ballShooterMot->ConfigPeakOutputVoltage(+12, 0);
-		ballShooterMot->SetP(0);
-		ballShooterMot->SetI(0);
+		ballShooterMot->SetP(1);
+		ballShooterMot->SetI(0.2);
 		ballShooterMot->SetD(0);
 		ballShooterMot->SetF(1.7);
 		ballShooterMot->SetAllowableClosedLoopErr(3);
@@ -255,6 +255,16 @@ public:
 		autoOutput = autoCom->tick(autoInput);
 
 		printf("Tick Complete\n");
+
+		double p = SmartDashboard::GetNumber("p: ", 1);
+		double i = SmartDashboard::GetNumber("i: ", 0.2);
+		double d = SmartDashboard::GetNumber("d: ", 0);
+		double f = SmartDashboard::GetNumber("f: ", 1.7);
+
+		if(ballShooterMot->GetSpeed() < 2200) ballShooterMot->SetPID(0, 0, 0, 1.8);
+		else ballShooterMot->SetPID(p,i,d,f);
+
+		SmartDashboard::PutNumber("Shooter Speed RPM: ", ballShooterMot->GetSpeed());
 
 		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
 		ballShooterMot->SetSetpoint(autoOutput.autoShooterSpd);
