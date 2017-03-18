@@ -26,7 +26,7 @@ void CommandTurn::init (commandInput input) {
 	} else if (comboAng < 0) {
 		comboAng += 360;
 	}
-	_finalRot = comboAng;
+	_finalRot = _toRotate;
 
 	double delta = gyroReadingInit - _finalRot;
 	if(abs(delta) > 180){
