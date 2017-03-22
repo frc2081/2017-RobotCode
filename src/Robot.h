@@ -77,6 +77,8 @@ int shooterSelection;
 extern double shooterAimLocation;
 const float period = 0.05;
 
+Relay *gearLoader;
+
 bool autoDockCmd;
 
 AnalogInput *autoEnable;

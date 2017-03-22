@@ -71,6 +71,9 @@ public:
         targetLight = new Relay(0);
         targetLight->Set(Relay::kOff);
 
+        gearLoader = new Relay(1);
+        gearLoader->Set(Relay::kOff);
+
 		AD = new liftAutoDock();
 		autoEnable = new AnalogInput(4);
 		autoAction = new AutoSelector(7);
@@ -433,6 +436,11 @@ public:
 
 		if(ballShooterMot->GetSpeed() < 2200) ballShooterMot->SetPID(0, 0, 0, 1.8);
 		else ballShooterMot->SetPID(p,i,d,f);
+
+		//Gear Loader Tilting
+		if (cntl1->bRB->State == true) gearLoader->Set(Relay::kForward);
+		else if (cntl1->bLB->State == true) gearLoader->Set(Relay::kReverse);
+		else gearLoader->Set(Relay::kOff);
 
 		//ballShooterMot->SetSetpoint(3000);
 
