@@ -276,6 +276,8 @@ public:
 		ballFeederMot->Set(autoOutput.autoLoadSpd);
 		shooterAimServo->Set(autoOutput.autoAimAng);
 		ballLoad->Set(autoOutput.autoIntakePwr);
+		if (autoOutput.autoGearDeploy) gearLoader->Set(Relay::kForward);
+		else gearLoader->Set(Relay::kOff);
 
 		LFPID->SetSetpoint(swerveLib->whl->angleLF);
 		RFPID->SetSetpoint(swerveLib->whl->angleRF);

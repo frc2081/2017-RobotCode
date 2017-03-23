@@ -10,6 +10,9 @@ liftAutoDock::liftAutoDock()
 	liftAutoDockCmd = false;
 	liftAutoDockState = DO_NOTHING;
 	
+	gearDeployCmd = false;
+	gearDeployTime = 0;
+
 	pegDistToImgCenter = 0;
 	targetDistApart = 0;
 	
@@ -26,6 +29,10 @@ double liftAutoDock::getLADDrvAngCmd(){
 
 double liftAutoDock::getLADDrvRotCmd(){
 	return drvRotCmd;
+}
+
+bool liftAutoDock::getLADGearDeployCmd(){
+	return gearDeployCmd;
 }
 
 void liftAutoDock::zeroDrive(){
@@ -74,6 +81,10 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 	} else if(liftAutoDockCmd == true && targetLock == false){
 		printf("AutoDock: No Target Found ");
 		liftAutoDockState = DO_NOTHING;	
+
+		gearDeployTime++;
+		if (gearDeployTime < gearDeployDuration) { gearDeployCmd = true;}
+		else {gearDeployCmd = false;}
 	}
 	
 	//Calculate all info about the lift target positions that is needed to guide the robot
@@ -129,7 +140,7 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 			break;
 		}
 
-		if(liftAutoDockCmd == true) {printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd);}
+		if(liftAutoDockCmd == true) {printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f Gear%d\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd, gearDeployCmd);}
 	}
 	
 

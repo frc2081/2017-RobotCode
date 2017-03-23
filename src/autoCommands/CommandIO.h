@@ -16,6 +16,7 @@
 		double autoLoadSpd;
 		double autoAimAng;
 		double autoIntakePwr;
+		bool autoGearDeploy;
 
 		commandOutput() {
 			autoAng = 0;
@@ -25,6 +26,7 @@
 			autoLoadSpd = 0;
 			autoIntakePwr = 0;
 			autoAimAng = .4;
+			autoGearDeploy = false;
 		}
 
 		commandOutput(double mag, double ang, double rot) {
@@ -35,6 +37,18 @@
 			autoLoadSpd = 0;
 			autoIntakePwr = 0;
 			autoAimAng = .4;
+			autoGearDeploy = false;
+		}
+
+		commandOutput(double mag, double ang, double rot, bool gearDeployCmd) {
+			autoAng = ang;
+			autoSpeed = mag;
+			autoRot = rot;
+			autoShooterSpd = 0;
+			autoLoadSpd = 0;
+			autoIntakePwr = 0;
+			autoAimAng = .4;
+			autoGearDeploy = gearDeployCmd;
 		}
 
 		commandOutput(double shootSpd, double rotSpd) {
@@ -45,6 +59,7 @@
 			autoShooterSpd = shootSpd;
 			autoLoadSpd = rotSpd;
 			autoAimAng = .4;
+			autoGearDeploy = false;
 		}
 
 		commandOutput(double mag, double ang, double rot, double shootSpd, double rotSpd, double aimAng, double intakePwr){
@@ -55,6 +70,7 @@
 			autoLoadSpd = rotSpd;
 			autoAimAng = aimAng;
 			autoIntakePwr = intakePwr;
+			autoGearDeploy = false;
 		}
 	};
 
