@@ -513,10 +513,10 @@ public:
 		//printf("test result: %f\n", SmartDashboard::GetNumber("A", 0));
 		//printf("Swerve Angles rf %.2f, lf %.2f, lb %.2f, rb %.2f\n", swerveLib->whl->angleRF,
 				//swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
-		printf("LFEnc: %.2f ", LFEncTurn->Get());
-		printf("RFEnc: %.2f ", RFEncTurn->Get());
-		printf("LBEnc: %.2f ", LBEncTurn->Get());
-		printf("RBEnc: %.2f\n", RBEncTurn->Get());
+		//printf("LFEnc: %.2f ", LFEncTurn->Get());
+		//printf("RFEnc: %.2f ", RFEncTurn->Get());
+		//printf("LBEnc: %.2f ", LBEncTurn->Get());
+		//printf("RBEnc: %.2f\n", RBEncTurn->Get());
 	}
 	
 

@@ -40,8 +40,9 @@ class liftAutoDock
 		int horzLineUpTolerance = 10; //Target max distance from center of lift to center of image
 		int distToLiftGoal = 300; //When moving toward the lift peg for final docking, how far apart
 									//the targets have to be to indicate the robot has reached the goal
+		double gearDeployDelay = 100;
+		double gearDeployDuration = gearDeployDelay + 15; //duration of time to run gear deploy motor
 
-		double gearDeployDuration = 50; //duration of time to run gear deploy motor
 		//IMAGE PROCESSING CALS
 		//Cals are for a 320x240 image
 		int liftImageWidth = 320;

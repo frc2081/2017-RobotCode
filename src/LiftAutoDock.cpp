@@ -63,9 +63,9 @@ void liftAutoDock::prepVisionData(){
 			targetLock = true;
 			leftTargetDistToImgCenter = contourCenterXs[0] - (liftImageWidth/2 -2);
 			rightTargetDistToImgCenter = contourCenterXs[1] - (liftImageWidth/2 -2);
-			}
-		}
-	}
+		}else {targetLock = false;}
+	}else {targetLock = false;}
+}
 
 void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 
@@ -79,11 +79,13 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 		liftAutoDockState = DO_NOTHING;	
 		//printf("AutoDock: No Command ");
 	} else if(liftAutoDockCmd == true && targetLock == false){
-		printf("AutoDock: No Target Found ");
-		liftAutoDockState = DO_NOTHING;	
+		printf("AutoDock: No Target Found. Gear delay %.2f", gearDeployTime);
+
+		//liftAutoDockState = DO_NOTHING;
 
 		gearDeployTime++;
-		if (gearDeployTime < gearDeployDuration) { gearDeployCmd = true;}
+		if (gearDeployTime > gearDeployDelay && gearDeployTime < gearDeployDuration) { gearDeployCmd = true; liftAutoDockState = DO_NOTHING;}
+		else if (gearDeployTime > gearDeployDuration) { liftAutoDockState = DO_NOTHING; }
 		else {gearDeployCmd = false;}
 	}
 	
@@ -128,11 +130,11 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 				drvAngCmd = 90 + centerHoldAngle;
 				if(targetDistApart < driveToListSlowDownVerDist ) drvMagCmd = driveToLiftPwrHigh;
 				else drvMagCmd = driveToLiftPwrLow;
-			} else {
+			} /*else {
 				drvMagCmd = 0;
 				drvRotCmd = 0;
 				liftAutoDockState = DONE;
-			}
+			}*/
 			break;	
 			
 		case DONE:
@@ -140,7 +142,7 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 			break;
 		}
 
-		if(liftAutoDockCmd == true) {printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f Gear%d\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd, gearDeployCmd);}
+		//if(liftAutoDockCmd == true) {printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f Gear%d\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd, gearDeployCmd);}
 	}
 	
 
