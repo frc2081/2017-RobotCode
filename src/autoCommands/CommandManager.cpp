@@ -117,7 +117,7 @@ void CommandManager::gearOnly(queue<CommandBase*> *queue,robotTeam team, robotSt
 		queue->push(new CommandVision(_swerveLib));
 	} else if (station == ONE && team == BLUE) {
 		queue->push(new CommandDrive(_swerveLib, 75, 0));
-		queue->push(new CommandTurn (_swerveLib, 125));
+		queue->push(new CommandTurn (_swerveLib, 180));
 		queue->push(new CommandVision(_swerveLib));
 	} else if (station == THREE && team == BLUE) {
 		queue->push(new CommandDrive(_swerveLib, 75, 90));
