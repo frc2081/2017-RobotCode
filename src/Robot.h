@@ -90,4 +90,11 @@ liftAutoDock *AD;
 extern commandInput autoInput;
 extern commandOutput autoOutput;
 
+double lfWhlAngCalOffset = 0;
+double rfWhlAngCalOffset = 0;
+double lbWhlAngCalOffset = 0;
+double rbWhlAngCalOffset = 0;
+DigitalInput *WhlAngCalButton;
+Preferences *prefs;
+
 #endif /* SRC_ROBOT_H_ */
