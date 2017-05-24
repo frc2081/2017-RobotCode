@@ -94,6 +94,13 @@ double lfWhlAngCalOffset = 0;
 double rfWhlAngCalOffset = 0;
 double lbWhlAngCalOffset = 0;
 double rbWhlAngCalOffset = 0;
+
+double lfWhlAngTarget = 0;
+double rfWhlAngTarget = 0;
+double lbWhlAngTarget = 0;
+double rbWhlAngTarget = 0;
+
+
 DigitalInput *WhlAngCalButton;
 Preferences *prefs;
 

@@ -69,7 +69,7 @@ public:
         visionThread.detach();
 
 		prefs = Preferences::GetInstance();
-		WhlAngCalButton = new DigitalInput(0);
+		WhlAngCalButton = new DigitalInput(1);
 
 		lfWhlAngCalOffset = prefs->GetDouble("lfWhlAngCalOffset", 0);
 		rfWhlAngCalOffset = prefs->GetDouble("rfWhlAngCalOffset", 0);
@@ -126,10 +126,10 @@ public:
 		//Located on the MXP expansion board
 		ballLoad = new VictorSP(15);
 		ballFeederMot = new VictorSP(11);
-		//ballShooterMot = new CANTalon(1);
+		ballShooterMot = new CANTalon(1);
 		shooterAimServo = new Servo(14);
 
-		/*ballShooterMot->SetTalonControlMode(CANTalon::kSpeedMode);
+		ballShooterMot->SetTalonControlMode(CANTalon::kSpeedMode);
 		ballShooterMot->SetFeedbackDevice(CANTalon::QuadEncoder);
 		ballShooterMot->ConfigEncoderCodesPerRev(20);
 		ballShooterMot->SetSensorDirection(false);
@@ -144,7 +144,7 @@ public:
 		ballShooterMot->SetVelocityMeasurementWindow(16);
 
 		ballShooterMot->SetSetpoint(0);
-		*/
+
 
 		LFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
 		RFEncDrv->SetDistancePerPulse(drvWhlDistPerEncCnt);
@@ -278,7 +278,7 @@ public:
 		SmartDashboard::PutNumber("Shooter Speed RPM: ", ballShooterMot->GetSpeed());
 
 		swerveLib->calcWheelVect(autoOutput.autoSpeed, autoOutput.autoAng, autoOutput.autoRot);
-		//ballShooterMot->SetSetpoint(autoOutput.autoShooterSpd);
+		ballShooterMot->SetSetpoint(autoOutput.autoShooterSpd);
 		ballFeederMot->Set(autoOutput.autoLoadSpd);
 		shooterAimServo->Set(autoOutput.autoAimAng);
 		ballLoad->Set(autoOutput.autoIntakePwr);
@@ -361,32 +361,37 @@ public:
 			}
 		}
 
+		rfWhlAngTarget = WhlAngCalOffset(swerveLib->whl->angleRF, rfWhlAngCalOffset);
+		lfWhlAngTarget = WhlAngCalOffset(swerveLib->whl->angleLF, lfWhlAngCalOffset);
+		rbWhlAngTarget = WhlAngCalOffset(swerveLib->whl->angleRB, rbWhlAngCalOffset);
+		lbWhlAngTarget = WhlAngCalOffset(swerveLib->whl->angleLB, lbWhlAngCalOffset);
+
 		//Intelligent Swerve imeplementation - prevents any wheel from having to rotate more than 90 degrees to carry out a command
-		if (fabs(swerveLib->whl->angleRF - currAng1) > 90 && fabs(swerveLib->whl->angleRF - currAng1) < 270) {
-			swerveLib->whl->angleRF = ((int)swerveLib->whl->angleRF + 180) % 360;
+		if (fabs(rfWhlAngTarget - currAng1) > 90 && fabs(rfWhlAngTarget - currAng1) < 270) {
+			rfWhlAngTarget = ((int)rfWhlAngTarget + 180) % 360;
 			swerveLib->whl->speedRF *= -1;
 		}
 
-		if (fabs(swerveLib->whl->angleLF - currAng2) > 90 && fabs(swerveLib->whl->angleLF - currAng2) < 270) {
-			swerveLib->whl->angleLF = ((int)swerveLib->whl->angleLF + 180) % 360;
+		if (fabs(lfWhlAngTarget - currAng2) > 90 && fabs(lfWhlAngTarget - currAng2) < 270) {
+			lfWhlAngTarget = ((int)lfWhlAngTarget + 180) % 360;
 			swerveLib->whl->speedLF *= -1;
 		}
 
-		if (fabs(swerveLib->whl->angleLB - currAng3) > 90 && fabs(swerveLib->whl->angleLB - currAng3) < 270) {
-			swerveLib->whl->angleLB = ((int)swerveLib->whl->angleLB + 180) % 360;
+		if (fabs(lbWhlAngTarget - currAng3) > 90 && fabs(lbWhlAngTarget - currAng3) < 270) {
+			lbWhlAngTarget = ((int)lbWhlAngTarget + 180) % 360;
 			swerveLib->whl->speedLB *= -1;
 		}
 
-		if (fabs(swerveLib->whl->angleRB - currAng4) > 90 && fabs(swerveLib->whl->angleRB - currAng4) < 270) {
-			swerveLib->whl->angleRB = ((int)swerveLib->whl->angleRB + 180) % 360;
+		if (fabs(rbWhlAngTarget - currAng4) > 90 && fabs(rbWhlAngTarget - currAng4) < 270) {
+			rbWhlAngTarget = ((int)rbWhlAngTarget + 180) % 360;
 			swerveLib->whl->speedRB *= -1;
 		}
 
 		//Set the PID controllers to angle the wheels properly
-		RFPID->SetSetpoint(WhlAngCalOffset(swerveLib->whl->angleRF, rfWhlAngCalOffset));
-		LFPID->SetSetpoint(WhlAngCalOffset(swerveLib->whl->angleLF, lfWhlAngCalOffset));
-		RBPID->SetSetpoint(WhlAngCalOffset(swerveLib->whl->angleRB, rbWhlAngCalOffset));
-		LBPID->SetSetpoint(WhlAngCalOffset(swerveLib->whl->angleLB, lbWhlAngCalOffset));
+		RFPID->SetSetpoint(rfWhlAngTarget);
+		LFPID->SetSetpoint(lfWhlAngTarget);
+		RBPID->SetSetpoint(rbWhlAngTarget);
+		LBPID->SetSetpoint(lbWhlAngTarget);
 
 		//Set the wheel speed based on what the calculations from the swervelib
 		LFMotDrv->Set(swerveLib->whl->speedLF);
@@ -441,15 +446,15 @@ public:
 		if(cntl2->bX->RE == true) {shooterAngle -= 0.05;}
 
 		shooterAimServo->Set(shooterAngle);
-		//ballShooterMot->SetSetpoint(shooterSpeed);
+		ballShooterMot->SetSetpoint(shooterSpeed);
 
 		double p = SmartDashboard::GetNumber("p: ", 1);
 		double i = SmartDashboard::GetNumber("i: ", 0.2);
 		double d = SmartDashboard::GetNumber("d: ", 0);
 		double f = SmartDashboard::GetNumber("f: ", 1.7);
 
-	//	if(ballShooterMot->GetSpeed() < 2200) ballShooterMot->SetPID(0, 0, 0, 1.8);
-		//else ballShooterMot->SetPID(p,i,d,f);
+		if(ballShooterMot->GetSpeed() < 2200) ballShooterMot->SetPID(0, 0, 0, 1.8);
+		else ballShooterMot->SetPID(p,i,d,f);
 
 		//Gear Loader Tilting
 		if (cntl1->bRB->State == true) gearLoader->Set(Relay::kForward);
@@ -482,15 +487,15 @@ public:
 		
 		//printf("LFEnc: %f RFEnc: %f LBEnc: %f RBEnc: %f Gyro %f\n", LFEncDrv->GetDistance(), RFEncDrv->GetDistance(), LBEncDrv->GetDistance(),RBEncDrv->GetDistance(), gyroManagerRun->getLastValue() );
 
-		printf("Distances: LFEnc: %.2f ", LFEncDrv->GetDistance());
-		printf("RFEnc: %.2f ", RFEncDrv->GetDistance());
-		printf("LBEnc: %.2f ", LBEncDrv->GetDistance());
-		printf("RBEnc: %.2f\n", RBEncDrv->GetDistance());
-		//printf("Swerve Angles rf %.2f, lf %.2f, lb %.2f, rb %.2f\n", swerveLib->whl->angleRF,
-				//swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
+		//printf("Distances: LFEnc: %.2f ", LFEncDrv->GetDistance());
+		//printf("RFEnc: %.2f ", RFEncDrv->GetDistance());
+		//printf("LBEnc: %.2f ", LBEncDrv->GetDistance());
+		//printf("RBEnc: %.2f\n", RBEncDrv->GetDistance());
+		printf("Swerve Angles rf %.2f, lf %.2f, lb %.2f, rb %.2f\n", swerveLib->whl->angleRF,
+				swerveLib->whl->angleLF, swerveLib->whl->angleLB, swerveLib->whl->angleRB);
 		//printf("%.2f, %.2f, %.2f, %.2f\n", swerveLib->whl->speedLF, swerveLib->whl->speedRF,
 				//swerveLib->whl->speedLB, swerveLib->whl->speedRB);
-		printf("Shooter Spd and Angle: %.2f, %.2f\n", shooterSpeed, shooterAngle);
+		//printf("Shooter Spd and Angle: %.2f, %.2f\n", shooterSpeed, shooterAngle);
 		/*printf("%.2f, %.2f, %.2f\n\n", cntl1->LX, cntl1->LY, cntl1->RX);
 		printf("%.5f, %.5f\n\n", gyroManagerRun->getLastValue(), currentFacing);
 		std::cout << cntl1->bA->RE << ClimbMotDrv1->Get() << "\n\n";
@@ -524,8 +529,10 @@ public:
 		//printf("LBEnc: %.2f ", LBEncTurn->Get());
 		//printf("RBEnc: %.2f\n", RBEncTurn->Get());
 
-		if(WhlAngCalButton->Get() == 1)
+		if(WhlAngCalButton->Get() == false)
 		{
+			printf("Encoder CAL values Set\n");
+
 			lfWhlAngCalOffset = LFEncTurn->Get();
 			rfWhlAngCalOffset = RFEncTurn->Get();
 			lbWhlAngCalOffset = LBEncTurn->Get();
@@ -535,7 +542,8 @@ public:
 			prefs->PutDouble("lbWhlAngCalOffset", lbWhlAngCalOffset);
 			prefs->PutDouble("rbWhlAngCalOffset", rbWhlAngCalOffset);
 		}
-		printf("button: %.2f ", WhlAngCalButton->Get());
+
+
 	}
 	
 	double WhlAngCalOffset(double cmd, double offset)
