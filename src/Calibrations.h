@@ -48,7 +48,7 @@ double RFOffset = 1;
 double LBOffset = 1;
 double RBOffset = 1;
 
-double winchDriveFactor = .7;
+double winchDriveFactor = 1;
 double winchDriveAngle = 0;
 
 #endif /* SRC_CALIBRATIONS_H_ */

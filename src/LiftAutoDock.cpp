@@ -10,6 +10,9 @@ liftAutoDock::liftAutoDock()
 	liftAutoDockCmd = false;
 	liftAutoDockState = DO_NOTHING;
 	
+	gearDeployCmd = false;
+	gearDeployTime = 0;
+
 	pegDistToImgCenter = 0;
 	targetDistApart = 0;
 	
@@ -26,6 +29,10 @@ double liftAutoDock::getLADDrvAngCmd(){
 
 double liftAutoDock::getLADDrvRotCmd(){
 	return drvRotCmd;
+}
+
+bool liftAutoDock::getLADGearDeployCmd(){
+	return gearDeployCmd;
 }
 
 void liftAutoDock::zeroDrive(){
@@ -56,9 +63,9 @@ void liftAutoDock::prepVisionData(){
 			targetLock = true;
 			leftTargetDistToImgCenter = contourCenterXs[0] - (liftImageWidth/2 -2);
 			rightTargetDistToImgCenter = contourCenterXs[1] - (liftImageWidth/2 -2);
-			}
-		}
-	}
+		}else {targetLock = false;}
+	}else {targetLock = false;}
+}
 
 void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 
@@ -72,8 +79,14 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 		liftAutoDockState = DO_NOTHING;	
 		//printf("AutoDock: No Command ");
 	} else if(liftAutoDockCmd == true && targetLock == false){
-		printf("AutoDock: No Target Found ");
-		liftAutoDockState = DO_NOTHING;	
+		printf("AutoDock: No Target Found. Gear delay %.2f", gearDeployTime);
+
+		//liftAutoDockState = DO_NOTHING;
+
+		gearDeployTime++;
+		if (gearDeployTime > gearDeployDelay && gearDeployTime < gearDeployDuration) { gearDeployCmd = true; liftAutoDockState = DO_NOTHING;}
+		else if (gearDeployTime > gearDeployDuration) { liftAutoDockState = DO_NOTHING; }
+		else {gearDeployCmd = false;}
 	}
 	
 	//Calculate all info about the lift target positions that is needed to guide the robot
@@ -117,11 +130,11 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 				drvAngCmd = 90 + centerHoldAngle;
 				if(targetDistApart < driveToListSlowDownVerDist ) drvMagCmd = driveToLiftPwrHigh;
 				else drvMagCmd = driveToLiftPwrLow;
-			} else {
+			} /*else {
 				drvMagCmd = 0;
 				drvRotCmd = 0;
 				liftAutoDockState = DONE;
-			}
+			}*/
 			break;	
 			
 		case DONE:
@@ -129,7 +142,7 @@ void liftAutoDock::calcLiftAutoDock(bool autoDockCommand){
 			break;
 		}
 
-		if(liftAutoDockCmd == true) {printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd);}
+		//if(liftAutoDockCmd == true) {printf("HorzDist %i VertDist %i Mag %f Ang %f Rot %f Gear%d\n", pegDistToImgCenter, targetDistApart, drvMagCmd, drvAngCmd, drvRotCmd, gearDeployCmd);}
 	}
 	
 

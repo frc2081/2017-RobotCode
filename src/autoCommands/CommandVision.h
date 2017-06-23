@@ -29,6 +29,7 @@ private:
 	double autoAng;
 
 	double autoRot;
+	double autoGearDeploy;
 
 	commandInput _input;
 };

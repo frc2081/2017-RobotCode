@@ -26,17 +26,23 @@ class liftAutoDock
 		int leftTargetDistToImgCenter, rightTargetDistToImgCenter;
 		bool liftAutoDockCmd;
 		double drvRotCmd, drvAngCmd, drvMagCmd;
+		bool gearDeployCmd;
+		double gearDeployTime;
+
 		
 		//Cals
-		double horzLineUpDrvPwrHigh = .4;
-		double horzLineUpDrvPwrLow = .3;
+		double horzLineUpDrvPwrHigh = .25;
+		double horzLineUpDrvPwrLow = .25;
 		double driveToLiftPwrHigh = .4;
 		double driveToLiftPwrLow = .3;
 		double driveToListSlowDownVerDist = 100;
 		double driveToLiftRot = -0.05;
-		int horzLineUpTolerance = 10; //Target max distance from center of lift to center of image
+		int horzLineUpTolerance = 20; //Target max distance from center of lift to center of image
 		int distToLiftGoal = 300; //When moving toward the lift peg for final docking, how far apart
 									//the targets have to be to indicate the robot has reached the goal
+		double gearDeployDelay = 100;
+		double gearDeployDuration = gearDeployDelay + 15; //duration of time to run gear deploy motor
+
 		//IMAGE PROCESSING CALS
 		//Cals are for a 320x240 image
 		int liftImageWidth = 320;
@@ -72,4 +78,5 @@ class liftAutoDock
 		double getLADDrvMagCmd();
 		double getLADDrvAngCmd();
 		double getLADDrvRotCmd();
+		bool getLADGearDeployCmd();
 };

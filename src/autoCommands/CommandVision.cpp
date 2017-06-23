@@ -29,8 +29,9 @@ commandOutput CommandVision::tick(commandInput input) {
 	autoAng = AD->getLADDrvAngCmd();
 	autoMag = AD->getLADDrvMagCmd();
 	autoRot = AD->getLADDrvRotCmd();
+	autoGearDeploy = AD->getLADGearDeployCmd();
 
-	return commandOutput(autoMag, autoAng, autoRot);
+	return commandOutput(autoMag, autoAng, autoRot, autoGearDeploy);
 }
 
 CommandVision::~CommandVision() {
