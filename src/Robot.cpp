@@ -70,6 +70,7 @@ public:
 
 		prefs = Preferences::GetInstance();
 		WhlAngCalButton = new DigitalInput(0);
+		DemoModeSelectSwitch = new DigitalInput(1);
 
 		lfWhlAngCalOffset = prefs->GetDouble("lfWhlAngCalOffset", 0);
 		rfWhlAngCalOffset = prefs->GetDouble("rfWhlAngCalOffset", 0);
@@ -215,7 +216,7 @@ public:
 	}
 
 	void AutonomousInit() override {
-		if(autoEnable->GetVoltage() <= 1) {
+		if(autoEnable->GetVoltage() <= 1 || DemoModeSelectSwitch->Get() == true) {
 			printf("******************AUTO DISABLED!*********************");
 			return; //if auto enable switch is off, do nothing
 		}
@@ -395,11 +396,18 @@ public:
 
 
 		//Set the wheel speed based on what the calculations from the swervelib
+		if(DemoModeSelectSwitch->Get() == true)
+		{
+			swerveLib->whl->speedLF = swerveLib->whl->speedLF / 2;
+			swerveLib->whl->speedRF = swerveLib->whl->speedRF / 2;
+			swerveLib->whl->speedRB = swerveLib->whl->speedRB / 2;
+			swerveLib->whl->speedLB = swerveLib->whl->speedLB / 2;
+		}
+
 		LFMotDrv->Set(swerveLib->whl->speedLF);
 		RFMotDrv->Set(swerveLib->whl->speedRF);
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
-
 		//*********WINCH***********
 		//Climbing is locked out unless the Y button of the drive controller is also held
 		//This is to prevent accidental command of the winch before the robot is ready to climb

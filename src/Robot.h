@@ -102,6 +102,7 @@ double rbWhlAngTarget = 0;
 
 
 DigitalInput *WhlAngCalButton;
+DigitalInput *DemoModeSelectSwitch;
 Preferences *prefs;
 
 #endif /* SRC_ROBOT_H_ */
