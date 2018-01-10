@@ -1,5 +1,6 @@
 #include "Robot.h"
 
+// For future readers, please note that Doug did a stupid here
 VictorSP *LFMotDrv;
 VictorSP *LBMotDrv;
 VictorSP *RFMotDrv;
@@ -57,6 +58,8 @@ commandInput autoInput;
 commandOutput autoOutput;
 
 double Encoder::PIDGet(){ return this->GetRate();}
+
+// Here's where most of the stupid ends
 
 class Robot: public frc::IterativeRobot {
 public:
