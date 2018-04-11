@@ -132,7 +132,7 @@ public:
 		//Located on the MXP expansion board
 		ballLoad = new VictorSP(15);
 		ballFeederMot = new VictorSP(11);
-		ballShooterMot = new CANTalon(1);
+		//ballShooterMot = new CANTalon(1);
 		shooterAimServo = new Servo(14);
 
 		ballShooterMot->SetTalonControlMode(CANTalon::kSpeedMode);
@@ -189,6 +189,10 @@ public:
 		LBEncDrv->Reset();
 		RBEncDrv->Reset();
 
+		liftOpen = new Solenoid(0);
+		liftClose = new Solenoid(1);
+		liftOpen->Set(false);
+		liftClose->Set(true);
 		//Init all control variables to safe states
 		runShooter = false;
 		feederSpeed = 0;
@@ -366,6 +370,39 @@ public:
 				swerveLib->whl->speedRB = 0;
 			}
 		}
+		//*********WINCH***********
+		//Climbing is locked out unless the Y button of the drive controller is also held
+		//This is to prevent accidental command of the winch before the robot is ready to climb
+		climbSpeed = 0.5;
+
+		if (cntl1->bStart->State && cntl1->bBack->State && cntl1->bLB->State) {
+			liftOpen->Set(true);
+			liftClose->Set(false);
+		} else {
+			liftOpen->Set(false);
+			liftClose->Set(true);
+		}
+		if(cntl1->bStart->State && cntl1->bBack->State && cntl1->bRB->State){
+			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
+			ClimbMotDrv2->Set(-climbSpeed);
+			ClimbMotDrv3->Set(-climbSpeed);
+
+			RFPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, rfWhlAngCalOffset));
+			LFPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, lfWhlAngCalOffset));
+			RBPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, rbWhlAngCalOffset));
+			LBPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, lbWhlAngCalOffset));
+
+
+			LFMotDrv->Set(0.1);
+			RFMotDrv->Set(0.1);
+			RBMotDrv->Set(0.1);
+			LBMotDrv->Set(0.1);
+
+		} else {
+			ClimbMotDrv1->Set(0);
+			ClimbMotDrv2->Set(0);
+			ClimbMotDrv3->Set(0);
+		}
 
 		//Intelligent Swerve imeplementation - prevents any wheel from having to rotate more than 90 degrees to carry out a command
 		if (fabs(swerveLib->whl->angleRF - currAng1) > 90 && fabs(swerveLib->whl->angleRF - currAng1) < 270) {
@@ -408,32 +445,6 @@ public:
 		RFMotDrv->Set(swerveLib->whl->speedRF);
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
-		//*********WINCH***********
-		//Climbing is locked out unless the Y button of the drive controller is also held
-		//This is to prevent accidental command of the winch before the robot is ready to climb
-		climbSpeed = cntl1->RTrig;
-
-		if(cntl1->bY->State == true){
-			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
-			ClimbMotDrv2->Set(-climbSpeed);
-			ClimbMotDrv3->Set(-climbSpeed);
-
-			RFPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, rfWhlAngCalOffset));
-			LFPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, lfWhlAngCalOffset));
-			RBPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, rbWhlAngCalOffset));
-			LBPID->SetSetpoint(WhlAngCalOffset(winchDriveAngle, lbWhlAngCalOffset));
-
-
-			LFMotDrv->Set(climbSpeed*winchDriveFactor);
-			RFMotDrv->Set(climbSpeed*winchDriveFactor);
-			RBMotDrv->Set(climbSpeed*winchDriveFactor);
-			LBMotDrv->Set(climbSpeed*winchDriveFactor);
-
-		} else {
-			ClimbMotDrv1->Set(0);
-			ClimbMotDrv2->Set(0);
-			ClimbMotDrv3->Set(0);
-		}
 
 		//*********INTAKE*********
 		//Get ball intake command and set output

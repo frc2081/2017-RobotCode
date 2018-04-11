@@ -100,6 +100,9 @@ double rfWhlAngTarget = 0;
 double lbWhlAngTarget = 0;
 double rbWhlAngTarget = 0;
 
+Solenoid *liftOpen;
+Solenoid *liftClose;
+
 
 DigitalInput *WhlAngCalButton;
 DigitalInput *DemoModeSelectSwitch;
