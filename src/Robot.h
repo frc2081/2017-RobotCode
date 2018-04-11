@@ -84,6 +84,13 @@ AutoSelector *autoAction;
 
 liftAutoDock *AD;
 
+Solenoid *cheesecakeLiftOpen;
+Solenoid *cheesecakeLiftClose;
+Compressor *compressor;
+DigitalInput *resetswitch;
+
+//Prefrences *_prefs;
+
 extern commandInput autoInput;
 extern commandOutput autoOutput;
 

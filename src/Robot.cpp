@@ -156,6 +156,15 @@ public:
 		LBEncDrv->Reset();
 		RBEncDrv->Reset();
 
+		compressor = new Compressor();
+		compressor->Start();
+
+		cheesecakeLiftOpen = new Solenoid(0);
+		cheesecakeLiftClose = new Solenoid(1);
+
+		cheesecakeLiftOpen->Set(false);
+		cheesecakeLiftClose->Set(true);
+
 		//NOTE: Shooter speed is revolutions per SECOND, not RPM
 		//VERY important that min command from PID be set to 0....otherwise the instant that the motor
 		//exceeded the target speed, it would attempt to reverse the shooter wheel!
@@ -164,6 +173,8 @@ public:
 		shooterPID->SetOutputRange(0,1);
 		shooterPID->SetSetpoint(0);
 		shooterPID->Enable();
+
+		resetswitch = new DigitalInput(0);
 
 		//Init all control variables to safe states
 		runShooter = false;
@@ -288,8 +299,8 @@ public:
 		currAng4 = swerveLib->whl->angleRB;
 
 		//Determine Lift auto docking command
-		if (cntl1->bA->State == true) autoDockCmd = true;
-		else autoDockCmd = false;
+		//if (cntl1->bA->State == true) autoDockCmd = true;
+		//else autoDockCmd = false;
 		
 		AD->calcLiftAutoDock(autoDockCmd);
 	
@@ -302,9 +313,45 @@ public:
 		} else {
 		//Calculate commanded robot motion from the drive controller stick
 		//Converts the two axes of the stick into a vector of angle comAng and magnitude comMag
-		comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI);// + currentFacing;
-		comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
-		comRot = cntl1->RX;
+
+			comAng = (atan2(-cntl1->LX, cntl1->LY) * 180/PI);// + currentFacing;
+			comMag = sqrt(pow(cntl1->LX, 2) + pow(cntl1->LY, 2));
+			comRot = cntl1->RX;
+			//*********WINCH***********
+			//Climbing is locked out unless the Y button of the drive controller is also held
+			//This is to prevent accidental command of the winch before the robot is ready to climb
+			//climbSpeed = cntl1->RTrig;
+			climbSpeed = 0.5;
+			if (cntl1->bStart->State == true && cntl1->bBack->State && cntl1->bLB->State) {
+				cheesecakeLiftOpen->Set(true);
+				cheesecakeLiftClose->Set(false);
+			} else {
+				cheesecakeLiftOpen->Set(false);
+				cheesecakeLiftClose->Set(true);
+			}
+
+			if(cntl1->bStart->State == true && cntl1->bBack->State && cntl1->bRB->State){
+				ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
+				ClimbMotDrv2->Set(-climbSpeed);
+				ClimbMotDrv3->Set(-climbSpeed);
+
+				comAng = 270;
+				comMag = 0.1;
+				//RFPID->SetSetpoint(winchDriveAngle);
+				//LFPID->SetSetpoint(winchDriveAngle);
+				//RBPID->SetSetpoint(winchDriveAngle);
+				//LBPID->SetSetpoint(winchDriveAngle);
+
+				//LFMotDrv->Set(climbSpeed*winchDriveFactor);
+				//RFMotDrv->Set(climbSpeed*winchDriveFactor);
+				//RBMotDrv->Set(climbSpeed*winchDriveFactor);
+				//LBMotDrv->Set(climbSpeed*winchDriveFactor);
+
+			} else {
+				ClimbMotDrv1->Set(0);
+				ClimbMotDrv2->Set(0);
+				ClimbMotDrv3->Set(0);
+			}
 
 			//Calculate the proper values for the swerve drive motion. If there are no inputs, keep the wheels in their previous position
 			if (cntl1->LX != 0 || cntl1->LY != 0 || cntl1->RX != 0) {
@@ -339,10 +386,10 @@ public:
 		}
 
 		//Set the PID controllers to angle the wheels properly
-		RFPID->SetSetpoint(swerveLib->whl->angleRF);
-		LFPID->SetSetpoint(swerveLib->whl->angleLF);
-		RBPID->SetSetpoint(swerveLib->whl->angleRB);
-		LBPID->SetSetpoint(swerveLib->whl->angleLB);
+		RFPID->SetSetpoint(WhlAngCalcOffset(swerveLib->whl->angleRF, RFOffset));
+		LFPID->SetSetpoint(WhlAngCalcOffset(swerveLib->whl->angleLF, LFOffset));
+		RBPID->SetSetpoint(WhlAngCalcOffset(swerveLib->whl->angleRB, RBOffset));
+		LBPID->SetSetpoint(WhlAngCalcOffset(swerveLib->whl->angleLB, LFOffset));
 
 		//Set the wheel speed based on what the calculations from the swervelib
 		LFMotDrv->Set(swerveLib->whl->speedLF);
@@ -350,31 +397,6 @@ public:
 		RBMotDrv->Set(swerveLib->whl->speedRB);
 		LBMotDrv->Set(swerveLib->whl->speedLB);
 
-		//*********WINCH***********
-		//Climbing is locked out unless the Y button of the drive controller is also held
-		//This is to prevent accidental command of the winch before the robot is ready to climb
-		climbSpeed = cntl1->RTrig;
-
-		if(cntl1->bY->State == true){
-			ClimbMotDrv1->Set(-climbSpeed); //Climb commands are negative to run the winch in the mechanically correct direction
-			ClimbMotDrv2->Set(-climbSpeed);
-			ClimbMotDrv3->Set(-climbSpeed);
-
-			RFPID->SetSetpoint(winchDriveAngle);
-			LFPID->SetSetpoint(winchDriveAngle);
-			RBPID->SetSetpoint(winchDriveAngle);
-			LBPID->SetSetpoint(winchDriveAngle);
-
-			LFMotDrv->Set(climbSpeed*winchDriveFactor);
-			RFMotDrv->Set(climbSpeed*winchDriveFactor);
-			RBMotDrv->Set(climbSpeed*winchDriveFactor);
-			LBMotDrv->Set(climbSpeed*winchDriveFactor);
-
-		} else {
-			ClimbMotDrv1->Set(0);
-			ClimbMotDrv2->Set(0);
-			ClimbMotDrv3->Set(0);
-		}
 
 		//*********INTAKE*********
 		//Get ball intake command and set output
@@ -445,6 +467,10 @@ public:
 
 	void DisabledPeriodic() {
 
+		if (resetswitch->Get()) {
+			ZeroEncoders();
+		}
+
 	//	robotAction RA = autoAction->getAction();
 		//robotStation RS = autoFieldPosition->getFieldPosition();
 
@@ -460,6 +486,26 @@ public:
 	}
 	
 private:
+
+	void ZeroEncoders() {
+		LFOffset = LFEncTurn->Get();
+		RFOffset = RFEncTurn->Get();
+		LBOffset = LBEncTurn->Get();
+		RBOffset = RBEncTurn->Get();
+		/*
+		_prefs->PutDouble("LFOffset", LFOffset);
+		_prefs->PutDouble("RFOffset", RFOffset);
+		_prefs->PutDouble("LBOffset", LBOffset);
+		_prefs->PutDouble("RBOffset", RBOffset);
+		*/
+	}
+
+	double WhlAngCalcOffset(double command, double offset) {
+		double target = command + offset;
+		if (target > 360) target -= 360;
+		return target;
+	}
+
 
 	gyroManager *gyroManagerRun;
 	CommandManager *autoCom;
